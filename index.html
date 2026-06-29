@@ -707,7 +707,7 @@ function renderYou(){
 var US={members:[],err:'',res:false};
 function syncUs(){}
 var FACILITATOR_EMAIL='soomin020114@gmail.com';
-function teamRef(uid){return _db.collection('team').doc(uid);}
+function teamRef(uid){return _db.collection('ws_team').doc(uid);}
 function isFacilitator(){return _user&&_user.email===FACILITATOR_EMAIL;}
 MEUS.teamSubmit=function(){
  if(!_user||!_db){alert('로그인이 필요합니다.');return;}
