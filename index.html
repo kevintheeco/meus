@@ -989,19 +989,29 @@ MEUS.youTeamFetch=function(){
     '<div style="margin-bottom:3px"><b style="font-size:14px">'+esc(r.name)+'</b> <span class="pill" style="background:var(--fill);color:var(--ink-soft);font-size:11px">'+rv.arch+'</span></div>'+
     '<div>'+bar+'</div>'+
     '</div>'+
-    '<button class="btn dark" style="padding:6px 14px;font-size:13px;flex-shrink:0" onclick="MEUS.youTeamSelect('+i+')">선택</button>'+
+    '<div style="display:flex;gap:5px;flex-shrink:0">'+
+    '<button class="btn" style="padding:5px 10px;font-size:12px" onclick="MEUS.youTeamSelect(\'a\','+i+')">나로</button>'+
+    '<button class="btn dark" style="padding:5px 10px;font-size:12px" onclick="MEUS.youTeamSelect(\'b\','+i+')">상대로</button>'+
+    '</div>'+
     '</div>';
   }).join('');
-  picker.innerHTML='<div class="card" style="padding:14px 18px;margin-bottom:12px"><div style="font-size:13px;color:var(--mute);margin-bottom:4px">팀원 선택 — 한 명 고르면 상대 코드가 자동으로 채워집니다</div>'+listHtml+'</div>';
+  picker.innerHTML='<div class="card" style="padding:14px 18px;margin-bottom:12px"><div style="font-size:13px;color:var(--mute);margin-bottom:10px">팀원 선택 — <b>나로</b> 또는 <b>상대로</b> 지정해 두 사람을 고르세요</div>'+listHtml+'</div>';
  }).catch(function(e){picker.innerHTML='<div class="card" style="padding:14px 18px;margin-bottom:12px"><p style="margin:0;color:#C0392B;font-size:13px">오류: '+e.message+'</p></div>';});
 };
-MEUS.youTeamSelect=function(i){
+MEUS.youTeamSelect=function(slot,i){
  var row=(MEUS._youTeamRows||[])[i];if(!row)return;
- var nb=document.getElementById('you_nb');if(nb)nb.value=row.name;
- var yb=document.getElementById('you_b');if(yb)yb.value=row.code;
- YOU.nb=row.name;YOU.b=row.code;
+ if(slot==='a'){
+  var na=document.getElementById('you_na');if(na)na.value=row.name;
+  var ya=document.getElementById('you_a');if(ya)ya.value=row.code;
+  YOU.na=row.name;YOU.a=row.code;
+ } else {
+  var nb=document.getElementById('you_nb');if(nb)nb.value=row.name;
+  var yb=document.getElementById('you_b');if(yb)yb.value=row.code;
+  YOU.nb=row.name;YOU.b=row.code;
+ }
+ var label=slot==='a'?'"나" 슬롯':'"상대" 슬롯';
  var picker=document.getElementById('you-team-picker');
- if(picker)picker.innerHTML='<div style="padding:8px 0 4px;font-size:13px;color:var(--mute)">✓ <b>'+esc(row.name)+'</b> 선택됨 — 아래 "두 사람 분석하기"를 눌러주세요.</div>';
+ if(picker){var cur=picker.querySelector('.pick-status');if(cur)cur.remove();var msg=document.createElement('div');msg.className='pick-status';msg.style.cssText='padding:6px 0 2px;font-size:13px;color:var(--mute)';msg.innerHTML='✓ <b>'+esc(row.name)+'</b> → '+label+' 설정됨';picker.insertBefore(msg,picker.firstChild);}
 };
 
 function renderYou(){
@@ -1009,7 +1019,7 @@ function renderYou(){
   var err=YOU.err?'<p style="margin:0 0 12px;color:#C0392B;font-size:14.5px">'+YOU.err+'</p>':'';
   app.innerHTML='<div class="wrap fade"><div class="head"><span class="ix">YOU</span><div><div class="kicker" style="margin-bottom:4px">2인 보완 · 짝 게임</div><h1>너를 읽고,<br>나를 맞춘다.</h1></div></div><p style="color:var(--ink-soft);font-size:16px;line-height:1.6;margin:14px 0 18px;max-width:34em">내 강점이 네 약점이면 "내가 도와줄게", 내 약점이 네 강점이면 "미안, 부탁해". 두 사람의 다이얼을 맞붙여 보완·과용조절을 읽습니다.</p>'+
   err+
-  '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px"><label style="font-weight:700">나</label><button class="btn" style="padding:7px 12px;font-size:14px" onclick="MEUS.youMine(\'a\')">내 저장 결과 불러오기</button></div><input id="you_na" placeholder="이름 (선택)" value="'+esc(YOU.na)+'" style="margin-bottom:9px"><textarea id="you_a" rows="2" placeholder="내 결과 코드 (M1…)" style="font-family:\'JetBrains Mono\',monospace;font-size:13.5px">'+esc(YOU.a)+'</textarea></div>'+
+  '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px"><label style="font-weight:700">나</label><div style="display:flex;gap:8px"><button class="btn" style="padding:7px 12px;font-size:13.5px" onclick="MEUS.youMine(\'a\')">내 저장</button><button class="btn" style="padding:7px 12px;font-size:13.5px" onclick="MEUS.youTeamFetch()">팀에서 불러오기</button></div></div><input id="you_na" placeholder="이름 (선택)" value="'+esc(YOU.na)+'" style="margin-bottom:9px"><textarea id="you_a" rows="2" placeholder="내 결과 코드 (M1…)" style="font-family:\'JetBrains Mono\',monospace;font-size:13.5px">'+esc(YOU.a)+'</textarea></div>'+
   '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px"><label style="font-weight:700">상대</label><div style="display:flex;gap:8px"><button class="btn" style="padding:7px 12px;font-size:13.5px" onclick="MEUS.youMine(\'b\')">내 저장</button><button class="btn" style="padding:7px 12px;font-size:13.5px" onclick="MEUS.youTeamFetch()">팀에서 불러오기</button></div></div><input id="you_nb" placeholder="상대 이름 (선택)" value="'+esc(YOU.nb)+'" style="margin-bottom:9px"><textarea id="you_b" rows="2" placeholder="상대 결과 코드 (M1…)" style="font-family:\'JetBrains Mono\',monospace;font-size:13.5px">'+esc(YOU.b)+'</textarea></div>'+
   '<div id="you-team-picker"></div>'+
   '<button class="btn dark" onclick="MEUS.youGo()" style="width:100%;font-size:16px">두 사람 분석하기 →</button>'+
