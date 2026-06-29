@@ -269,6 +269,30 @@ var E=[
  {id:'e5',t:'회복하는 방식',o:[{d:'drive',t:'바로 다음 일로'},{d:'connect',t:'사람을 만남'},{d:'order',t:'혼자 정리·정돈'},{d:'explore',t:'새 자극을 찾음'}]}
 ];
 
+/* ---------- PART F. 가치관 렌즈 (1) — 우선순위 (결정의 렌즈) ---------- */
+var VAL=[
+ {k:'speed',t:'성과·속도',d:'빠르게 해내고 결과로 보여주는 것',drv:'drive'},
+ {k:'people',t:'관계·화합',d:'사람과 신뢰, 팀 분위기',drv:'connect'},
+ {k:'quality',t:'정확·품질',d:'빈틈없는 완성도와 기준',drv:'order'},
+ {k:'novel',t:'혁신·성장',d:'새 시도와 배움',drv:'explore'},
+ {k:'auto',t:'자율·독립',d:'내 방식대로 정할 자유',drv:'explore'},
+ {k:'stable',t:'안정·예측',d:'흔들리지 않는 안정감',drv:'order'}
+];
+
+/* ---------- PART K. 역량 스냅샷 (8) — 행동 빈도 (자기과대 보정) ---------- */
+/* dir 'pos' = 자주 발휘할수록 강함 · 'neg' = 자주일수록 약함(반전) */
+var KMP=[
+ {id:'k1',comp:'time',label:'시간관리',t:'여러 일이 몰려도 우선순위를 정해 제때 끝냈다',dir:'pos'},
+ {id:'k2',comp:'time',label:'시간관리',t:'마감을 놓치거나 닥쳐서 허둥댔다',dir:'neg'},
+ {id:'k3',comp:'social',label:'친화력',t:'처음 본 사람과도 금세 편하게 어울렸다',dir:'pos'},
+ {id:'k4',comp:'exec',label:'추진력',t:'막힌 일을 끝까지 밀어붙여 굴러가게 했다',dir:'pos'},
+ {id:'k5',comp:'finish',label:'마무리력',t:'시작은 했는데 끝을 못 맺고 흐지부지됐다',dir:'neg'},
+ {id:'k6',comp:'crisis',label:'위기대응',t:'갑작스런 문제를 침착하게 풀어냈다',dir:'pos'},
+ {id:'k7',comp:'persuade',label:'설득력',t:'반대하던 사람을 설득해 함께 움직였다',dir:'pos'},
+ {id:'k8',comp:'detail',label:'꼼꼼함',t:'남이 놓친 오류나 빈틈을 미리 잡아냈다',dir:'pos'}
+];
+var COMP=[{k:'time',label:'시간관리'},{k:'social',label:'친화력'},{k:'exec',label:'추진력'},{k:'finish',label:'마무리력'},{k:'crisis',label:'위기대응'},{k:'persuade',label:'설득력'},{k:'detail',label:'꼼꼼함'}];
+
 /* ---------- 결과 텍스트 ---------- */
 var PF={
  drive:{m:'목표 달성·성과·속도·영향력으로 움직인다. 정체와 무능을 가장 못 견딘다.',nd:'명확한 목표 · 자율성 · 빠른 결정 · 결과 인정',tr:'우유부단 · 시간 낭비 · 통제권 상실',cm:'결론부터, 간결하게.',wk:'큰 목표와 데드라인을 주고 방법은 맡겨라. 결정 전 "한 박자 점검" 신호를 합의해두면 독주를 막는다.',sh:['결단 → 독단·성급','주도 → 통제·마이크로매니징','성취 → 과속·과정 무시']},
@@ -280,7 +304,7 @@ var AR={drive_connect:'캡틴',drive_order:'집행관',drive_explore:'개척자'
 var AD={캡틴:'사람을 끌고 결과를 내는 리더',집행관:'강하게 밀되 빈틈없이 관철하는',개척자:'빠르게 새 길을 여는',코치:'사람을 챙기며 끌고 가는',살림꾼:'사람도 빈틈도 함께 챙기는',촉진자:'사람을 모아 새 시도를 끌어내는',관리자:'원칙 위에서 결과를 내는',지킴이:'신뢰와 안정으로 팀을 받치는',설계자:'구조와 아이디어를 잇는',비저너리:'비전을 추진력으로 밀어붙이는',영감가:'사람을 설득해 변화를 이끄는',아키텍트:'새 아이디어를 정교하게 구현하는',통역자:'상황 따라 역할을 바꾸며 사람들을 잇는'};
 
 /* ---------- 상태 ---------- */
-function blank(){return{phase:'intro',step:0,name:'',A:{},B:{},C:{},D:{},E:{},reflection:'',hint:false,shared:false};}
+function blank(){return{phase:'intro',step:0,name:'',A:{},B:{},C:{},D:{},E:{},V:[],K:{},reflection:'',hint:false,shared:false};}
 var S=blank();
 
 /* STEPS 빌드 */
@@ -290,6 +314,8 @@ for(var i=0;i<B.length;i+=3)STEPS.push({type:'pair',sec:'양자택일',items:B.s
 for(var j=0;j<C.length;j+=4)STEPS.push({type:'dial',sec:'강점 다이얼',items:C.slice(j,j+4)});
 D.forEach(function(q){STEPS.push({type:'conflict',sec:'갈등 시퀀스',item:q});});
 for(var k=0;k<E.length;k+=3)STEPS.push({type:'energy',sec:'에너지·소진',items:E.slice(k,k+3)});
+STEPS.push({type:'values',sec:'가치관 · 결정의 렌즈'});
+for(var vk=0;vk<KMP.length;vk+=4)STEPS.push({type:'competency',sec:'역량 스냅샷',items:KMP.slice(vk,vk+4)});
 STEPS.push({type:'reflection',sec:'마무리 메모'});
 
 var app=document.getElementById('app');
@@ -305,6 +331,8 @@ function done(st){
  if(st.type==='dial')return st.items.every(function(q){return S.C[q.id]!=null;});
  if(st.type==='conflict')return(S.D[st.item.id]||[]).length===3;
  if(st.type==='energy')return st.items.every(function(q){return S.E[q.id]!=null;});
+ if(st.type==='values')return(S.V||[]).length===3;
+ if(st.type==='competency')return st.items.every(function(q){return S.K[q.id]!=null;});
  return true;
 }
 
@@ -328,7 +356,13 @@ function compute(s){
  var dial={};C.forEach(function(q){var v=s.C[q.id];if(v==null)return;if(!dial[q.f])dial[q.f]={over:0,under:0,has:true};dial[q.f][q.z]=v;});
  // 갈등 시퀀스
  var seq=D.map(function(q){return(s.D[q.id]||[])[0]||null;});
- return{fs:fs,ds:ds,bl:bl,rk:rk,p:p,s:sd,lo:lo,bal:bal,arch:arch,dial:dial,seq:seq};
+ // 가치관(상위 3 우선순위) — 키 배열
+ var vals=(s.V||[]).slice(0,3);
+ // 역량(0–3 레벨, 행동빈도 / neg 반전 / time은 2문항 평균)
+ var comp={};COMP.forEach(function(c){comp[c.k]={sum:0,n:0};});
+ KMP.forEach(function(q){var v=s.K[q.id];if(v==null)return;var sc=q.dir==='neg'?(3-v):v;comp[q.comp].sum+=sc;comp[q.comp].n++;});
+ var compLv={};COMP.forEach(function(c){compLv[c.k]=comp[c.k].n?Math.round(comp[c.k].sum/comp[c.k].n*10)/10:null;});
+ return{fs:fs,ds:ds,bl:bl,rk:rk,p:p,s:sd,lo:lo,bal:bal,arch:arch,dial:dial,seq:seq,vals:vals,comp:compLv};
 }
 function dialZone(over,under){
  if(over>=2&&over>under)return'over';
@@ -355,13 +389,15 @@ function packAnswers(s){
  C.forEach(function(q){var v=s.C[q.id];slots.push(v==null?0:v);});
  D.forEach(function(q){var r=s.D[q.id]||[];for(var i=0;i<3;i++){var pos=r.indexOf(q.o[i].m);slots.push(pos<0?0:pos+1);}});
  E.forEach(function(q){var v=s.E[q.id];slots.push(v==null?0:DK.indexOf(v));});
+ VAL.forEach(function(vd){var pos=(s.V||[]).indexOf(vd.k);slots.push(pos<0?0:pos+1);});
+ KMP.forEach(function(q){var v=s.K[q.id];slots.push(v==null?0:v);});
  var bytes=[];for(var i=0;i<slots.length;i+=4)bytes.push((slots[i]||0)|((slots[i+1]||0)<<2)|((slots[i+2]||0)<<4)|((slots[i+3]||0)<<6));
  var bin='';bytes.forEach(function(b){bin+=String.fromCharCode(b);});
- return 'M2'+btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+ return 'M3'+btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 }
 function unpackAnswers(code){
  try{
-  if(!code||code.slice(0,2)!=='M2')return null;
+  if(!code||code.slice(0,2)!=='M3')return null;
   var b64=code.slice(2).replace(/-/g,'+').replace(/_/g,'/');var bin=atob(b64);
   var slots=[];for(var i=0;i<bin.length;i++){var b=bin.charCodeAt(i);slots.push(b&3,(b>>2)&3,(b>>4)&3,(b>>6)&3);}
   var s=blank(),idx=0;
@@ -370,6 +406,8 @@ function unpackAnswers(code){
   C.forEach(function(q){s.C[q.id]=slots[idx++];});
   D.forEach(function(q){var picks=[];for(var i=0;i<3;i++){var v=slots[idx++];if(v>0)picks.push([q.o[i].m,v]);}picks.sort(function(a,b){return a[1]-b[1];});s.D[q.id]=picks.map(function(p){return p[0];});});
   E.forEach(function(q){s.E[q.id]=DK[slots[idx++]];});
+  var vpicks=[];VAL.forEach(function(vd){var v=slots[idx++];if(v>0)vpicks.push([vd.k,v]);});vpicks.sort(function(a,b){return a[1]-b[1];});s.V=vpicks.map(function(p){return p[0];});
+  KMP.forEach(function(q){s.K[q.id]=slots[idx++];});
   return s;
  }catch(e){return null;}
 }
@@ -384,6 +422,8 @@ window.MEUS={
  dial:function(qid,v){S.C[qid]=v;S.hint=false;renderApp();},
  conf:function(qid,m){var a=(S.D[qid]||[]).slice();var k=a.indexOf(m);if(k>=0)a.splice(k,1);else if(a.length<3)a.push(m);S.D[qid]=a;S.hint=false;renderApp();},
  energy:function(qid,d){S.E[qid]=d;S.hint=false;renderApp();},
+ val:function(k){var a=(S.V||[]).slice();var i=a.indexOf(k);if(i>=0)a.splice(i,1);else if(a.length<3)a.push(k);S.V=a;S.hint=false;renderApp();},
+ komp:function(qid,v){S.K[qid]=v;S.hint=false;renderApp();},
  start:function(){var el=document.getElementById('nm');if(el)S.name=el.value;S.phase='assess';S.step=0;renderApp();window.scrollTo(0,0);},
  resume:function(){var c;try{c=localStorage.getItem('meus.last');}catch(e){}var st=unpackAnswers(c);if(st){try{st.name=localStorage.getItem('meus.name')||'';}catch(e){}S=st;S.phase='result';renderApp();window.scrollTo(0,0);}},
  next:function(){var st=STEPS[S.step];if(!done(st)){S.hint=true;renderApp();return;}if(S.step<STEPS.length-1){S.step++;S.hint=false;}else{S.phase='result';try{localStorage.setItem('meus.last',packAnswers(S));localStorage.setItem('meus.name',S.name||'');}catch(e){}}renderApp();window.scrollTo(0,0);},
@@ -409,7 +449,7 @@ function renderApp(){
   '<div class="head"><span class="ix">ME</span><div><div class="kicker" style="margin-bottom:5px">개인 진단 · 12 facet 모델</div><h1>나를 움직이는 힘을<br>한 장으로 읽다.</h1></div></div>'+
   '<p style="color:var(--ink-soft);font-size:clamp(15px,2.2vw,18px);line-height:1.6;margin:16px 0 0;max-width:30em">검사는 사람을 네 글자에 가두는 게 아닙니다. 같은 사람 안의 결을 더 잘게 나눠, "지지는 잘 하는데 아무나 믿진 않는다" 같은 모순처럼 보이던 진실을 해상도 높게 드러냅니다.</p>'+
   '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:24px">'+dh+'</div>'+
-  '<div class="card" style="margin-top:22px"><div class="mono" style="font-size:11px;color:var(--faint);letter-spacing:.06em;margin-bottom:16px">60 문항 · 약 20분 · 자동 채점 · 발표·인쇄용 결과지</div><label style="font-weight:700;display:block;margin-bottom:8px;font-size:14px">이름 <span style="font-weight:400;color:var(--faint)">(결과지·워크숍용, 선택)</span></label><input id="nm" oninput="MEUS.nm(this.value)" placeholder="예) 김수민" value="'+esc(S.name)+'"><button class="btn dark" onclick="MEUS.start()" style="width:100%;margin-top:14px;font-size:16px">진단 시작하기 →</button>'+resumed+'</div>'+
+  '<div class="card" style="margin-top:22px"><div class="mono" style="font-size:11px;color:var(--faint);letter-spacing:.06em;margin-bottom:16px">약 68문항 · 20–25분 · 동력·가치관·역량까지 · 발표·인쇄용 결과지</div><label style="font-weight:700;display:block;margin-bottom:8px;font-size:14px">이름 <span style="font-weight:400;color:var(--faint)">(결과지·워크숍용, 선택)</span></label><input id="nm" oninput="MEUS.nm(this.value)" placeholder="예) 김수민" value="'+esc(S.name)+'"><button class="btn dark" onclick="MEUS.start()" style="width:100%;margin-top:14px;font-size:16px">진단 시작하기 →</button>'+resumed+'</div>'+
   '<p style="text-align:center;font-size:12px;color:var(--faint);margin-top:18px">자기보고식 진단 · 채용·평가가 아닌 상호 이해를 위한 도구 · <a href="#/decoder" style="color:var(--mute)">먼저 해독표 보기</a></p></div>';
   return;
  }
@@ -423,6 +463,8 @@ function renderApp(){
   else if(st.type==='conflict'){var c=st.item;var ord=S.D[c.id]||[];var oh='';c.o.forEach(function(o){var idx=ord.indexOf(o.m);var on=idx>=0;oh+='<button class="rank" onclick="MEUS.conf(\''+c.id+'\',\''+o.m+'\')" style="'+(on?'border:1.5px solid '+MD[o.m].hex:'')+'"><span class="rdot" style="'+(on?'background:'+MD[o.m].hex+';color:var(--screen);border-color:'+MD[o.m].hex:'')+'">'+(on?idx+1:'·')+'</span><span>'+o.t+'</span></button>';});
    body='<div class="kicker" style="margin-bottom:9px">'+c.s+'</div><h3 style="font-size:clamp(20px,3vw,27px);line-height:1.35;letter-spacing:-.02em;margin:0 0 7px">'+c.t+'</h3><p style="margin:0 0 22px;color:var(--mute);font-size:14px">나와 가까운 순서대로 1 → 2 → 3을 탭하세요.</p>'+oh;}
   else if(st.type==='energy'){st.items.forEach(function(q){var v=S.E[q.id];var oh='';q.o.forEach(function(o){var on=v===o.d;oh+='<button class="rank" onclick="MEUS.energy(\''+q.id+'\',\''+o.d+'\')" style="'+(on?'border:1.5px solid var('+DR[o.d].v+')':'')+'"><span class="rdot" style="'+(on?'background:var('+DR[o.d].v+');color:var(--screen);border-color:transparent':'')+'">'+(on?'●':'·')+'</span><span>'+o.t+'</span></button>';});body+='<div style="margin-bottom:22px"><h3 style="margin:0 0 13px;font-size:17px">'+q.t+'</h3>'+oh+'</div>';});}
+  else if(st.type==='values'){var oh='';VAL.forEach(function(v){var idx=(S.V||[]).indexOf(v.k);var on=idx>=0;oh+='<button class="rank" onclick="MEUS.val(\''+v.k+'\')" style="'+(on?'border:1.5px solid var(--ink);background:var(--panel)':'')+'"><span class="rdot" style="'+(on?selBadge:'')+'">'+(on?idx+1:'·')+'</span><span><b>'+v.t+'</b> <span style="color:var(--mute);font-weight:400;font-size:13.5px">'+v.d+'</span></span></button>';});body='<div class="kicker" style="margin-bottom:11px">Values · 결정의 렌즈</div><h3 style="font-size:clamp(20px,3vw,27px);line-height:1.35;letter-spacing:-.02em;margin:0 0 7px">일할 때 더 중요하게 지키는 것</h3><p style="margin:0 0 22px;color:var(--mute);font-size:14px">가장 중요한 1·2·3순위를 차례로 탭하세요. 충돌은 보통 "누가 옳냐"가 아니라 여기 1순위가 달라서 생깁니다.</p>'+oh;}
+  else if(st.type==='competency'){body+='<p style="color:var(--mute);margin:2px 2px 16px;font-size:14px">최근 한 달, 아래와 같았던 적이 <b style="color:var(--ink)">몇 번</b> 있었나요? 솔직히 — 자기를 후하게 보지 마세요.</p>';st.items.forEach(function(q){var v=S.K[q.id];var fh='';FREQ.forEach(function(lab,fi){var on=v===fi;fh+='<button class="fq'+(on?' on':'')+'" onclick="MEUS.komp(\''+q.id+'\','+fi+')" style="'+(on?'background:var(--ink)':'')+'">'+lab+'</button>';});body+='<div class="card" style="padding:18px"><p style="margin:0 0 13px;font-weight:600;line-height:1.45">'+q.t+'</p><div class="freq">'+fh+'</div></div>';});}
   else{body='<div class="kicker" style="margin-bottom:11px">Closing note</div><h3 style="font-size:22px;margin:0 0 6px">마무리 메모 <span style="font-weight:400;font-size:15px;color:var(--faint)">(선택)</span></h3><p style="margin:0 0 14px;color:var(--mute);font-size:14px">동료들에게 꼭 알려주고 싶은 나의 한 가지가 있다면?</p><textarea rows="4" oninput="MEUS.rf(this.value)" placeholder="예) 저는 말이 없어질 때가 화난 게 아니라 생각 정리 중인 거예요.">'+esc(S.reflection)+'</textarea><p style="margin:18px 0 0;color:var(--connect);font-weight:700">거의 다 왔어요. 결과를 확인해 보세요.</p>';}
   var hint=(S.hint&&!done(st))?'<p style="margin:11px 0 0;text-align:center;font-size:13px;color:#B0391F">이 화면의 항목을 모두 채워주세요.</p>':'';
   var last=S.step===STEPS.length-1;
@@ -475,6 +517,16 @@ function renderResult(){
  var stl=['처음 부딪힐 때','평행선일 때','더는 못 참을 때'];var seqc='';r.seq.forEach(function(m,idx){seqc+='<div style="flex:1;min-width:148px;border:1px solid var(--hairline);border-radius:2px;padding:14px 16px;background:var(--panel)"><div class="mono" style="font-size:10px;color:var(--faint);margin-bottom:8px">'+(idx+1)+'단계 · '+stl[idx]+'</div><div style="display:flex;align-items:center;gap:7px"><span style="width:9px;height:9px;border-radius:50%;background:'+(m?MD[m].hex:'var(--faint)')+'"></span><span style="font-weight:700;font-size:16px">'+(m?MD[m].name:'-')+'</span><span class="display" style="font-size:12px;color:var(--mute)">'+(m?MD[m].en:'')+'</span></div></div>';if(idx<2)seqc+='<div style="display:flex;align-items:center;color:var(--rule-strong);font-family:var(--font-mono)">→</div>';});
  var seqL='';seqText(r.seq).forEach(function(t){seqL+='<p style="margin:8px 0 0;color:var(--mute);font-size:13.5px">▸ '+t+'</p>';});
  H+='<div style="margin-top:clamp(28px,4vw,44px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,28px)"><div class="sec" style="margin:0 0 16px">Conflict sequence · 갈등 시퀀스</div><div style="display:flex;align-items:stretch;gap:10px;flex-wrap:wrap">'+seqc+'</div>'+seqL+'</div>';
+ // 결정의 렌즈 (가치관)
+ if(r.vals&&r.vals.length){var vh='';r.vals.forEach(function(k,i){var vd=VAL.filter(function(v){return v.k===k;})[0];if(!vd)return;vh+='<span style="display:inline-flex;align-items:center;gap:8px;border:1px solid var(--rule);border-radius:2px;padding:9px 14px;margin:0 9px 9px 0;'+(i===0?'background:var('+DR[vd.drv].v+');color:var(--screen);border-color:transparent':'')+'"><span class="mono" style="font-size:11px;'+(i===0?'':'color:var(--faint)')+'">'+(i+1)+'</span> <b>'+vd.t+'</b></span>';});
+  var v0=VAL.filter(function(v){return v.k===r.vals[0];})[0];
+  var vT=v0?'결정의 1순위는 <b style="color:var('+DR[v0.drv].v+')">'+v0.t+'</b>입니다. 회의에서 이걸 먼저 챙기고, 충돌은 대개 상대의 1순위가 달라서 생깁니다 — "누가 옳냐"가 아니라 "무엇을 먼저 두냐"의 차이.':'';
+  H+='<div style="margin-top:clamp(28px,4vw,44px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,28px)"><div class="sec" style="margin:0 0 14px">Decision lens · 결정의 렌즈 (가치 우선순위)</div><div style="margin-bottom:8px">'+vh+'</div><p style="margin:6px 0 0;color:var(--ink-soft);font-size:14px">'+vT+'</p></div>';}
+ // 강점 포트레이트 (역량)
+ var compRows=COMP.slice().filter(function(c){return r.comp[c.k]!=null;}).sort(function(a,b){return r.comp[b.k]-r.comp[a.k];});
+ if(compRows.length){var crh='';compRows.forEach(function(c){var lv=r.comp[c.k];var pct=Math.round(lv/3*100);var word=lv>=2.5?'아주 자주':lv>=1.5?'자주':lv>=0.7?'가끔':'드묾';crh+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><span style="flex:none;width:60px;font-size:13px">'+c.label+'</span><div style="flex:1">'+fillbar(pct,'var(--ink)')+'</div><span class="mono" style="flex:none;width:54px;text-align:right;font-size:11px;color:var(--mute)">'+word+'</span></div>';});
+  var top2=compRows.slice(0,2).map(function(c){return c.label;}).join(' · ');
+  H+='<div style="margin-top:clamp(28px,4vw,44px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,28px)"><div class="sec" style="margin:0 0 6px">Strength portrait · 강점 포트레이트 (최근 행동)</div><p style="margin:0 0 16px;color:var(--mute);font-size:13.5px">동력이 "왜 움직이나"라면, 이건 최근 행동에서 실제로 자주 나온 강점입니다.</p>'+crh+'<p style="margin:12px 0 0;color:var(--ink-soft);font-size:14px">요즘 가장 자주 발휘되는 강점은 <b>'+top2+'</b>입니다.</p></div>';}
  // 나 사용설명서 (4블록)
  var pf=PF[r.p];var anti=ANTI[r.p].map(function(d){return '<b style="color:var('+DR[d].v+')">'+DR[d].name+'</b>';}).join('·');
  var shadF=FK.filter(function(f){return r.dial[f]&&dialZone(r.dial[f].over||0,r.dial[f].under||0)==='over';});
@@ -501,7 +553,7 @@ function renderResult(){
 /* ---------- 렌더: 랜딩 ---------- */
 function renderLanding(){
  var mods=[
-  {k:'me',on:true,col:'--drive',t:'나',en:'Me',d:'60문항으로 4동력·12 facet·강점 다이얼을 진단하고, 발표·인쇄용 결과지를 받습니다.',cta:'진단 시작',href:'#/me'},
+  {k:'me',on:true,col:'--drive',t:'나',en:'Me',d:'동력·12 facet·강점 다이얼에 가치관·역량까지 진단하고, 발표·인쇄용 결과지를 받습니다.',cta:'진단 시작',href:'#/me'},
   {k:'you',on:true,col:'--connect',t:'너',en:'You',d:'두 사람의 코드를 맞대 보완·과용조절을 찾습니다. "내가 도와줄게 / 미안, 부탁해".',cta:'2인 분석',href:'#/you'},
   {k:'us',on:true,col:'--order',t:'우리',en:'Us',d:'팀 전체의 분포 지도·보완 매트릭스·집단 사각지대를 그립니다.',cta:'팀 지도',href:'#/us'}
  ];
@@ -510,7 +562,7 @@ function renderLanding(){
  app.innerHTML='<div class="wrap fade">'+
  '<div style="border-top:2px solid var(--ink);padding-top:18px"><div class="kicker" style="color:var(--drive);margin-bottom:18px">업무성향 진단 · 12 facet 모델</div><h1 style="font-size:clamp(34px,7vw,68px);line-height:1.05;letter-spacing:-.03em;max-width:13em">나를 알고,<br>너를 읽고,<br>우리를 맞춘다.</h1><p style="font-size:clamp(15px,2.2vw,19px);line-height:1.6;color:var(--ink-soft);margin:22px 0 0;max-width:30em">검사는 사람을 네 글자에 가두는 게 아닙니다. 같은 사람 안의 결을 더 잘게 나눠, 모순처럼 보이던 진실을 해상도 높게 드러냅니다.</p></div>'+
  '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(212px,1fr));gap:14px;margin:clamp(36px,6vw,56px) 0 0">'+cards+'</div>'+
- '<div style="display:flex;gap:24px;flex-wrap:wrap;margin-top:clamp(30px,4vw,44px);border-top:1px solid var(--hairline);padding-top:16px" class="mono"><span style="font-size:11px;letter-spacing:.06em;color:var(--faint)">60 문항</span><span style="font-size:11px;letter-spacing:.06em;color:var(--faint)">15–20 분</span><span style="font-size:11px;letter-spacing:.06em;color:var(--faint)">자기보고식</span><span style="font-size:11px;letter-spacing:.06em;color:var(--faint)">채용·평가 아님</span><a href="#/decoder" style="font-size:11px;letter-spacing:.06em;color:var(--mute);margin-left:auto">해독표 읽기 →</a></div>'+
+ '<div style="display:flex;gap:24px;flex-wrap:wrap;margin-top:clamp(30px,4vw,44px);border-top:1px solid var(--hairline);padding-top:16px" class="mono"><span style="font-size:11px;letter-spacing:.06em;color:var(--faint)">약 68문항</span><span style="font-size:11px;letter-spacing:.06em;color:var(--faint)">20–25 분</span><span style="font-size:11px;letter-spacing:.06em;color:var(--faint)">자기보고식</span><span style="font-size:11px;letter-spacing:.06em;color:var(--faint)">채용·평가 아님</span><a href="#/decoder" style="font-size:11px;letter-spacing:.06em;color:var(--mute);margin-left:auto">해독표 읽기 →</a></div>'+
  '<p style="text-align:center;font-size:12px;color:var(--faint);margin-top:22px">자기보고식 진단 · 채용·평가가 아닌 상호 이해를 위한 도구</p></div>';
 }
 
@@ -564,6 +616,10 @@ function renderYou(){
  var t1=temperRows(pa,pb,na,nb),t2=temperRows(pb,pa,nb,na);
  H+='<div class="sec" style="margin:clamp(26px,3vw,34px) 0 14px">과용 조절</div>';
  H+=(t1||t2)?(t1+t2):'<div class="card"><p style="color:var(--mute);font-size:14.5px;margin:0">지금 응답에선 둘 다 뚜렷한 과용 구간이 적어요. 좋은 신호입니다.</p></div>';
+ // 결정 기준(가치 충돌)
+ if(pa.r.vals&&pa.r.vals.length&&pb.r.vals&&pb.r.vals.length){var va=VAL.filter(function(v){return v.k===pa.r.vals[0];})[0],vb=VAL.filter(function(v){return v.k===pb.r.vals[0];})[0];
+  var vT=(pa.r.vals[0]===pb.r.vals[0])?'두 사람의 1순위 가치가 <b style="color:var('+DR[va.drv].v+')">'+va.t+'</b>로 같아요 — 결정 기준이 잘 맞아 부딪힐 일이 적습니다.':'<b>'+esc(na)+'</b>의 1순위는 <b style="color:var('+DR[va.drv].v+')">'+va.t+'</b>, <b>'+esc(nb)+'</b>는 <b style="color:var('+DR[vb.drv].v+')">'+vb.t+'</b>. 부딪힐 땐 보통 "누가 옳냐"가 아니라 여기서 갈립니다 — 결정 전에 "이번엔 뭘 먼저 둘까"를 맞춰두면 충돌이 줄어요.';
+  H+='<div class="sec" style="margin:clamp(26px,3vw,34px) 0 14px">결정 기준 · 가치 렌즈</div><div style="border:1px solid var(--rule);border-radius:2px;background:var(--panel);padding:16px 18px"><p style="margin:0;font-size:14.5px;color:var(--ink-soft)">'+vT+'</p></div>';}
  // 공통 사각지대
  var both=wA.filter(function(d){return wB.indexOf(d)>=0;});
  var blindT=both.length?'두 사람 모두 <b style="color:var('+DR[both[0]].v+')">'+both.map(function(d){return DR[d].name;}).join(' · ')+'</b>이(가) 약합니다 — 이 둘이 함께 일할 때의 공통 사각지대. '+(both.indexOf('order')>=0?'마감·디테일을 챙길 제3자':both.indexOf('connect')>=0?'분위기·관계를 챙길 제3자':both.indexOf('drive')>=0?'결단을 밀어줄 제3자':'새 관점을 던질 제3자')+'를 붙이면 좋아요.':'두 사람의 약점이 서로 달라, 둘이서도 네 동력을 비교적 고르게 덮습니다.';
@@ -625,7 +681,12 @@ function renderUs(){
  var syn='<p style="margin:0 0 12px;font-size:14.5px"><b style="color:var('+DR[topD].v+')">시너지 ·</b> 팀의 <b>'+DR[topD].name+'</b> 평균이 '+avg[topD]+'로 가장 높아요'+(topPeople.length?' — '+topPeople.map(esc).join(' · ')+ig(topPeople[topPeople.length-1])+' 끌어갑니다.':'.')+'</p>';
  var spread=avg[topD]-avg[blind];
  var caution='<p style="margin:0;font-size:14.5px;color:var(--ink-soft)"><b style="color:var(--ink)">주의 ·</b> '+(spread>=22?'동력 편중이 큽니다('+DR[topD].name+' '+avg[topD]+' vs '+DR[blind].name+' '+avg[blind]+'). 한 방향으로 쏠려 '+DR[blind].name+' 관점이 회의에서 자주 빠질 수 있어요.':'동력 분포가 비교적 고른 편이라 역할이 자연스럽게 나뉩니다. 다만 모두가 비슷하면 같은 사각지대를 공유하니 아래를 보세요.')+'</p>';
- H+='<div style="margin-top:clamp(28px,4vw,40px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,26px)"><div class="sec" style="margin:0 0 14px">시너지 · 주의점</div>'+syn+caution+'</div>';
+ // 팀 가치(1순위 분포)
+ var vcount={};M.forEach(function(p){var v=(p.r.vals||[])[0];if(v)vcount[v]=(vcount[v]||0)+1;});
+ var vKeys=Object.keys(vcount);var valLine='';
+ if(vKeys.length){vKeys.sort(function(a,b){return vcount[b]-vcount[a];});var topV=VAL.filter(function(v){return v.k===vKeys[0];})[0];var spread=vKeys.length;
+  valLine='<p style="margin:9px 0 0;font-size:14.5px;color:var(--ink-soft)"><b style="color:var(--ink)">결정 기준 ·</b> 팀에서 가장 많은 1순위 가치는 <b style="color:var('+DR[topV.drv].v+')">'+topV.t+'</b>('+vcount[vKeys[0]]+'명)'+(spread>=4?' — 다만 1순위가 '+spread+'갈래로 흩어져, 의사결정 때 "이번엔 뭘 먼저"를 명시하지 않으면 충돌이 잦을 수 있어요.':spread===1?' — 전원이 같은 기준이라 결정은 빠르지만, 다른 관점이 빠질 위험.':'. 결정이 엇갈리면 "누가 옳냐"보다 1순위 차이를 먼저 보세요.')+'</p>';}
+ H+='<div style="margin-top:clamp(28px,4vw,40px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,26px)"><div class="sec" style="margin:0 0 14px">시너지 · 주의점</div>'+syn+caution+valLine+'</div>';
  // 보완 매트릭스 (●○·)
  var grid='<div style="display:grid;grid-template-columns:92px repeat(4,1fr);gap:1px;background:var(--hairline);border:1px solid var(--hairline);border-radius:2px;overflow:hidden;font-family:var(--font-mono);font-size:12px">';
  grid+='<div style="background:var(--fill);padding:9px 12px"></div>';
@@ -683,13 +744,15 @@ route();
 if(location.hash==='#/selftest'){(function(){
  var log=[],ok=0,fail=0;function t(name,cond){if(cond)ok++;else fail++;log.push((cond?'✓':'✗')+' '+name);}
  // 1) 순수 응답 → 코드 라운드트립
- var s=blank();A.forEach(function(q){s.A[q.id]=[0,1];});B.forEach(function(q){s.B[q.id]=q.id.length%2;});C.forEach(function(q,i){s.C[q.id]=i%4;});D.forEach(function(q){s.D[q.id]=['assert','accommodate','analyze'];});E.forEach(function(q,i){s.E[q.id]=DK[i%4];});
+ var s=blank();A.forEach(function(q){s.A[q.id]=[0,1];});B.forEach(function(q){s.B[q.id]=q.id.length%2;});C.forEach(function(q,i){s.C[q.id]=i%4;});D.forEach(function(q){s.D[q.id]=['assert','accommodate','analyze'];});E.forEach(function(q,i){s.E[q.id]=DK[i%4];});s.V=['speed','people','quality'];KMP.forEach(function(q,i){s.K[q.id]=i%4;});
  var code=packAnswers(s);var s2=unpackAnswers(code);
  t('round-trip A',JSON.stringify(s.A)===JSON.stringify(s2.A));
  t('round-trip B',JSON.stringify(s.B)===JSON.stringify(s2.B));
  t('round-trip C',JSON.stringify(s.C)===JSON.stringify(s2.C));
  t('round-trip D',JSON.stringify(s.D)===JSON.stringify(s2.D));
  t('round-trip E',JSON.stringify(s.E)===JSON.stringify(s2.E));
+ t('round-trip V(가치관)',JSON.stringify(s.V)===JSON.stringify(s2.V));
+ t('round-trip K(역량)',JSON.stringify(s.K)===JSON.stringify(s2.K));
  // 2) 전부 drive로 답하면 추진 최상위
  var sd=blank();A.forEach(function(q){var di=q.o.map(function(o){return FC[o.f].d;}).indexOf('drive');var ord=[];if(di>=0)ord.push(di);q.o.forEach(function(o,oi){if(oi!==di&&ord.length<3)ord.push(oi);});sd.A[q.id]=ord;});B.forEach(function(q){sd.B[q.id]=FC[q.a.f].d==='drive'?0:1;});E.forEach(function(q){sd.E[q.id]='drive';});
  var rd=compute(sd);t('drive 편향 → 추진 1위',rd.rk[0]==='drive');
