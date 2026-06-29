@@ -340,37 +340,108 @@ function done(st){
 
 /* ---------- 채점 엔진 (순수) ---------- */
 function compute(s){
- // facet 점수 = Likert 평균(역문항 반전) → 0~100
+ // ══════════════════════════════════════════════════
+ // 통합 facet 누산기 — 모든 질문 유형이 fsum/fcnt에 기여
+ // 채점 원칙: 선택=val5 강긍정, 미선택=val2 약부정, 각 유형별 가중치
+ // ══════════════════════════════════════════════════
  var fsum={},fcnt={};FK.forEach(function(f){fsum[f]=0;fcnt[f]=0;});
+
+ // ① LK Likert(36) — primary w=1.0 + 교차 베타
  LK.forEach(function(q){
   var v=s.LK[q.id];if(v==null)return;
-  var val=q.rev?(6-v):v;           // primary-direction normalized value (1-5)
-  fsum[q.f]+=val; fcnt[q.f]+=1;   // primary facet: full weight
+  var val=q.rev?(6-v):v;
+  fsum[q.f]+=val;fcnt[q.f]+=1;
   if(q.x)Object.keys(q.x).forEach(function(f2){
    var beta=q.x[f2];
-   if(beta>0){fsum[f2]+=val*beta;fcnt[f2]+=beta;}          // same direction
-   else{fsum[f2]+=(6-val)*(-beta);fcnt[f2]+=(-beta);}      // reverse: high primary → low secondary
+   if(beta>0){fsum[f2]+=val*beta;fcnt[f2]+=beta;}
+   else{fsum[f2]+=(6-val)*(-beta);fcnt[f2]+=(-beta);}
   });
  });
+
+ // ② A 상황판단(6×4) — 4지 강제선택: 1순위=5/w0.60, 2순위=4/w0.50, 미선택=2/w0.25
+ A.forEach(function(q){
+  var ranks=s.A[q.id]||[];
+  var pos={};ranks.forEach(function(oi,pi){pos[oi]=pi;});
+  q.o.forEach(function(opt,oi){
+   if(!opt.f)return;
+   var pi=pos[oi];
+   var val=(pi===0)?5:(pi===1)?4:2;
+   var w=(pi===0)?0.60:(pi===1)?0.50:0.25;
+   fsum[opt.f]+=val*w;fcnt[opt.f]+=w;
+  });
+ });
+
+ // ③ OV 과용(12 facets) — 높은 자기보고 = 해당 facet 적극 사용 중 (저가중 확인 신호)
+ OV.forEach(function(q){
+  var v=s.OV[q.id];if(v==null)return;
+  fsum[q.f]+=v*0.30;fcnt[q.f]+=0.30;
+ });
+
+ // ④ D 갈등 스타일(3단계) — 단계가 깊을수록 가중치 ↑, facet 레벨 직접 매핑
+ var dFacets={
+  assert:      {decision:0.45,lead:0.40,achieve:0.15},
+  accommodate: {support:0.40,empathy:0.35,trust:0.25},
+  analyze:     {caution:0.40,precision:0.35,plan:0.25}
+ };
+ var dStW=[0.45,0.55,0.65];
+ D.forEach(function(q,di){
+  var m=(s.D[q.id]||[])[0];if(!m||!dFacets[m])return;
+  var sw=dStW[di];
+  Object.keys(dFacets[m]).forEach(function(f){
+   var b=dFacets[m][f];fsum[f]+=5*b*sw;fcnt[f]+=b*sw;
+  });
+  Object.keys(dFacets).forEach(function(st){
+   if(st===m)return;
+   Object.keys(dFacets[st]).forEach(function(f){
+    var b=dFacets[st][f];fsum[f]+=2*b*sw*0.35;fcnt[f]+=b*sw*0.35;
+   });
+  });
+ });
+
+ // ⑤ E 에너지(5문항) — 선택 동력 → 해당 facets 긍정, 미선택 → 약부정
+ var eFacets={
+  drive:{decision:0.40,lead:0.35,achieve:0.25},
+  connect:{support:0.40,empathy:0.35,trust:0.25},
+  order:{plan:0.35,precision:0.35,caution:0.30},
+  explore:{idea:0.40,flex:0.30,vision:0.30}
+ };
+ var eQW={e1:0.65,e2:0.65,e3:0.55,e4:0.50,e5:0.60};
+ E.forEach(function(q){
+  var d=s.E[q.id];if(!d||!eFacets[d])return;
+  var qw=eQW[q.id]||0.55;
+  Object.keys(eFacets[d]).forEach(function(f){
+   var b=eFacets[d][f];fsum[f]+=5*b*qw;fcnt[f]+=b*qw;
+  });
+  DK.forEach(function(od){
+   if(od===d)return;
+   Object.keys(eFacets[od]).forEach(function(f){
+    var b=eFacets[od][f];fsum[f]+=2*b*qw*0.25;fcnt[f]+=b*qw*0.25;
+   });
+  });
+ });
+
+ // ⑥ V 가치관(상위 3 선택) — 순위별 facet 직접 기여
+ var vFacets={
+  speed: {decision:0.50,achieve:0.40,lead:0.10},
+  people:{support:0.40,empathy:0.35,trust:0.25},
+  quality:{precision:0.45,plan:0.35,caution:0.20},
+  novel: {idea:0.45,vision:0.35,flex:0.20},
+  auto:  {flex:0.40,vision:0.30,idea:0.20,decision:0.10},
+  stable:{plan:0.40,caution:0.35,precision:0.25}
+ };
+ var vVals=[5,4.5,4],vWts=[0.65,0.55,0.45];
+ (s.V||[]).slice(0,3).forEach(function(k,rank){
+  var fm=vFacets[k];if(!fm)return;
+  var val=vVals[rank],w=vWts[rank];
+  Object.keys(fm).forEach(function(f){fsum[f]+=val*fm[f]*w;fcnt[f]+=fm[f]*w;});
+ });
+
+ // ── facet 점수 0~100 (모든 신호 통합) ──
  var fs={};FK.forEach(function(f){var m=fcnt[f]?fsum[f]/fcnt[f]:3;fs[f]=Math.round((m-1)/4*100);});
- // 상황판단(SJT) 보조 가산 (1순위 +6, 2순위 +3)
- A.forEach(function(q){var r=s.A[q.id]||[];r.forEach(function(oi,pos){if(pos>1)return;var f=q.o[oi]&&q.o[oi].f;if(f)fs[f]=Math.min(100,fs[f]+(pos===0?6:3));});});
- // 동력 = facet 평균 (1차)
+
+ // ── drive = facet 순수 평균 (외부 보정 없음) ──
  var ds={drive:0,connect:0,order:0,explore:0};
  DK.forEach(function(d){var ff=FK.filter(function(f){return FC[f].d===d;});ds[d]=ff.reduce(function(a,f){return a+fs[f];},0)/ff.length;});
- // ── 다각화 신호: E·D·V·OV → 동력 점수 보조 ──
- // E 에너지 (e1 살아있다·e2 힘빠짐·e3 기준·e4 스트레스·e5 회복) — 5문항 × 가중치
- var eWt={e1:6,e2:4,e3:4,e4:3,e5:4};
- E.forEach(function(q){var d=s.E[q.id];if(d)ds[d]+=(eWt[q.id]||4);});
- // D 갈등 시퀀스 — assert→drive, accommodate→connect, analyze→order (각 단계 +3)
- var dMap={assert:'drive',accommodate:'connect',analyze:'order'};
- D.forEach(function(q){var m=(s.D[q.id]||[])[0];if(m&&dMap[m])ds[dMap[m]]+=3;});
- // V 가치관 우선순위 — 1위 +5, 2위 +3, 3위 +1
- var vMap={speed:'drive',people:'connect',quality:'order',novel:'explore',auto:'explore',stable:'order'};
- var vPts=[5,3,1];
- (s.V||[]).slice(0,3).forEach(function(k,i){var d=vMap[k];if(d)ds[d]+=vPts[i];});
- // OV 과용강점 — 높은 자기보고(≥4) = 해당 facet 강하게 사용 중 → 동력 확인
- OV.forEach(function(q){var v=s.OV[q.id];if(v>=4)ds[FC[q.f].d]+=2;else if(v===3)ds[FC[q.f].d]+=1;});
  var sum=DK.reduce(function(a,k){return a+ds[k];},0)||1;
  var bl={};DK.forEach(function(k){bl[k]=Math.round(ds[k]/sum*100);});
  var diff=100-DK.reduce(function(a,k){return a+bl[k];},0);
