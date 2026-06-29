@@ -103,6 +103,7 @@ input:focus,textarea:focus{outline:2px solid var(--ink);outline-offset:0;backgro
   <a class="navlink" href="#/me">나</a>
   <a class="navlink" href="#/you">너</a>
   <a class="navlink" href="#/us">우리</a>
+  <a class="navlink" href="#/lead">강사용</a>
   <button class="navlink" id="authbtn" onclick="MEUS.authclick()" style="background:none;border:none;cursor:pointer;font:inherit;font-family:var(--font-sans);font-weight:600;font-size:13.5px;color:var(--mute)">로그인</button>
   <button class="iconbtn" id="themebtn" onclick="MEUS.theme()" aria-label="다크/라이트 전환" title="다크/라이트">◐</button>
  </div>
@@ -235,7 +236,7 @@ var D=[
 /* ---------- PART E. 에너지·소진 (5) — 단일선택 ---------- */
 var E=[
  {id:'e1',t:'일하면서 "가장 살아있다" 싶은 순간은?',o:[{d:'drive',t:'목표를 이뤄내 눈에 보이는 성과가 났을 때'},{d:'connect',t:'사람들과 마음이 통하고 같이 잘 해냈을 때'},{d:'order',t:'빈틈없이 깔끔하게 끝까지 마무리했을 때'},{d:'explore',t:'새로운 걸 배우거나 발견했을 때'}]},
- {id:'e2',t:'가장 힘 빠지고 진 빠지는 상황은?',o:[{d:'drive',t:'결정이 안 나고 시간만 흘러 일이 안 굴러갈 때'},{d:'connect',t:'사람들 사이가 냉랭하고 갈등이 도는 분위기일 때'},{d:'order',t:'급하게 대충 처리하거나 뭘 해야 할지 불분명할 때'},{d:'explore',t:'똑같은 일만 반복되고 내 맘대로 못 하게 막힐 때'}]},
+ {id:'e2',t:'가장 힘 빠지고 진 빠지는 상황은?',o:[{d:'drive',t:'결정이 안 나고 시간만 흘러 일이 안 굴러갈 때'},{d:'connect',t:'사람들 사이가 냉랭하고 갈등이 도는 분위기일 때'},{d:'order',t:'기준이나 계획 없이 일이 주먹구구로 흘러갈 때'},{d:'explore',t:'똑같은 일만 반복되고 내 맘대로 못 하게 막힐 때'}]},
  {id:'e3',t:'"오늘 일 잘 풀렸다" 싶은 기준은?',o:[{d:'drive',t:'오늘 많이 해치웠다'},{d:'connect',t:'누군가에게 도움이 됐다'},{d:'order',t:'빈틈없이 끝냈다'},{d:'explore',t:'새로 배운 게 있다'}]},
  {id:'e4',t:'스트레스 받으면 나오는 내 신호는?',o:[{d:'drive',t:'말이 빨라지고 세지며 급해진다'},{d:'connect',t:'조용히 참으며 맞춰준다'},{d:'order',t:'더 깐깐해지고 완벽하려 든다'},{d:'explore',t:'집중이 흩어지고 딴 데로 샌다'}]},
  {id:'e5',t:'지쳤을 때 회복하는 방식은?',o:[{d:'drive',t:'바로 다음 일에 뛰어든다'},{d:'connect',t:'사람들을 만나 푼다'},{d:'order',t:'혼자 정리하고 정돈한다'},{d:'explore',t:'새로운 자극을 찾아 나선다'}]}
@@ -724,6 +725,59 @@ function renderUs(){
  app.innerHTML=H;
 }
 
+/* ---------- 렌더: 강사용 퍼실리테이터 가이드 ---------- */
+function renderLead(){
+ function row(l,v){return '<div style="display:grid;grid-template-columns:84px 1fr;gap:14px;padding:10px 0;border-top:1px solid var(--hairline)"><div class="mono" style="font-size:11px;color:var(--mute);padding-top:2px">'+l+'</div><div style="font-size:14.5px;line-height:1.6;color:var(--ink-soft)">'+v+'</div></div>';}
+ function phase(t,g,goal,script){return '<div style="border:1px solid var(--rule);border-radius:2px;background:var(--panel);padding:16px 18px;margin-bottom:10px"><div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:8px"><span class="pill" style="background:var(--ink);color:var(--screen)">'+t+'</span><span class="mono" style="font-size:11px;color:var(--mute)">'+g+'</span></div><div style="font-weight:700;font-size:15px;margin-bottom:5px">'+goal+'</div><div style="font-size:14px;line-height:1.65;color:var(--ink-soft)">'+script+'</div></div>';}
+ function reading(name,mean,tip){return '<div style="border-top:1px solid var(--hairline);padding:11px 0"><div style="font-weight:700;font-size:14.5px;margin-bottom:3px">'+name+'</div><div style="font-size:13.5px;line-height:1.6;color:var(--ink-soft)">'+mean+' <span style="color:var(--mute)">— 강사 팁: '+tip+'</span></div></div>';}
+ var H='<div class="wrap result fade">';
+ H+='<div class="head"><span class="ix">LEAD</span><div style="flex:1"><div class="kicker" style="margin-bottom:4px">Facilitator Guide · 세션을 이끄는 법</div><h1>퍼실리테이터 가이드</h1></div><span class="mono noprint" style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);border:1px solid var(--rule-strong);border-radius:2px;padding:5px 9px;white-space:nowrap;align-self:center">Print-ready</span></div>';
+ H+='<p style="color:var(--ink-soft);font-size:15px;line-height:1.7;margin:14px 0 0;max-width:42em">이 한 장이면 MEUS 팀 세션을 처음 이끌어도 됩니다. 핵심 원칙은 하나 — <b style="color:var(--ink)">이건 평가가 아니라, 서로를 읽는 공용어를 만드는 시간</b>입니다.</p>';
+ // 개요
+ H+='<div class="sec">세션 한눈에</div><div class="card">'+row('목적','서로의 일하는 방식을 같은 언어로 이해하고, 협업·갈등의 마찰을 줄인다.')+row('인원·시간','6명 내외 · 40–50분 (개인 공유가 길어지면 60분)')+row('준비물','각자 미리 검사 완료(결과지/코드 또는 로그인) · 화면 공유 또는 결과지 인쇄 · /우리에 팀 코드 입력')+row('자리','둘러앉아 서로 보이게. 강사는 진행자이자 참여자.')+'</div>';
+ // 타임라인
+ H+='<div class="sec">진행 타임라인 (약 50분)</div>';
+ H+=phase('1 · 도입','5분','"오늘은 점수 매기는 자리가 아니다"를 먼저 못 박기','세 가지를 말하고 시작하세요 — ① 우열은 없다(어떤 동력도 더 낫지 않다) ② 사람을 한 글자로 가두지 않는다("넌 추진형이라"가 아니라 "그 상황엔 추진이 세게 나왔네") ③ 약점은 결함이 아니라 강점을 과하게 쓴 그림자(overdone)다.');
+ H+=phase('2 · 나','15분','각자 자기 결과지를 3가지로 요약 공유','한 사람씩 돌아가며: <b>①시그니처 강점 1개 ②과용주의(⚠) 1개 ③"이렇게 대해주세요" 한 줄</b>. 강사는 "그게 실제로 드러난 최근 사례 있어요?"로 한 번 더 끌어냅니다. (1인 2분)');
+ H+=phase('3 · 너','10분','가까이 일하는 2명씩 보완 짝 맞추기','두 사람의 코드를 /너에 넣고 "내가 도와줄게 / 미안, 부탁해" 카드를 소리 내어 읽게 하세요. 서로의 사각지대를 채워주는 관계가 눈에 보입니다.');
+ H+=phase('4 · 우리','15분','팀 지도를 같이 읽고 우리 팀을 한 문장으로','/우리에 전원 코드를 넣고 분포 지도·시너지·집단 사각지대를 함께 봅니다. "우리 팀은 ___가 강하고 ___가 빈다"를 팀이 합의하게 하세요.');
+ H+=phase('5 · 약속','5분','다음 주에 바로 쓸 팀 약속 1–2개','집단 사각지대를 메울 작은 약속을 정합니다. 예) "결정 전에 신중형 의견을 한 번은 듣는다", "갈등 초기에 작게 표현한다".');
+ // 결과지 읽는 법
+ H+='<div class="sec">결과지 읽는 법 (강사용)</div><div class="card" style="padding:6px 22px 14px">'+
+  reading('아키타입','주 동력+부 동력으로 붙는 별명.','별명은 대화의 출발일 뿐, "넌 이 유형이라"로 고정하지 마세요.')+
+  reading('동력 블렌드 · 컴퍼스','네 힘의 무게중심.','가장 낮은 동력 = 사각지대(약점 아님). "이건 이 사람의 빈자리"로 부드럽게.')+
+  reading('facet 12눈금','같은 색도 결이 다름.','"지지는 높은데 신뢰는 낮네" 같은 디테일을 짚으면 "어떻게 알았지?" 반응이 나옵니다 — 여기서 몰입이 생깁니다.')+
+  reading('강점 피라미드 · ⚠과용','시그니처부터 거의 안 쓰는 강점까지.','⚠ 표시는 "강점이 지나치면 약점". 본인이 인정하면 가장 깊은 대화가 됩니다.')+
+  reading('갈등 삼각형 · 화살표','초기→한계로의 이동. 길수록 평소와 갈등이 다름.','화살표 긴 사람에겐 "갈등 깊어지면 갑자기 달라지니, 바뀌기 전 신호를 주자"고 팀에 부탁하세요.')+
+  reading('결정의 렌즈 (가치)','무엇을 먼저 두느냐.','팀 충돌의 대부분은 "누가 옳냐"가 아니라 1순위 가치가 달라서입니다. 두 사람의 1순위를 나란히 보여주세요.')+
+  reading('나 사용설명서','본인이 직접 알려주는 취급법.','가장 실용적인 부분. 옆자리 동료가 바로 적용하게 하세요.')+'</div>';
+ // 팀 지도 해석
+ H+='<div class="sec">팀 분포 지도 해석</div><div class="card">'+
+  row('한쪽 쏠림','그 방향이 팀의 강점이자 기질 — 동시에 반대편이 사각지대. 예) 추진·체계로 쏠리면 빠르고 빈틈없지만 사람·새 시도가 빌 수 있음.')+
+  row('고르게 분포','역할이 자연스럽게 나뉘는 균형 팀. 단, 모두 비슷하면 같은 사각지대를 공유하니 주의.')+
+  row('외톨이 점','한 명만 다른 자리 = 그 사람이 팀의 결정적 보완재이자, 외로울 수 있는 위치. 의식적으로 자리를 만들어 주세요.')+
+  row('집단 사각지대','아무도 강하지 않은 동력. 의사결정 체크리스트에 그 관점을 넣거나, 그 힘이 강한 사람을 합류시키세요.')+'</div>';
+ // 갈등 다루기
+ H+='<div class="sec">갈등을 다루는 법</div><div class="card">'+
+  row('주장 vs 수용','한쪽은 부딪혀 풀고(주장) 한쪽은 참다가 곪습니다(수용). 수용형이 초기에 작게 표현하도록 안전한 분위기를 만드세요.')+
+  row('분석형','갈등에서 물러나 따집니다. 결론을 재촉하면 더 닫혀요 — 생각할 시간을 주고 "언제까지 정리해서 다시 얘기하자"로.')+
+  row('화살표 긴 사람','평소와 갈등의 모습 차이가 큼. 본인도 모를 수 있으니, "한계에 다다르면 이렇게 변한다"를 미리 공유하면 팀이 덜 당황합니다.')+'</div>';
+ // 디스커션 질문
+ H+='<div class="sec">강사가 던질 질문</div><div class="card"><ul style="margin:0;padding-left:18px;font-size:14.5px;line-height:1.9;color:var(--ink-soft)"><li>결과에서 "오 정확하다" 싶은 한 줄과, "이건 아닌데" 싶은 한 줄은?</li><li>당신의 과용주의(⚠)가 실제로 터졌던 최근 사례 하나?</li><li>당신을 가장 잘 보완해 주는 동료는 어떤 사람인가요?</li><li>우리 팀의 집단 사각지대, 누가 어떻게 채울 수 있을까요?</li><li>오늘 알게 된 것 중, 내일 당장 바꿔볼 한 가지는?</li></ul></div>';
+ // Do / Don't
+ H+='<div class="sec">퍼실리테이터 원칙</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px">'+
+  '<div style="border:1px solid var(--rule);border-left:4px solid var(--connect);border-radius:2px;background:var(--panel);padding:16px 18px"><div style="font-weight:800;margin-bottom:8px;color:var(--connect)">이렇게 (Do)</div><ul style="margin:0;padding-left:17px;font-size:13.5px;line-height:1.75;color:var(--ink-soft)"><li>강점으로 먼저 시작한다</li><li>"자기보고식"임을 전제하고 본인 해석을 존중</li><li>약점은 overdone(과용) 프레임으로</li><li>안전한 분위기 — 공유 범위는 본인이 정함</li></ul></div>'+
+  '<div style="border:1px solid var(--rule);border-left:4px solid var(--drive);border-radius:2px;background:var(--panel);padding:16px 18px"><div style="font-weight:800;margin-bottom:8px;color:var(--drive)">이건 금물 (Don\'t)</div><ul style="margin:0;padding-left:17px;font-size:13.5px;line-height:1.75;color:var(--ink-soft)"><li>"넌 ~형이라 그래"로 라벨 고정</li><li>동력에 우열 매기기 / 균형형이 더 낫다</li><li>채용·평가·줄세우기 분위기</li><li>한 사람을 몰아세우거나 대신 해석</li></ul></div>'+'</div>';
+ // FAQ
+ H+='<div class="sec">자주 나오는 반응 대응</div><div class="card">'+
+  row('"결과가 안 맞는 것 같아요"','그날 컨디션·자기인식 차이일 수 있어요. 동의하는 부분부터 짚고, "검사는 정답이 아니라 대화의 시작점"이라고. 본인이 더 맞다고 느끼면 그게 맞습니다.')+
+  row('"다 비슷하게 나왔어요"','네 동력이 고른 허브(통역자)형 — 상황 적응력이 강점입니다. 색이 옅게 느껴지면 가치·갈등 패턴으로 더 들여다보세요.')+
+  row('"민감한 게 드러날까 걱정"','공유 범위는 전적으로 본인이 정합니다. 강점 중심으로 가고, 약점은 본인이 꺼낸 만큼만.')+'</div>';
+ H+='<div class="noprint" style="display:flex;gap:11px;flex-wrap:wrap;margin-top:16px"><button class="btn dark" onclick="MEUS.print()">가이드 인쇄 / PDF</button><a class="btn" href="#/us" style="text-decoration:none">팀 지도 열기 →</a></div>';
+ H+='<p style="margin-top:18px;text-align:center;font-size:12px;color:var(--faint)">MEUS 퍼실리테이터 가이드 · 자기보고식 진단을 다루는 사람을 위한 안내</p></div>';
+ app.innerHTML=H;
+}
+
 /* ---------- 렌더: 해독표 ---------- */
 function renderDecoder(){
  var PERSON={drive:'"일단 해보죠." 결론부터 내고 밀고 나가는 사람',connect:'"다들 괜찮아요?" 분위기를 살피고 챙기는 사람',order:'"근거부터 보죠." 계획과 검증으로 완성도를 지키는 사람',explore:'"이건 어때요?" 큰 그림과 새 방식을 던지는 사람'};
@@ -753,6 +807,7 @@ function route(){
  if(h==='#/me'){if(S.phase==='result'||S.phase==='assess'){renderApp();}else{S.phase='intro';renderApp();}window.scrollTo(0,0);return;}
  if(h==='#/you'){renderYou();window.scrollTo(0,0);return;}
  if(h==='#/us'){renderUs();window.scrollTo(0,0);return;}
+ if(h==='#/lead'||h==='#/guide'){renderLead();window.scrollTo(0,0);return;}
  renderLanding();window.scrollTo(0,0);
 }
 window.addEventListener('hashchange',route);
