@@ -583,6 +583,17 @@ function renderResult(){
  var extra='';if(S.reflection)extra+='<div style="border:1px solid var(--hairline);border-radius:2px;background:var(--fill);padding:14px 16px;margin-top:12px;font-size:14.5px;color:var(--ink-soft)"><b style="color:var(--ink)">내가 남긴 메모 ·</b> '+esc(S.reflection)+'</div>';
  extra+='<p style="margin:12px 0 0;font-size:14px;color:var(--mute)">가장 덜 쓰는 근육은 <b style="color:var('+DR[r.lo].v+')">'+DR[r.lo].name+'</b> — 약점이 아니라 사각지대입니다. 이 힘이 강한 동료가 당신을 보완해 줍니다.</p>';
  H+='<div style="margin-top:clamp(28px,4vw,44px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,28px)"><div class="sec" style="margin:0 0 16px">User manual · '+(nm?esc(nm)+'님 ':'')+'사용설명서</div>'+man+extra+'</div>';
+ // ===== 협업 궁합 =====
+ var lowTypes=Object.keys(AR).filter(function(k){return k.split('_')[0]===r.lo;}).map(function(k){return AR[k];});
+ var sameTypes=Object.keys(AR).filter(function(k){return k.split('_')[0]===r.p&&AR[k]!==r.arch;}).map(function(k){return AR[k];});
+ var ovList=FK.filter(function(f){return r.dial[f]&&r.dial[f].ov!=null&&r.dial[f].ov>=4;}).sort(function(a,b){return r.dial[b].ov-r.dial[a].ov;});
+ var fric=ovList.length?('당신이 <b>'+FC[ovList[0]].name+'</b>을(를) 과하게 쓸 때, <b>'+ANTI[FC[ovList[0]].d].map(function(d){return DR[d].name;}).join('·')+'</b>이(가) 강한 사람이 균형을 잡아 줍니다.'):'특정 과용이 두드러지지 않아, 대부분의 유형과 무난하게 맞춰 갑니다.';
+ function cg(t,c,b){return '<div style="border:1px solid var(--rule);border-left:4px solid '+c+';border-radius:2px;background:var(--panel);padding:15px 17px"><div style="font-weight:800;font-size:14px;margin-bottom:6px">'+t+'</div><div style="font-size:13.5px;line-height:1.6;color:var(--ink-soft)">'+b+'</div></div>';}
+ H+='<div style="margin-top:clamp(28px,4vw,44px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,28px)"><div class="sec" style="margin:0 0 6px">협업 궁합 · 누구와 잘 맞나</div><p style="margin:0 0 14px;color:var(--mute);font-size:13.5px">관계를 고정하려는 게 아니라, 어떤 결의 사람과 시너지·보완·조율이 생기는지 봅니다.</p><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">'+
+  cg('🤝 보완 (빈자리를 채움)','var('+DR[r.lo].v+')','당신이 가장 덜 쓰는 <b style="color:var('+DR[r.lo].v+')">'+DR[r.lo].name+'</b>이 강한 '+(lowTypes.length?'<b>'+lowTypes.join(' · ')+'</b> 같은 유형':'사람')+'과 짝이면, 서로의 빈자리가 채워집니다.')+
+  cg('⚡ 증폭 (잘 통함·주의)','var('+DR[r.p].v+')',(sameTypes.length?'<b>'+sameTypes.join(' · ')+'</b>처럼 ':'')+'같은 <b style="color:var('+DR[r.p].v+')">'+DR[r.p].name+'</b>이 강한 사람과는 빠르게 통합니다. 다만 같은 사각지대('+DR[r.lo].name+')를 공유하니 제3자가 필요해요.')+
+  cg('⚖️ 조율 (과용 브레이크)','var(--ink)',fric)+
+  '</div></div>';
  // SDI 크로스맵
  H+='<div style="margin-top:clamp(26px,3vw,36px);border-top:1px solid var(--hairline);padding-top:clamp(18px,2.5vw,24px)"><div class="sec" style="margin:0 0 10px">SDI crossmap</div><p style="margin:0;color:var(--mute);font-size:14px;line-height:1.6"><b style="color:var(--connect)">Connect</b>≈사람(Blue) · <b style="color:var(--drive)">Drive</b>≈성과(Red) · <b style="color:var(--order)">Order</b>≈절차(Green) · <b style="color:var(--explore)">Explore</b>는 SDI에 없는 확장축. 갈등 3모드는 SDI의 Assert·Accommodate·Analyze와 같은 결.</p></div>';
  // 푸터
@@ -707,6 +718,20 @@ function renderUs(){
  var H='<div class="wrap result fade">';
  H+='<div class="head"><span class="ix">US</span><div><div class="kicker" style="margin-bottom:3px">팀 리포트 · '+n+'명</div><h2>우리 팀의 지도</h2></div></div>';
  H+='<div style="display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 0">'+teamRk.map(function(k){return '<span class="pill" style="border:1px solid var(--rule);background:var(--panel)"><span style="color:'+DR[k].hex+'">●</span> '+DR[k].name+' <span class="mono">'+avg[k]+'</span></span>';}).join('')+'</div>';
+ // ===== 팀 종합 리딩 (내러티브) =====
+ var TN=[];var topD0=teamRk[0],topD1=teamRk[1];
+ var leadByD=function(d){return M.filter(function(p){return p.r.p===d;}).map(function(p){return p.name||'멤버';});};
+ var lp=leadByD(topD0);
+ TN.push('이 팀의 무게중심은 <b style="color:var('+DR[topD0].v+')">'+DR[topD0].name+'</b>('+avg[topD0]+')과 <b style="color:var('+DR[topD1].v+')">'+DR[topD1].name+'</b>('+avg[topD1]+')입니다'+(lp.length?' — '+lp.map(esc).join('·')+'가 '+DR[topD0].name+'을(를) 끌어갑니다.':'.'));
+ var spread=avg[topD0]-avg[blind];
+ TN.push(spread>=22?'동력이 <b>'+DR[topD0].name+'</b> 쪽으로 뚜렷이 쏠려 있어 — 그 방향은 강하지만, 반대편(<b style="color:var('+DR[blind].v+')">'+DR[blind].name+'</b>)이 팀의 빈자리입니다.':'네 동력이 비교적 고르게 퍼져 있어, 역할이 자연스럽게 나뉘는 균형 팀입니다.');
+ var nobodyD=DK.filter(function(d){return M.every(function(p){return p.r.rk.slice(0,2).indexOf(d)<0;});});
+ if(nobodyD.length)TN.push('특히 <b style="color:var('+DR[nobodyD[0]].v+')">'+nobodyD.map(function(d){return DR[d].name;}).join('·')+'</b>은(는) 강한 사람이 한 명도 없는 <b>집단 사각지대</b> — 의사결정 때 이 관점을 의도적으로 챙기거나 보강이 필요합니다.');
+ var vc={};M.forEach(function(p){var v=(p.r.vals||[])[0];if(v)vc[v]=(vc[v]||0)+1;});var vk=Object.keys(vc).sort(function(a,b){return vc[b]-vc[a];});
+ if(vk.length){var v0=VAL.filter(function(x){return x.k===vk[0];})[0];TN.push('가장 많은 1순위 가치는 <b>'+v0.t+'</b>('+vc[vk[0]]+'명)'+(vk.length>=4?' — 다만 1순위가 '+vk.length+'갈래로 흩어져, 결정 기준을 명시하지 않으면 충돌이 잦을 수 있어요.':'. 결정이 엇갈릴 땐 1순위 가치 차이를 먼저 보세요.'));}
+ var oneLine={drive:'결정과 추진',connect:'사람과 화합',order:'정확과 체계',explore:'새 시도와 변화'};
+ TN.push('한 줄로 — <b>'+oneLine[topD0]+'</b>엔 강하고 <b>'+oneLine[blind]+'</b>이 상대적으로 약한 팀. 강사는 이 강점을 살리되 빈자리를 의식적으로 채우게 이끄세요.');
+ H+='<div style="margin-top:clamp(22px,3vw,30px);border-top:2px solid var(--ink);padding-top:clamp(16px,2.5vw,22px)"><div class="sec" style="margin:0 0 12px">팀 종합 리딩</div>'+TN.map(function(t){return '<p style="margin:0 0 10px;font-size:14.5px;line-height:1.7;color:var(--ink-soft)">▸ '+t+'</p>';}).join('')+'</div>';
  // 01 분포 지도 (2축)
  var cx=160,cy=160,Rad=114;
  var maxAbs=1;M.forEach(function(p){maxAbs=Math.max(maxAbs,Math.abs(p.r.bl.drive-p.r.bl.connect),Math.abs(p.r.bl.order-p.r.bl.explore));});
