@@ -594,6 +594,19 @@ function renderResult(){
   cg('⚡ 증폭 (잘 통함·주의)','var('+DR[r.p].v+')',(sameTypes.length?'<b>'+sameTypes.join(' · ')+'</b>처럼 ':'')+'같은 <b style="color:var('+DR[r.p].v+')">'+DR[r.p].name+'</b>이 강한 사람과는 빠르게 통합니다. 다만 같은 사각지대('+DR[r.lo].name+')를 공유하니 제3자가 필요해요.')+
   cg('⚖️ 조율 (과용 브레이크)','var(--ink)',fric)+
   '</div></div>';
+ // ===== 에너지 · 스트레스 (E 응답 그대로) =====
+ var eLab={e1:'살아있다고 느낄 때',e2:'진 빠지는 상황',e3:'"잘 풀렸다"의 기준',e4:'스트레스 신호',e5:'회복하는 방식'};
+ var eRows='';E.forEach(function(q){var d=S.E[q.id];if(!d)return;var opt=q.o.filter(function(o){return o.d===d;})[0];if(opt)eRows+='<div style="display:grid;grid-template-columns:130px 1fr;gap:12px;padding:10px 0;border-top:1px solid var(--hairline)"><div class="mono" style="font-size:11px;color:var(--mute);padding-top:2px">'+eLab[q.id]+'</div><div style="font-size:14.5px;color:var(--ink)"><span style="color:var('+DR[d].v+')">●</span> '+opt.t+'</div></div>';});
+ if(eRows)H+='<div style="margin-top:clamp(28px,4vw,44px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,28px)"><div class="sec" style="margin:0 0 6px">에너지 · 스트레스</div><p style="margin:0 0 8px;color:var(--mute);font-size:13.5px">무엇이 당신을 살아나게 하고, 진 빠지게 하는가. 동료가 알아두면 좋은 신호입니다.</p>'+eRows+'</div>';
+ // ===== 성장 제언 =====
+ var grow=[];
+ var loTip={drive:'가끔은 완벽하지 않아도 빠르게 결단해 밀어붙여 보세요. 멈춰 있는 것보다 낫습니다.',connect:'결정 전에 "이 결정이 사람들에게 어떻게 느껴질까"를 한 번 더 헤아려 보세요.',order:'중요한 일엔 시작 전 계획과 끝의 점검을 한 단계만 더해도 결과가 단단해집니다.',explore:'검증된 길에서 한 걸음 벗어나 새 방식을 작게 시도해보면 시야가 넓어집니다.'};
+ grow.push('가장 덜 쓰는 <b style="color:var('+DR[r.lo].v+')">'+DR[r.lo].name+'</b> — '+loTip[r.lo]);
+ if(ovList.length){var f0=ovList[0];grow.push('<b>'+FC[f0].name+'</b>이(가) 과용 구간 — 강점이지만, 지나치다 싶을 때 <b>'+ANTI[FC[f0].d].map(function(d){return DR[d].name;}).join('·')+'</b>의 시선을 한 번 빌려보세요.');}
+ var wf=fOf(r.p).slice().sort(function(a,b){return r.fs[a]-r.fs[b];})[0];
+ if(r.fs[wf]<=45)grow.push('주 동력 '+DR[r.p].name+' 안에서도 <b>'+FC[wf].name+'</b>('+r.fs[wf]+')은 상대적으로 낮아 — 여기를 한 칸 키우면 강점이 더 입체적이 됩니다.');
+ grow.push('약점을 없애려 애쓰기보다, <b>나를 보완하는 동료와 짝</b>을 짓는 게 더 빠릅니다. (위 협업 궁합 참고)');
+ H+='<div style="margin-top:clamp(28px,4vw,44px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,28px)"><div class="sec" style="margin:0 0 14px">성장 제언 · Growth edges</div>'+grow.map(function(t){return '<p style="margin:0 0 10px;font-size:14.5px;line-height:1.7;color:var(--ink-soft)">▸ '+t+'</p>';}).join('')+'</div>';
  // SDI 크로스맵
  H+='<div style="margin-top:clamp(26px,3vw,36px);border-top:1px solid var(--hairline);padding-top:clamp(18px,2.5vw,24px)"><div class="sec" style="margin:0 0 10px">SDI crossmap</div><p style="margin:0;color:var(--mute);font-size:14px;line-height:1.6"><b style="color:var(--connect)">Connect</b>≈사람(Blue) · <b style="color:var(--drive)">Drive</b>≈성과(Red) · <b style="color:var(--order)">Order</b>≈절차(Green) · <b style="color:var(--explore)">Explore</b>는 SDI에 없는 확장축. 갈등 3모드는 SDI의 Assert·Accommodate·Analyze와 같은 결.</p></div>';
  // 푸터
