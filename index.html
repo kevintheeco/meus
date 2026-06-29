@@ -127,18 +127,18 @@ var DK=['drive','connect','order','explore'];
 var MD={assert:{name:'주장',en:'Assert',hex:'#D85A30'},accommodate:{name:'수용',en:'Accommodate',hex:'#378ADD'},analyze:{name:'분석',en:'Analyze',hex:'#1D9E75'}};
 
 var FC={
- decision:{d:'drive',name:'결단',str:'결단력',desc:'빠르게 정한다',ov:'독단·성급'},
- lead:{d:'drive',name:'주도',str:'주도성',desc:'끌고 간다',ov:'통제·독주'},
- achieve:{d:'drive',name:'성취',str:'성취·임팩트',desc:'이기고 해낸다',ov:'과속·과정무시'},
- support:{d:'connect',name:'지지',str:'지지·협력',desc:'편들고 돕는다',ov:'과잉헌신'},
- trust:{d:'connect',name:'신뢰',str:'신뢰·위임',desc:'믿고 맡긴다',ov:'과신·맹신'},
- empathy:{d:'connect',name:'공감',str:'공감·경청',desc:'감정을 읽는다',ov:'솔직함 회피'},
- precision:{d:'order',name:'정밀',str:'정밀·정확',desc:'품질을 지킨다',ov:'완벽주의'},
- plan:{d:'order',name:'계획',str:'계획·구조',desc:'절차를 세운다',ov:'경직·변화거부'},
- caution:{d:'order',name:'신중',str:'신중·점검',desc:'리스크를 본다',ov:'분석마비'},
- idea:{d:'explore',name:'발상',str:'발상·창의',desc:'새 아이디어를 낸다',ov:'산만·미완성'},
- flex:{d:'explore',name:'유연',str:'유연·적응',desc:'상황에 맞춘다',ov:'변덕·일관성없음'},
- vision:{d:'explore',name:'비전',str:'비전·통찰',desc:'큰 그림을 본다',ov:'현실성부족'}
+ decision:{d:'drive',name:'결단',str:'결단력',desc:'빠르게 결론짓고 움직인다',ov:'독단·성급'},
+ lead:{d:'drive',name:'주도',str:'주도성',desc:'방향을 잡고 팀을 이끈다',ov:'통제·독주'},
+ achieve:{d:'drive',name:'성취',str:'성취·임팩트',desc:'성과를 향해 끝까지 밀어붙인다',ov:'과속·과정무시'},
+ support:{d:'connect',name:'지지',str:'지지·협력',desc:'사람을 편들고 뒤를 받쳐준다',ov:'과잉헌신'},
+ trust:{d:'connect',name:'신뢰',str:'신뢰·위임',desc:'먼저 믿고 자율을 내어준다',ov:'과신·맹신'},
+ empathy:{d:'connect',name:'공감',str:'공감·경청',desc:'감정을 읽고 마음을 맞춘다',ov:'솔직함 회피'},
+ precision:{d:'order',name:'정밀',str:'정밀·정확',desc:'오차 없이 정확하게 마무리한다',ov:'완벽주의'},
+ plan:{d:'order',name:'계획',str:'계획·구조',desc:'절차와 구조를 먼저 세운다',ov:'경직·변화거부'},
+ caution:{d:'order',name:'신중',str:'신중·점검',desc:'리스크를 짚고 검증한다',ov:'분석마비'},
+ idea:{d:'explore',name:'발상',str:'발상·창의',desc:'새 연결과 아이디어를 만든다',ov:'산만·미완성'},
+ flex:{d:'explore',name:'유연',str:'유연·적응',desc:'상황에 맞게 방식을 바꾼다',ov:'변덕·일관성없음'},
+ vision:{d:'explore',name:'비전',str:'비전·통찰',desc:'큰 그림과 장기 방향을 본다',ov:'현실성부족'}
 };
 var FK=['decision','lead','achieve','support','trust','empathy','precision','plan','caution','idea','flex','vision'];
 
@@ -546,9 +546,30 @@ function renderResult(){
   '<text x="130" y="20" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="var(--ink)">Drive</text><text x="240" y="134" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="var(--ink)">Explore</text><text x="130" y="248" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="var(--ink)">Order</text><text x="22" y="134" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="var(--ink)">Connect</text></svg>';
  var dials='';DK.forEach(function(d){var fs=FK.filter(function(f){return FC[f].d===d;});var vals=fs.map(function(f){return r.fs[f];});var hi=fs[vals.indexOf(Math.max.apply(null,vals))],loF=fs[vals.indexOf(Math.min.apply(null,vals))];
    var note=(lop&&lop.d===d&&best>0)?'<span class="mono" style="font-size:11px;color:var(--faint);margin-left:auto">'+FC[lop.hi].name+'↑ · '+FC[lop.lo].name+'↓</span>':'';
-   var rows='';fs.forEach(function(f){rows+='<div style="display:flex;align-items:center;gap:10px"><span style="flex:none;width:42px;font-size:12.5px;color:var(--ink-soft)">'+FC[f].name+'</span><div class="minidial">'+facetZones(f,true)+'<div class="mk" style="left:calc('+fpos(f).toFixed(0)+'% - 1px)"></div></div></div>';});
-   dials+='<div><div style="display:flex;align-items:center;gap:7px;margin-bottom:9px"><span style="width:8px;height:8px;border-radius:50%;background:var('+DR[d].v+')"></span><span style="font-weight:700;font-size:14px">'+DR[d].name+'</span>'+note+'</div><div style="display:flex;flex-direction:column;gap:7px">'+rows+'</div></div>';});
- H+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:clamp(20px,3vw,40px);margin-top:clamp(28px,4vw,44px);align-items:start"><div><div class="sec" style="margin:0 0 14px">Compass · 동력 균형</div><div style="text-align:center">'+compass+'</div></div><div><div class="sec" style="margin:0 0 14px">Facet dials · 12 눈금</div><div style="display:flex;flex-direction:column;gap:16px">'+dials+'</div></div></div>';
+   var rows='';fs.forEach(function(f){
+    var score=r.fs[f];
+    var ov=r.dial[f]&&r.dial[f].ov!=null?r.dial[f].ov:0;
+    var ovTag=ov>=4?'<span style="font-size:10.5px;color:#A0291A;margin-left:5px;font-weight:700">⚠ 과용</span>':ov===3?'<span style="font-size:10.5px;color:#7a5000;margin-left:5px">△ 주의</span>':'';
+    var scoreCol=score>=70?'color:var('+DR[d].v+');font-weight:800':score<=40?'color:var(--faint)':'color:var(--ink-soft);font-weight:700';
+    rows+='<div style="margin-bottom:6px">'+
+     '<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">'+
+      '<span style="flex:none;width:38px;font-size:13px;font-weight:600;color:var(--ink)">'+FC[f].name+'</span>'+
+      '<div class="minidial" style="flex:1">'+facetZones(f,true)+'<div class="mk" style="left:calc('+fpos(f).toFixed(0)+'% - 1px)"></div></div>'+
+      '<span class="mono" style="flex:none;font-size:13px;width:24px;text-align:right;'+scoreCol+'">'+score+'</span>'+
+     '</div>'+
+     '<div style="padding-left:46px;font-size:11.5px;color:var(--faint);line-height:1.3">'+FC[f].desc+ovTag+'</div>'+
+    '</div>';
+   });
+   dials+='<div><div style="display:flex;align-items:center;gap:7px;margin-bottom:10px"><span style="width:8px;height:8px;border-radius:50%;background:var('+DR[d].v+')"></span><span style="font-weight:700;font-size:14px">'+DR[d].name+'</span>'+note+'</div><div style="display:flex;flex-direction:column;gap:2px">'+rows+'</div></div>';});
+ var dialLegend='<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;flex-wrap:wrap">'+
+  '<span style="font-size:11px;color:var(--faint);font-weight:600;letter-spacing:.04em;text-transform:uppercase">범례</span>'+
+  '<span style="display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--mute)"><span style="width:18px;height:7px;background:var(--paint);border-radius:1px;display:inline-block"></span>낮은 활용</span>'+
+  '<span style="display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--mute)"><span style="width:18px;height:7px;background:var(--drive);border-radius:1px;display:inline-block;opacity:.8"></span>적정 활용</span>'+
+  '<span style="display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--mute)"><span style="width:18px;height:7px;border-radius:1px;display:inline-block;background:repeating-linear-gradient(45deg,#B84A26,#B84A26 3px,#8B3210 3px,#8B3210 6px)"></span>과용 구간</span>'+
+  '<span style="display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--mute)"><span style="width:2px;height:12px;background:var(--ink);display:inline-block"></span>현재 위치</span>'+
+  '<span style="display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--mute)">점수 0–100 (높을수록 강한 특성)</span>'+
+ '</div>';
+ H+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:clamp(20px,3vw,40px);margin-top:clamp(28px,4vw,44px);align-items:start"><div><div class="sec" style="margin:0 0 14px">Compass · 동력 균형</div><div style="text-align:center">'+compass+'</div></div><div><div class="sec" style="margin:0 0 10px">Facet dials · 12 눈금</div>'+dialLegend+'<div style="display:flex;flex-direction:column;gap:14px">'+dials+'</div></div></div>';
  // 갈등 시퀀스
  var stl=['처음 부딪힐 때','평행선일 때','더는 못 참을 때'];var seqc='';r.seq.forEach(function(m,idx){seqc+='<div style="flex:1;min-width:148px;border:1px solid var(--hairline);border-radius:2px;padding:14px 16px;background:var(--panel)"><div class="mono" style="font-size:11px;color:var(--faint);margin-bottom:8px">'+(idx+1)+'단계 · '+stl[idx]+'</div><div style="display:flex;align-items:center;gap:7px"><span style="width:9px;height:9px;border-radius:50%;background:'+(m?MD[m].hex:'var(--faint)')+'"></span><span style="font-weight:700;font-size:16px">'+(m?MD[m].name:'-')+'</span><span class="display" style="font-size:13px;color:var(--mute)">'+(m?MD[m].en:'')+'</span></div></div>';if(idx<2)seqc+='<div style="display:flex;align-items:center;color:var(--rule-strong);font-family:var(--font-mono)">→</div>';});
  var seqL='';seqText(r.seq).forEach(function(t){seqL+='<p style="margin:8px 0 0;color:var(--mute);font-size:14.5px">▸ '+t+'</p>';});
