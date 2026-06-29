@@ -636,31 +636,35 @@ function renderResult(){
  // ===== 에너지 · 스트레스 (E 응답 + 불일치 분석) =====
  var eLab={e1:'살아있다고 느낄 때',e2:'진 빠지는 상황',e3:'"잘 풀렸다"의 기준',e4:'스트레스 신호',e5:'회복하는 방식'};
  var eRows='';E.forEach(function(q){var d=S.E[q.id];if(!d)return;var opt=q.o.filter(function(o){return o.d===d;})[0];if(opt)eRows+='<div style="display:grid;grid-template-columns:130px 1fr;gap:12px;padding:10px 0;border-top:1px solid var(--hairline)"><div class="mono" style="font-size:11px;color:var(--mute);padding-top:2px">'+eLab[q.id]+'</div><div style="font-size:14.5px;color:var(--ink)"><span style="color:var('+DR[d].v+')">●</span> '+opt.t+'</div></div>';});
- // E 불일치 분석 — Likert 동력 vs 에너지 응답
+ // E 불일치 분석 — 실제 답변 텍스트 기반
  var eA={e1:S.E.e1,e2:S.E.e2,e3:S.E.e3,e4:S.E.e4,e5:S.E.e5};
+ function eText(qid,drv){var q=E.filter(function(x){return x.id===qid;})[0];if(!q||!drv)return null;var o=q.o.filter(function(x){return x.d===drv;})[0];return o?o.t:null;}
  var eDivLines=[];
  // 1. 살아있다(e1) vs 주 동력
- if(eA.e1){
+ var e1txt=eText('e1',eA.e1);
+ if(eA.e1&&e1txt){
   if(eA.e1===r.p){
-   eDivLines.push('일하는 방식과 에너지 원천이 같은 방향입니다 — <b style="color:var('+DR[r.p].v+')">'+DR[r.p].name+'</b> 환경이 당신을 살아나게도 하고 성과도 냅니다. 이 환경을 지키는 것이 가장 중요한 번아웃 예방법입니다.');
+   eDivLines.push('"'+e1txt+'" — 살아있는 순간이 주 동력(<b style="color:var('+DR[r.p].v+')">'+DR[r.p].name+'</b>)과 같은 방향입니다. 이 환경을 지키는 게 가장 중요한 번아웃 예방법이에요.');
   } else if(eA.e1===r.s){
-   eDivLines.push('<b style="color:var('+DR[r.p].v+')">'+DR[r.p].name+'</b>으로 일하지만 진짜 살아나는 건 <b style="color:var('+DR[eA.e1].v+')">'+DR[eA.e1].name+'</b> 순간 — 부 동력이 에너지 공급원입니다. 이 시간을 의도적으로 확보해야 오래 달릴 수 있어요.');
+   eDivLines.push('"'+e1txt+'" — 진짜 살아나는 순간. <b style="color:var('+DR[r.p].v+')">'+DR[r.p].name+'</b>으로 일하지만 에너지는 <b style="color:var('+DR[eA.e1].v+')">'+DR[eA.e1].name+'</b>에서 충전됩니다. 이 시간을 의도적으로 확보해야 오래 달려요.');
   } else {
-   eDivLines.push('<b style="color:var('+DR[r.p].v+')">'+DR[r.p].name+'</b>으로 움직이지만 진짜 살아나는 건 <b style="color:var('+DR[eA.e1].v+')">'+DR[eA.e1].name+'</b> 순간입니다. 엔진과 충전소가 다릅니다 — '+DR[eA.e1].name+' 시간을 의도적으로 만들지 않으면 소진이 빠를 수 있어요.');
+   eDivLines.push('"'+e1txt+'" — 진짜 살아나는 순간. <b style="color:var('+DR[r.p].v+')">'+DR[r.p].name+'</b>으로 일하는 사람인데 충전 원천은 <b style="color:var('+DR[eA.e1].v+')">'+DR[eA.e1].name+'</b>. 엔진과 충전소가 달라 — 이 시간이 없으면 소진이 빠릅니다.');
   }
  }
- // 2. 스트레스 모드(e4) vs 주 동력
- if(eA.e4&&eA.e4!==r.p){
-  var sm={drive:'급해지고 밀어붙이는 쪽으로',connect:'조용히 맞춰주는 쪽으로',order:'더 깐깐하고 완벽해지는 쪽으로',explore:'집중이 흩어지는 쪽으로'};
-  eDivLines.push('스트레스 상황에서는 평소(<b style="color:var('+DR[r.p].v+')">'+DR[r.p].name+'</b>) 대신 <b style="color:var('+DR[eA.e4].v+')">'+DR[eA.e4].name+'</b> 모드가 켜집니다 — '+sm[eA.e4]+' 바뀌어요. 주변엔 "갑자기 다른 사람"처럼 보일 수 있어요.');
+ // 2. 스트레스 신호(e4) — 추상 동력명 대신 실제 답변 텍스트 직접 사용
+ var e4txt=eText('e4',eA.e4);
+ if(eA.e4&&e4txt&&eA.e4!==r.p){
+  eDivLines.push('스트레스 신호: <b>"'+e4txt+'"</b> — 평소('+DR[r.p].name+') 방식과 다른 면이 나와요. 주변엔 갑자기 다른 사람처럼 보일 수 있어요.');
  }
  // 3. 성취 기준(e3) vs 살아있다(e1)
- if(eA.e3&&eA.e1&&eA.e3!==eA.e1){
-  eDivLines.push('살아나는 건 <b style="color:var('+DR[eA.e1].v+')">'+DR[eA.e1].name+'</b>, 잘 됐다는 느낌은 <b style="color:var('+DR[eA.e3].v+')">'+DR[eA.e3].name+'</b> 기준에서 옵니다. 에너지와 성취감의 원천이 달라 — 두 가지가 같이 채워질 때 진짜 만족을 느낍니다.');
+ var e3txt=eText('e3',eA.e3);
+ if(eA.e3&&eA.e1&&eA.e3!==eA.e1&&e1txt&&e3txt){
+  eDivLines.push('살아나는 건 <b>"'+e1txt+'"</b>, 잘 됐다는 기준은 <b>"'+e3txt+'"</b> — 에너지와 성취감의 원천이 달라요. 두 가지가 같이 채워질 때 진짜 만족이 옵니다.');
  }
- // 4. 회복(e5) vs 살아있다(e1) — 같으면 강화, 다르면 다층성
- if(eA.e5&&eA.e1&&eA.e5!==eA.e1){
-  eDivLines.push('충전 방식(<b style="color:var('+DR[eA.e5].v+')">'+DR[eA.e5].name+'</b>)이 에너지 원천(<b style="color:var('+DR[eA.e1].v+')">'+DR[eA.e1].name+'</b>)과 다릅니다. 활기를 주는 것과 회복을 주는 것이 다른 사람 — 지쳤을 땐 평소와 다른 방식으로 충전해야 합니다.');
+ // 4. 회복(e5) vs 살아있다(e1)
+ var e5txt=eText('e5',eA.e5);
+ if(eA.e5&&eA.e1&&eA.e5!==eA.e1&&e5txt){
+  eDivLines.push('지쳤을 때 회복법: <b>"'+e5txt+'"</b> — 활기를 주는 상황과 회복 방식이 달라요. 소진됐을 땐 평소와 다른 방식이 더 잘 통합니다.');
  }
  var eDivHtml='';
  if(eDivLines.length){eDivHtml='<div style="margin-top:16px;padding:14px 16px;background:var(--fill);border-radius:2px;border-left:3px solid var(--hairline)"><div class="mono" style="font-size:10px;letter-spacing:.08em;color:var(--faint);margin-bottom:10px">ENERGY PATTERN · 에너지 패턴 해석</div>'+eDivLines.slice(0,3).map(function(t){return '<p style="margin:0 0 9px;font-size:14px;line-height:1.7;color:var(--ink-soft)">▸ '+t+'</p>';}).join('')+'</div>';}
@@ -682,6 +686,41 @@ function renderResult(){
  }
  grow.push('약점을 없애려 애쓰기보다, <b>나를 보완하는 동료와 짝</b>을 짓는 게 더 빠릅니다. (위 협업 궁합 참고)');
  H+='<div style="margin-top:clamp(28px,4vw,44px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,28px)"><div class="sec" style="margin:0 0 14px">성장 제언 · Growth edges</div>'+grow.map(function(t){return '<p style="margin:0 0 10px;font-size:14.5px;line-height:1.7;color:var(--ink-soft)">▸ '+t+'</p>';}).join('')+'</div>';
+ // ===== 원시 응답 데이터 =====
+ (function(){
+  var dots5=function(v){var s='';for(var i=1;i<=5;i++)s+='<span style="color:'+(i<=v?'var(--ink)':'var(--hairline)')+'">●</span>';return s;};
+  var RH='<div style="margin-top:clamp(28px,4vw,44px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,28px)">';
+  RH+='<details><summary style="cursor:pointer;list-style:none;-webkit-appearance:none;display:flex;align-items:center;gap:10px"><div class="sec" style="margin:0">원시 응답 데이터</div><span style="font-size:12px;color:var(--mute);font-family:\'JetBrains Mono\',monospace">펼치기 ↓</span></summary>';
+  RH+='<div style="margin-top:18px;display:flex;flex-direction:column;gap:26px">';
+  // — Likert (성향 진단), facet별 그룹
+  RH+='<div><div style="font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin-bottom:10px">성향 진단 · Likert</div>';
+  DK.forEach(function(d){
+   var ff=FK.filter(function(f){return FC[f].d===d;});
+   RH+='<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:700;color:var('+DR[d].v+');margin-bottom:6px">'+DR[d].name.toUpperCase()+'</div>';
+   ff.forEach(function(f){
+    var fqs=LK.filter(function(q){return q.f===f;});
+    RH+='<div style="margin-bottom:6px"><div style="font-size:11px;color:var(--mute);margin-bottom:3px">'+FC[f].str+' <span class="mono" style="color:var(--faint)">'+r.fs[f]+'</span></div>';
+    fqs.forEach(function(q){var v=S.LK[q.id];if(v==null)return;RH+='<div style="display:grid;grid-template-columns:1fr 64px;gap:8px;padding:3px 0;font-size:12.5px;color:var(--ink-soft)"><div>'+(q.rev?'<span style="color:var(--faint)" title="역문항">↩</span> ':'')+esc(q.t)+'</div><div class="mono" style="text-align:right;letter-spacing:-.5px">'+dots5(v)+'</div></div>';});
+    RH+='</div>';
+   });
+   RH+='</div>';
+  });
+  RH+='</div>';
+  // — SJT (상황판단), 1·2순위만
+  var aRows='';A.forEach(function(q){var picks=S.A[q.id]||[];if(!picks.length)return;aRows+='<div style="padding:8px 0;border-top:1px solid var(--hairline)"><div style="font-size:12.5px;color:var(--mute);margin-bottom:5px">'+esc(q.t)+'</div>';picks.slice(0,2).forEach(function(oi,rank){var o=q.o[oi];if(!o)return;aRows+='<div style="font-size:13px;color:var(--ink-soft);padding:1px 0"><span class="mono" style="color:var(--faint);margin-right:6px">'+(rank+1)+'순위</span>'+esc(o.t)+'</div>';});aRows+='</div>';});
+  if(aRows)RH+='<div><div style="font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin-bottom:10px">상황 판단 · SJT</div>'+aRows+'</div>';
+  // — 갈등 시퀀스
+  var dRows='';D.forEach(function(q,qi){var ranks=S.D[q.id]||[];if(!ranks.length)return;dRows+='<div style="padding:8px 0;border-top:1px solid var(--hairline)"><div style="font-size:11px;color:var(--mute);margin-bottom:4px">'+(qi+1)+'단계 · '+esc(q.t)+'</div>';ranks.forEach(function(m,ri){dRows+='<div style="font-size:13px;padding:1px 0;color:'+(ri===0?'var(--ink)':'var(--mute)')+'"><span class="mono" style="margin-right:6px;color:var(--faint)">'+(ri+1)+'</span>'+MD[m].name+'</div>';});dRows+='</div>';});
+  if(dRows)RH+='<div><div style="font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin-bottom:10px">갈등 시퀀스 · Conflict</div>'+dRows+'</div>';
+  // — 에너지 응답
+  var eRawRows='';E.forEach(function(q){var d=S.E[q.id];if(!d)return;var opt=q.o.filter(function(o){return o.d===d;})[0];if(!opt)return;eRawRows+='<div style="display:grid;grid-template-columns:120px 1fr;gap:8px;padding:6px 0;border-top:1px solid var(--hairline);font-size:13px"><div style="color:var(--mute)">'+eLab[q.id]+'</div><div style="color:var(--ink-soft)"><span style="color:var('+DR[d].v+')">●</span> '+esc(opt.t)+'</div></div>';});
+  if(eRawRows)RH+='<div><div style="font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin-bottom:10px">에너지 · Energy</div>'+eRawRows+'</div>';
+  // — 가치관
+  if(S.V&&S.V.length){var vRawRows='';S.V.forEach(function(k,i){var v=VAL.filter(function(x){return x.k===k;})[0];if(!v)return;vRawRows+='<div style="display:grid;grid-template-columns:24px 1fr;gap:8px;padding:4px 0;font-size:13px;color:'+(i<3?'var(--ink-soft)':'var(--faint)')+'"><span class="mono">'+(i+1)+'</span><span>'+v.t+'</span></div>';});
+  RH+='<div><div style="font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin-bottom:10px">가치관 · Values</div>'+vRawRows+'</div>';}
+  RH+='</div></details></div>';
+  H+=RH;
+ })();
  // SDI 크로스맵
  H+='<div style="margin-top:clamp(26px,3vw,36px);border-top:1px solid var(--hairline);padding-top:clamp(18px,2.5vw,24px)"><div class="sec" style="margin:0 0 10px">SDI crossmap</div><p style="margin:0;color:var(--mute);font-size:14px;line-height:1.6"><b style="color:var(--connect)">Connect</b>≈사람(Blue) · <b style="color:var(--drive)">Drive</b>≈성과(Red) · <b style="color:var(--order)">Order</b>≈절차(Green) · <b style="color:var(--explore)">Explore</b>는 SDI에 없는 확장축. 갈등 3모드는 SDI의 Assert·Accommodate·Analyze와 같은 결.</p></div>';
  // 푸터
