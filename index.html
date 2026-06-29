@@ -138,117 +138,79 @@ var FC={
 var FK=['decision','lead','achieve','support','trust','empathy','precision','plan','caution','idea','flex','vision'];
 
 /* ---------- PART A. 상황판단 (16) — 순위형 ---------- */
+/* 엄선 상황판단 6 — 1순위만 골라도 통과(2순위 선택). 성향 점수의 보조 신호. */
 var A=[
- {id:'a1',t:'동료가 큰 계획을, 나름 설득력 있는 자료와 근거로 자신 있게 제안한다.',o:[
-   {t:'좋네요, 일단 밀어주고 같이 추진하자',f:'support'},{t:'가정과 근거를 한 번 더 같이 짚어보자',f:'precision'},
-   {t:'큰 그림이 끌린다, 아이디어를 더 키우자',f:'idea'},{t:'실행 계획과 역할부터 정하자',f:'lead'}]},
- {id:'a2',t:'마감 1시간 전, 작지만 신경 쓰이는 오류를 발견했다.',o:[
-   {t:'일정 지키게 일단 넘기고 끝나고 고친다',f:'decision'},{t:'마감을 조금 미뤄도 지금 바로잡는다',f:'precision'},
-   {t:'팀에 공유해 같이 빨리 처리한다',f:'support'},{t:'이참에 더 나은 방식으로 손본다',f:'idea'}]},
- {id:'a3',t:'새 프로젝트 첫날, 방향이 아직 또렷하지 않다.',o:[
-   {t:'작게라도 빠르게 시작해 감을 잡는다',f:'decision'},{t:'목표·범위·단계를 먼저 정리한다',f:'plan'},
-   {t:'팀이 어떻게 협업할지 분위기부터 잡는다',f:'empathy'},{t:'가능한 방향을 여러 갈래로 펼친다',f:'vision'}]},
- {id:'a4',t:'같은 팀원에게 아쉬운 피드백을 줘야 한다.',o:[
-   {t:'핵심을 분명하고 솔직하게 바로 전한다',f:'lead'},{t:'사실과 근거를 정리해 차분히 설명한다',f:'precision'},
-   {t:'관계가 상하지 않게 따뜻하게 1:1로',f:'empathy'},{t:'성장·개선의 기회로 바꿔 전한다',f:'vision'}]},
- {id:'a5',t:'정보가 부족한데 지금 결정해야 한다.',o:[
-   {t:'가진 걸로 정하고 가면서 보정한다',f:'decision'},{t:'핵심 정보 하나만 더 확인하고 정한다',f:'caution'},
-   {t:'영향받을 사람들 의견을 먼저 구한다',f:'support'},{t:'다른 선택지가 더 없는지 본다',f:'idea'}]},
- {id:'a6',t:'잘 짜둔 계획이 외부 변수로 틀어졌다.',o:[
-   {t:'곧장 새 방법으로 갈아타 밀고 간다',f:'decision'},{t:'무엇이 어긋났는지 짚고 다시 세운다',f:'plan'},
-   {t:'팀이 동요하지 않게 먼저 추스른다',f:'empathy'},{t:'오히려 더 나은 길의 기회로 본다',f:'flex'}]},
- {id:'a7',t:'팀원이 요즘 부쩍 지쳐 보인다.',o:[
-   {t:'무엇이 막혔는지 묻고 같이 푼다',f:'lead'},{t:'업무량·일정에 무리가 없는지 본다',f:'caution'},
-   {t:'먼저 다가가 안부를 묻고 들어준다',f:'empathy'},{t:'환기될 새 방식을 제안한다',f:'idea'}]},
- {id:'a8',t:'모두가 좋다는 방향에 나만 의문이 든다.',o:[
-   {t:'분명히 말하고 토론을 건다',f:'lead'},{t:'근거를 정리해 차분히 반론한다',f:'precision'},
-   {t:'분위기를 보며 조심스레 운을 뗀다',f:'support'},{t:'"이런 관점도 있다"며 가능성을 연다',f:'vision'}]},
- {id:'a9',t:'두 가지 일의 마감이 겹쳐 하나만 제대로 할 수 있다.',o:[
-   {t:'임팩트 큰 쪽을 잡는다',f:'achieve'},{t:'원래 약속한 쪽을 지킨다',f:'plan'},
-   {t:'남이 더 곤란해질 쪽을 돕는다',f:'support'},{t:'둘을 합쳐 절충안을 찾는다',f:'flex'}]},
- {id:'a10',t:'회의가 길어지는데 결론이 안 난다.',o:[
-   {t:'"결론부터 내자"고 한다',f:'decision'},{t:'안건을 정리해 구조를 잡는다',f:'plan'},
-   {t:'아직 말 못 한 사람을 챙긴다',f:'empathy'},{t:'논의의 틀 자체를 바꿔본다',f:'idea'}]},
- {id:'a11',t:'공들인 내 아이디어가 채택되지 않았다.',o:[
-   {t:'더 설득해 다시 도전한다',f:'achieve'},{t:'왜 안 됐는지 분석한다',f:'caution'},
-   {t:'채택된 안을 적극 지지한다',f:'support'},{t:'다음 기회로 유연하게 넘긴다',f:'flex'}]},
- {id:'a12',t:'잘 모르는 협력사가 새 방식을 권한다.',o:[
-   {t:'일단 바로 시도해본다',f:'decision'},{t:'검증부터 충분히 한다',f:'caution'},
-   {t:'제안한 사람을 믿고 맡겨본다',f:'trust'},{t:'신나서 더 키워본다',f:'idea'}]},
- {id:'a13',t:'일을 위임받았는데 방법은 자유다.',o:[
-   {t:'내 방식대로 주도해 끌고 간다',f:'lead'},{t:'절차와 단계부터 세운다',f:'plan'},
-   {t:'관련된 사람들과 함께 간다',f:'support'},{t:'실험적으로 새롭게 해본다',f:'flex'}]},
- {id:'a14',t:'갈등하는 두 동료 사이에 끼었다.',o:[
-   {t:'결론을 내 중재한다',f:'lead'},{t:'사실관계부터 정리한다',f:'caution'},
-   {t:'양쪽 감정을 다 들어준다',f:'empathy'},{t:'공동 목표로 다시 묶는다',f:'vision'}]},
- {id:'a15',t:'큰 성과로 칭찬받는 자리다.',o:[
-   {t:'벌써 다음 목표를 말한다',f:'achieve'},{t:'아쉬웠던 점을 짚는다',f:'precision'},
-   {t:'팀의 공으로 돌린다',f:'support'},{t:'앞으로의 가능성을 그린다',f:'vision'}]},
- {id:'a16',t:'익숙한 일이 반복돼 지루하다.',o:[
-   {t:'더 빨리·더 많이 해본다',f:'achieve'},{t:'완성도를 한 단계 더 높인다',f:'precision'},
-   {t:'동료를 돕는 데 시간을 쓴다',f:'support'},{t:'새로운 방식을 시도한다',f:'idea'}]},
- {id:'a17',t:'가격을 두고 협상이 팽팽하다.',o:[
-   {t:'마지노선을 긋고 거기서 버틴다',f:'decision'},{t:'상대를 믿고 먼저 카드를 연다',f:'trust'},
-   {t:'근거를 들어 적정선을 설득한다',f:'precision'},{t:'조건을 새로 짜 판을 바꾼다',f:'idea'}]},
- {id:'a18',t:'공들인 프로젝트가 기대에 못 미쳤다.',o:[
-   {t:'다음엔 뭘 바꿀지 바로 정한다',f:'decision'},{t:'어디서 어긋났는지 되짚는다',f:'caution'},
-   {t:'서로 탓하지 않게 먼저 추스른다',f:'empathy'},{t:'실패에서 다음 기회를 본다',f:'vision'}]},
- {id:'a19',t:'두 사람이 서로 자기 일이 먼저라 한다.',o:[
-   {t:'내가 정리해 우선순위를 못 박는다',f:'lead'},{t:'기준을 세워 둘을 맞춘다',f:'plan'},
-   {t:'양쪽을 다독여 같이 가게 한다',f:'support'},{t:'둘 다 굴러가게 길을 찾는다',f:'flex'}]},
- {id:'a20',t:'원격으로만 일하는데 진척이 흐릿하다.',o:[
-   {t:'짧게 통화해 바로 정리하자 한다',f:'lead'},{t:'진행판을 만들어 공유한다',f:'plan'},
-   {t:'다들 지치지 않았는지 살핀다',f:'empathy'},{t:'더 나은 협업 방식을 제안한다',f:'idea'}]},
- {id:'a21',t:'새 멤버가 막 합류했다.',o:[
-   {t:'중요한 일을 믿고 맡겨 본다',f:'trust'},{t:'역할과 규칙부터 또렷이 안내한다',f:'plan'},
-   {t:'곁에서 도우며 적응을 돕는다',f:'support'},{t:'그의 방식에 맞춰 유연하게 간다',f:'flex'}]},
- {id:'a22',t:'고객이 빠듯한 일정을 밀어붙인다.',o:[
-   {t:'가능한 선을 분명히 긋는다',f:'decision'},{t:'일정의 위험을 짚어 보여준다',f:'caution'},
-   {t:'팀을 믿고 일을 나눠 맡긴다',f:'trust'},{t:'어떻게든 해내 성과로 보인다',f:'achieve'}]},
- {id:'a23',t:'내가 한 일이 당연하게 여겨진다.',o:[
-   {t:'성과를 또렷이 드러내 알린다',f:'achieve'},{t:'흔들림 없이 내 기준을 지킨다',f:'precision'},
-   {t:'같이한 사람부터 먼저 챙긴다',f:'support'},{t:'더 의미 있는 다음 일을 찾는다',f:'vision'}]},
- {id:'a24',t:'익숙한 팀에 매너리즘이 돈다.',o:[
-   {t:'목표를 다시 세워 드라이브를 건다',f:'achieve'},{t:'무너진 기준부터 다잡는다',f:'precision'},
-   {t:'서로의 안부를 다시 묻는다',f:'empathy'},{t:'판을 흔들 새 시도를 던진다',f:'idea'}]}
+ {id:'a1',t:'마감 1시간 전, 작지만 신경 쓰이는 오류를 발견했다.',o:[
+   {t:'일정부터 — 일단 넘기고 끝나고 고친다',f:'decision'},{t:'찜찜하다, 마감 늦더라도 지금 바로잡는다',f:'precision'},
+   {t:'팀에 바로 알리고 같이 빨리 처리한다',f:'support'},{t:'이참에 아예 더 나은 방식으로 손본다',f:'idea'}]},
+ {id:'a2',t:'같은 팀원에게 아쉬운 피드백을 줘야 한다.',o:[
+   {t:'돌리지 않고 핵심을 바로 말한다',f:'lead'},{t:'사실과 예시를 정리해 차분히 말한다',f:'precision'},
+   {t:'관계 상하지 않게 따로 불러 부드럽게',f:'empathy'},{t:'성장에 도움 되는 방향으로 풀어 말한다',f:'vision'}]},
+ {id:'a3',t:'잘 모르는 협력사가 새 방식을 권한다.',o:[
+   {t:'일단 한번 바로 해본다',f:'decision'},{t:'검증부터 충분히 하고 본다',f:'caution'},
+   {t:'권한 사람을 믿고 맡겨본다',f:'trust'},{t:'가능성이 보이면 더 키워본다',f:'idea'}]},
+ {id:'a4',t:'일을 위임받았는데 방법은 자유다.',o:[
+   {t:'내 방식대로 끌고 간다',f:'lead'},{t:'절차와 단계부터 짜놓고 시작한다',f:'plan'},
+   {t:'관련된 사람들에게 먼저 조언을 구한다',f:'support'},{t:'이것저것 새롭게 실험해본다',f:'flex'}]},
+ {id:'a5',t:'갈등하는 두 동료 사이에 끼었다.',o:[
+   {t:'내가 끼어들어 결론을 내준다',f:'lead'},{t:'누구 말이 맞는지 사실부터 본다',f:'caution'},
+   {t:'양쪽 얘기를 다 들어준다',f:'empathy'},{t:'공동 목표를 다시 보게 묶어준다',f:'vision'}]},
+ {id:'a6',t:'공들인 프로젝트가 기대에 못 미쳤다.',o:[
+   {t:'다음엔 뭘 바꿀지 바로 정한다',f:'decision'},{t:'어디서 어긋났는지 차분히 되짚는다',f:'caution'},
+   {t:'서로 탓하지 않게 분위기부터 추스른다',f:'empathy'},{t:'그래도 여기서 뭘 배웠나를 본다',f:'vision'}]}
 ];
 
-/* ---------- PART B. 양자택일 (14) — 강제선택 ---------- */
-var B=[
- {id:'b1',a:{t:'어려운 동료를 적극 편들고 돕는다',f:'support'},b:{t:'잘 모르는 사람에게도 쉽게 믿고 맡긴다',f:'trust'}},
- {id:'b2',a:{t:'빨리 정하고 움직인다',f:'decision'},b:{t:'확인을 마치고 정한다',f:'caution'}},
- {id:'b3',a:{t:'내가 끌고 간다',f:'lead'},b:{t:'남을 먼저 살핀다',f:'empathy'}},
- {id:'b4',a:{t:'빈틈없이 정확하게',f:'precision'},b:{t:'새롭고 다르게',f:'idea'}},
- {id:'b5',a:{t:'이기고 싶다',f:'achieve'},b:{t:'같이 가고 싶다',f:'support'}},
- {id:'b6',a:{t:'정해진 대로 간다',f:'plan'},b:{t:'상황 따라 바꾼다',f:'flex'}},
- {id:'b7',a:{t:'큰 그림을 본다',f:'vision'},b:{t:'디테일을 본다',f:'precision'}},
- {id:'b8',a:{t:'사람을 믿는다',f:'trust'},b:{t:'리스크를 본다',f:'caution'}},
- {id:'b9',a:{t:'내가 통제한다',f:'lead'},b:{t:'흐름에 맡긴다',f:'flex'}},
- {id:'b10',a:{t:'감정을 먼저 본다',f:'empathy'},b:{t:'결론을 먼저 낸다',f:'decision'}},
- {id:'b11',a:{t:'새 아이디어',f:'idea'},b:{t:'안정된 절차',f:'plan'}},
- {id:'b12',a:{t:'성과',f:'achieve'},b:{t:'관계',f:'empathy'}},
- {id:'b13',a:{t:'눈에 보이는 성과',f:'achieve'},b:{t:'먼 가능성',f:'vision'}},
- {id:'b14',a:{t:'믿고 맡긴다',f:'trust'},b:{t:'직접 챙긴다',f:'lead'}}
+/* ---------- PART 1. 성향 (36) — 5점 Likert (12 facet × 3, rev=역문항) ---------- */
+var LIK=['전혀 아니다','아니다','보통','그렇다','매우 그렇다'];
+var LK=[
+ {f:'decision',t:'무언가 결정할 일이 생기면 빠르게 정하고 움직인다'},
+ {f:'decision',t:'고민을 길게 끌기보다 일단 정하는 편이 낫다고 본다'},
+ {f:'decision',t:'중요한 결정일수록 한참을 망설이다 미루곤 한다',rev:1},
+ {f:'lead',t:'일이 흐지부지될 때 내가 나서서 끌고 가는 편이다'},
+ {f:'lead',t:'모임에서 자연스럽게 방향을 잡는 역할을 맡게 된다'},
+ {f:'lead',t:'누군가 이끌어주길 기다리는 편이다',rev:1},
+ {f:'achieve',t:'눈에 보이는 성과를 낼 때 가장 살아있다고 느낀다'},
+ {f:'achieve',t:'무엇이든 실행했으면 결과물이 나와야 한다고 생각한다'},
+ {f:'achieve',t:'결과보다 과정 자체로 충분히 만족하는 편이다',rev:1},
+ {f:'support',t:'동료가 어려우면 내 일을 미뤄서라도 돕는 편이다'},
+ {f:'support',t:'함께 일하는 사람들의 입장과 상황을 먼저 배려한다'},
+ {f:'support',t:'내 할 일에 집중하느라 남 챙기는 건 뒷전이 된다',rev:1},
+ {f:'trust',t:'잘 모르는 사람에게도 일단 믿고 맡겨보는 편이다'},
+ {f:'trust',t:'사람은 기본적으로 믿을 만하다고 생각한다'},
+ {f:'trust',t:'확실해지기 전엔 쉽게 사람을 믿지 않는다',rev:1},
+ {f:'empathy',t:'상대의 표정·말투에서 감정 변화를 잘 알아챈다'},
+ {f:'empathy',t:'결정할 때 사람들이 어떻게 느낄지를 먼저 생각한다'},
+ {f:'empathy',t:'감정보다 사실과 논리가 먼저다',rev:1},
+ {f:'precision',t:'업무를 꼼꼼하고 체계적으로 진행하는 편이다'},
+ {f:'precision',t:'작은 오류나 빈틈도 그냥 넘어가지 못한다'},
+ {f:'precision',t:'디테일보다 일단 굴러가게 하는 게 우선이다',rev:1},
+ {f:'plan',t:'시작 전에 계획과 순서를 정리해야 마음이 놓인다'},
+ {f:'plan',t:'즉흥적으로 바꾸기보다 정해둔 대로 가는 게 편하다'},
+ {f:'plan',t:'계획 없이도 상황 봐가며 잘 해내는 편이다',rev:1},
+ {f:'caution',t:'결정 전에 위험요소를 미리 따져보는 게 습관이다'},
+ {f:'caution',t:'충분한 정보와 근거가 있어야 마음이 놓인다'},
+ {f:'caution',t:'깊이 따지기보다 일단 부딪혀 보는 편이다',rev:1},
+ {f:'idea',t:'새로운 아이디어를 떠올리고 시도하는 게 즐겁다'},
+ {f:'idea',t:'"원래 이렇게 해왔다"를 들으면 다른 방법을 찾고 싶다'},
+ {f:'idea',t:'검증된 방식이 있으면 굳이 새 시도를 하지 않는다',rev:1},
+ {f:'flex',t:'상황이 바뀌면 계획을 빠르게 바꿔 적응하는 편이다'},
+ {f:'flex',t:'예상 못 한 변수도 비교적 유연하게 받아들인다'},
+ {f:'flex',t:'한번 정한 방식을 도중에 바꾸는 건 불편하다',rev:1},
+ {f:'vision',t:'눈앞의 일보다 큰 그림과 먼 미래를 먼저 본다'},
+ {f:'vision',t:'지금 하는 일이 어디로 향하는지가 늘 궁금하다'},
+ {f:'vision',t:'큰 방향보다 당장의 구체적인 일이 더 와닿는다',rev:1}
 ];
 
-/* ---------- PART C. 강점 다이얼 (14) — 빈도앵커 ---------- */
-var C=[
- {id:'c1',f:'decision',z:'over',t:'밀어붙이다 과정을 건너뛰거나 누군가를 앞질러 불편해진 적'},
- {id:'c2',f:'decision',z:'under',t:'결단을 미루다 타이밍을 놓친 적'},
- {id:'c3',f:'lead',z:'over',t:'내 방식대로 통제하려다 사람을 답답하게 한 적'},
- {id:'c4',f:'support',z:'over',t:'거절을 못 해 일을 떠안은 적'},
- {id:'c5',f:'support',z:'under',t:'할 말을 못 해 문제가 더 커진 적'},
- {id:'c6',f:'trust',z:'over',t:'사람을 덥석 믿었다가 손해 본 적'},
- {id:'c7',f:'trust',z:'under',t:'못 믿어 거리를 두다 기회를 놓친 적'},
- {id:'c8',f:'precision',z:'over',t:'완벽을 기하다 결정·제출이 늦어진 적'},
- {id:'c9',f:'precision',z:'under',t:'대충 넘겼다가 빈틈이 드러난 적'},
- {id:'c10',f:'caution',z:'over',t:'리스크를 너무 따지다 시작을 못 한 적'},
- {id:'c11',f:'idea',z:'over',t:'새것에 끌려 손대다 마무리가 흐지부지된 적'},
- {id:'c12',f:'idea',z:'under',t:'익숙한 방식만 고수하다 더 나은 길을 놓친 적'},
- {id:'c13',f:'empathy',z:'over',t:'남 감정에 너무 휘말려 내 페이스를 잃은 적'},
- {id:'c14',f:'plan',z:'over',t:'계획대로만 가려다 더 나은 변화를 놓친 적'}
+/* ---------- PART 2. 강점·그림자 (6) — 5점 Likert (과용 신호) ---------- */
+var OV=[
+ {f:'decision',t:'급하게 밀어붙이다 과정을 건너뛴 적이 있다'},
+ {f:'lead',t:'내 방식대로 하려다 사람을 답답하게 한 적이 있다'},
+ {f:'support',t:'거절을 못 해 일을 떠안곤 한다'},
+ {f:'precision',t:'완벽을 기하다 결정·제출이 늦어지곤 한다'},
+ {f:'caution',t:'이것저것 너무 따지다 시작이 늦어질 때가 있다'},
+ {f:'idea',t:'새것에 끌려 벌이다 마무리가 약해지곤 한다'}
 ];
-var FREQ=['0회','1회','2–3회','4회+'];
+
 
 /* ---------- PART D. 갈등 시퀀스 (3) — 단계별 순위 ---------- */
 var D=[
@@ -279,19 +241,17 @@ var VAL=[
  {k:'stable',t:'안정·예측',d:'흔들리지 않는 안정감',drv:'order'}
 ];
 
-/* ---------- PART K. 역량 스냅샷 (8) — 행동 빈도 (자기과대 보정) ---------- */
-/* dir 'pos' = 자주 발휘할수록 강함 · 'neg' = 자주일수록 약함(반전) */
-var KMP=[
- {id:'k1',comp:'time',label:'시간관리',t:'여러 일이 몰려도 우선순위를 정해 제때 끝냈다',dir:'pos'},
- {id:'k2',comp:'time',label:'시간관리',t:'마감을 놓치거나 닥쳐서 허둥댔다',dir:'neg'},
- {id:'k3',comp:'social',label:'친화력',t:'처음 본 사람과도 금세 편하게 어울렸다',dir:'pos'},
- {id:'k4',comp:'exec',label:'추진력',t:'막힌 일을 끝까지 밀어붙여 굴러가게 했다',dir:'pos'},
- {id:'k5',comp:'finish',label:'마무리력',t:'시작은 했는데 끝을 못 맺고 흐지부지됐다',dir:'neg'},
- {id:'k6',comp:'crisis',label:'위기대응',t:'갑작스런 문제를 침착하게 풀어냈다',dir:'pos'},
- {id:'k7',comp:'persuade',label:'설득력',t:'반대하던 사람을 설득해 함께 움직였다',dir:'pos'},
- {id:'k8',comp:'detail',label:'꼼꼼함',t:'남이 놓친 오류나 빈틈을 미리 잡아냈다',dir:'pos'}
+/* ---------- 역량(강점 포트레이트) — facet 점수에서 자동 산출 ---------- */
+/* 각 역량 = 관련 facet 점수 평균(0~100). 별도 문항 없음. */
+var COMP=[
+ {k:'time',label:'시간관리',fac:['plan','caution','decision']},
+ {k:'social',label:'친화력',fac:['trust','empathy','support']},
+ {k:'exec',label:'추진력',fac:['decision','lead','achieve']},
+ {k:'finish',label:'마무리력',fac:['precision','plan']},
+ {k:'crisis',label:'위기대응',fac:['decision','flex','caution']},
+ {k:'persuade',label:'설득력',fac:['lead','empathy','vision']},
+ {k:'detail',label:'꼼꼼함',fac:['precision','caution']}
 ];
-var COMP=[{k:'time',label:'시간관리'},{k:'social',label:'친화력'},{k:'exec',label:'추진력'},{k:'finish',label:'마무리력'},{k:'crisis',label:'위기대응'},{k:'persuade',label:'설득력'},{k:'detail',label:'꼼꼼함'}];
 
 /* ---------- 결과 텍스트 ---------- */
 var PF={
@@ -304,18 +264,18 @@ var AR={drive_connect:'캡틴',drive_order:'집행관',drive_explore:'개척자'
 var AD={캡틴:'사람을 끌고 결과를 내는 리더',집행관:'강하게 밀되 빈틈없이 관철하는',개척자:'빠르게 새 길을 여는',코치:'사람을 챙기며 끌고 가는',살림꾼:'사람도 빈틈도 함께 챙기는',촉진자:'사람을 모아 새 시도를 끌어내는',관리자:'원칙 위에서 결과를 내는',지킴이:'신뢰와 안정으로 팀을 받치는',설계자:'구조와 아이디어를 잇는',비저너리:'비전을 추진력으로 밀어붙이는',영감가:'사람을 설득해 변화를 이끄는',아키텍트:'새 아이디어를 정교하게 구현하는',통역자:'상황 따라 역할을 바꾸며 사람들을 잇는'};
 
 /* ---------- 상태 ---------- */
-function blank(){return{phase:'intro',step:0,name:'',A:{},B:{},C:{},D:{},E:{},V:[],K:{},reflection:'',hint:false,shared:false};}
+function blank(){return{phase:'intro',step:0,name:'',A:{},LK:{},OV:{},D:{},E:{},V:[],reflection:'',hint:false,shared:false};}
 var S=blank();
+LK.forEach(function(q,i){q.id='l'+i;});OV.forEach(function(q,i){q.id='o'+i;});
 
-/* STEPS 빌드 */
+/* STEPS 빌드 — 성향(Likert) 중심 + 엄선 상황 + 강점/그림자 + 갈등·에너지·가치관 */
 var STEPS=[];
+for(var i=0;i<LK.length;i+=4)STEPS.push({type:'likert',sec:'성향 진단',items:LK.slice(i,i+4)});
 A.forEach(function(q){STEPS.push({type:'sjt',sec:'상황 판단',item:q});});
-for(var i=0;i<B.length;i+=3)STEPS.push({type:'pair',sec:'양자택일',items:B.slice(i,i+3)});
-for(var j=0;j<C.length;j+=4)STEPS.push({type:'dial',sec:'강점 다이얼',items:C.slice(j,j+4)});
+STEPS.push({type:'over',sec:'강점·그림자',items:OV});
 D.forEach(function(q){STEPS.push({type:'conflict',sec:'갈등 시퀀스',item:q});});
 for(var k=0;k<E.length;k+=3)STEPS.push({type:'energy',sec:'에너지·소진',items:E.slice(k,k+3)});
 STEPS.push({type:'values',sec:'가치관 · 결정의 렌즈'});
-for(var vk=0;vk<KMP.length;vk+=4)STEPS.push({type:'competency',sec:'역량 스냅샷',items:KMP.slice(vk,vk+4)});
 STEPS.push({type:'reflection',sec:'마무리 메모'});
 
 var app=document.getElementById('app');
@@ -326,24 +286,27 @@ function eb(w){return batchim(w)?'은':'는';}
 function ig(w){return batchim(w)?'이':'가';}
 
 function done(st){
- if(st.type==='sjt')return(S.A[st.item.id]||[]).length===2;
- if(st.type==='pair')return st.items.every(function(q){return S.B[q.id]!=null;});
- if(st.type==='dial')return st.items.every(function(q){return S.C[q.id]!=null;});
- if(st.type==='conflict')return(S.D[st.item.id]||[]).length===3;
+ if(st.type==='likert')return st.items.every(function(q){return S.LK[q.id]!=null;});
+ if(st.type==='over')return st.items.every(function(q){return S.OV[q.id]!=null;});
+ if(st.type==='sjt')return(S.A[st.item.id]||[]).length>=1;
+ if(st.type==='conflict')return(S.D[st.item.id]||[]).length>=1;
  if(st.type==='energy')return st.items.every(function(q){return S.E[q.id]!=null;});
- if(st.type==='values')return(S.V||[]).length===3;
- if(st.type==='competency')return st.items.every(function(q){return S.K[q.id]!=null;});
+ if(st.type==='values')return(S.V||[]).length>=1;
  return true;
 }
 
 /* ---------- 채점 엔진 (순수) ---------- */
 function compute(s){
- var fs={};FK.forEach(function(f){fs[f]=0;});
- A.forEach(function(q){var r=s.A[q.id]||[];r.forEach(function(oi,pos){var f=q.o[oi]&&q.o[oi].f;if(f&&pos<2)fs[f]+=(2-pos);});});
- B.forEach(function(q){var v=s.B[q.id];if(v!=null){var f=v===0?q.a.f:q.b.f;fs[f]+=2;}});
+ // facet 점수 = Likert 평균(역문항 반전) → 0~100
+ var fsum={},fcnt={};FK.forEach(function(f){fsum[f]=0;fcnt[f]=0;});
+ LK.forEach(function(q){var v=s.LK[q.id];if(v==null)return;var val=q.rev?(6-v):v;fsum[q.f]+=val;fcnt[q.f]++;});
+ var fs={};FK.forEach(function(f){var m=fcnt[f]?fsum[f]/fcnt[f]:3;fs[f]=Math.round((m-1)/4*100);});
+ // 상황판단(SJT) 보조 가산 (1순위 +6, 2순위 +3)
+ A.forEach(function(q){var r=s.A[q.id]||[];r.forEach(function(oi,pos){if(pos>1)return;var f=q.o[oi]&&q.o[oi].f;if(f)fs[f]=Math.min(100,fs[f]+(pos===0?6:3));});});
+ // 동력 = facet 평균
  var ds={drive:0,connect:0,order:0,explore:0};
- FK.forEach(function(f){ds[FC[f].d]+=fs[f];});
- E.forEach(function(q){var d=s.E[q.id];if(d)ds[d]+=3;});
+ DK.forEach(function(d){var ff=FK.filter(function(f){return FC[f].d===d;});ds[d]=ff.reduce(function(a,f){return a+fs[f];},0)/ff.length;});
+ E.forEach(function(q){var d=s.E[q.id];if(d)ds[d]+=6;});
  var sum=DK.reduce(function(a,k){return a+ds[k];},0)||1;
  var bl={};DK.forEach(function(k){bl[k]=Math.round(ds[k]/sum*100);});
  var diff=100-DK.reduce(function(a,k){return a+bl[k];},0);
@@ -352,16 +315,15 @@ function compute(s){
  var p=rk[0],sd=rk[1],lo=rk[3];
  var bal=(bl[rk[0]]-bl[rk[3]])<=12;
  var arch=bal?'통역자':AR[p+'_'+sd];
- // 다이얼
- var dial={};C.forEach(function(q){var v=s.C[q.id];if(v==null)return;if(!dial[q.f])dial[q.f]={over:0,under:0,has:true};dial[q.f][q.z]=v;});
+ // 다이얼: facet 점수 위치 + 과용(OV) 가산
+ var ovv={};OV.forEach(function(q){var v=s.OV[q.id];if(v!=null)ovv[q.f]=v;});
+ var dial={};FK.forEach(function(f){dial[f]={ov:(ovv[f]!=null?ovv[f]:null),has:true};});
  // 갈등 시퀀스
  var seq=D.map(function(q){return(s.D[q.id]||[])[0]||null;});
- // 가치관(상위 3 우선순위) — 키 배열
+ // 가치관(상위 3 우선순위)
  var vals=(s.V||[]).slice(0,3);
- // 역량(0–3 레벨, 행동빈도 / neg 반전 / time은 2문항 평균)
- var comp={};COMP.forEach(function(c){comp[c.k]={sum:0,n:0};});
- KMP.forEach(function(q){var v=s.K[q.id];if(v==null)return;var sc=q.dir==='neg'?(3-v):v;comp[q.comp].sum+=sc;comp[q.comp].n++;});
- var compLv={};COMP.forEach(function(c){compLv[c.k]=comp[c.k].n?Math.round(comp[c.k].sum/comp[c.k].n*10)/10:null;});
+ // 역량(강점 포트레이트) = 관련 facet 평균 → 0~3 레벨
+ var compLv={};COMP.forEach(function(c){var a=c.fac.reduce(function(x,f){return x+fs[f];},0)/c.fac.length;compLv[c.k]=Math.round(a/100*3*10)/10;});
  return{fs:fs,ds:ds,bl:bl,rk:rk,p:p,s:sd,lo:lo,bal:bal,arch:arch,dial:dial,seq:seq,vals:vals,comp:compLv};
 }
 function dialZone(over,under){
@@ -385,29 +347,27 @@ function seqText(seq){
 function packAnswers(s){
  var slots=[];
  A.forEach(function(q){var r=s.A[q.id]||[];for(var i=0;i<4;i++){var pos=r.indexOf(i);slots.push(pos<0?0:pos+1);}});
- B.forEach(function(q){var v=s.B[q.id];slots.push(v==null?0:v+1);});
- C.forEach(function(q){var v=s.C[q.id];slots.push(v==null?0:v);});
+ LK.forEach(function(q){var v=s.LK[q.id];slots.push(v==null?0:v);});
+ OV.forEach(function(q){var v=s.OV[q.id];slots.push(v==null?0:v);});
  D.forEach(function(q){var r=s.D[q.id]||[];for(var i=0;i<3;i++){var pos=r.indexOf(q.o[i].m);slots.push(pos<0?0:pos+1);}});
- E.forEach(function(q){var v=s.E[q.id];slots.push(v==null?0:DK.indexOf(v));});
+ E.forEach(function(q){var v=s.E[q.id];slots.push(v==null?0:DK.indexOf(v)+1);});
  VAL.forEach(function(vd){var pos=(s.V||[]).indexOf(vd.k);slots.push(pos<0?0:pos+1);});
- KMP.forEach(function(q){var v=s.K[q.id];slots.push(v==null?0:v);});
- var bytes=[];for(var i=0;i<slots.length;i+=4)bytes.push((slots[i]||0)|((slots[i+1]||0)<<2)|((slots[i+2]||0)<<4)|((slots[i+3]||0)<<6));
+ var bytes=[];for(var i=0;i<slots.length;i+=2)bytes.push((slots[i]||0)|((slots[i+1]||0)<<4));
  var bin='';bytes.forEach(function(b){bin+=String.fromCharCode(b);});
- return 'M3'+btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+ return 'M4'+btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 }
 function unpackAnswers(code){
  try{
-  if(!code||code.slice(0,2)!=='M3')return null;
+  if(!code||code.slice(0,2)!=='M4')return null;
   var b64=code.slice(2).replace(/-/g,'+').replace(/_/g,'/');var bin=atob(b64);
-  var slots=[];for(var i=0;i<bin.length;i++){var b=bin.charCodeAt(i);slots.push(b&3,(b>>2)&3,(b>>4)&3,(b>>6)&3);}
+  var slots=[];for(var i=0;i<bin.length;i++){var b=bin.charCodeAt(i);slots.push(b&15,(b>>4)&15);}
   var s=blank(),idx=0;
   A.forEach(function(q){var picks=[];for(var i=0;i<4;i++){var v=slots[idx++];if(v>0)picks.push([i,v]);}picks.sort(function(a,b){return a[1]-b[1];});s.A[q.id]=picks.map(function(p){return p[0];});});
-  B.forEach(function(q){var v=slots[idx++];s.B[q.id]=v===0?null:v-1;});
-  C.forEach(function(q){s.C[q.id]=slots[idx++];});
+  LK.forEach(function(q){var v=slots[idx++];s.LK[q.id]=v===0?null:v;});
+  OV.forEach(function(q){var v=slots[idx++];s.OV[q.id]=v===0?null:v;});
   D.forEach(function(q){var picks=[];for(var i=0;i<3;i++){var v=slots[idx++];if(v>0)picks.push([q.o[i].m,v]);}picks.sort(function(a,b){return a[1]-b[1];});s.D[q.id]=picks.map(function(p){return p[0];});});
-  E.forEach(function(q){s.E[q.id]=DK[slots[idx++]];});
+  E.forEach(function(q){var v=slots[idx++];s.E[q.id]=v===0?null:DK[v-1];});
   var vpicks=[];VAL.forEach(function(vd){var v=slots[idx++];if(v>0)vpicks.push([vd.k,v]);});vpicks.sort(function(a,b){return a[1]-b[1];});s.V=vpicks.map(function(p){return p[0];});
-  KMP.forEach(function(q){s.K[q.id]=slots[idx++];});
   return s;
  }catch(e){return null;}
 }
@@ -417,13 +377,11 @@ window.MEUS={
  nav:function(){},
  theme:function(){var d=document.body.classList.toggle('dark');try{localStorage.setItem('meus.theme',d?'dark':'light');}catch(e){}},
  nm:function(v){S.name=v;},rf:function(v){S.reflection=v;},
+ lik:function(store,qid,v){(store==='over'?S.OV:S.LK)[qid]=v;S.hint=false;renderApp();},
  sjt:function(qid,oi){var a=(S.A[qid]||[]).slice();var k=a.indexOf(oi);if(k>=0)a.splice(k,1);else if(a.length<2)a.push(oi);S.A[qid]=a;S.hint=false;renderApp();},
- pair:function(qid,v){S.B[qid]=v;S.hint=false;renderApp();},
- dial:function(qid,v){S.C[qid]=v;S.hint=false;renderApp();},
  conf:function(qid,m){var a=(S.D[qid]||[]).slice();var k=a.indexOf(m);if(k>=0)a.splice(k,1);else if(a.length<3)a.push(m);S.D[qid]=a;S.hint=false;renderApp();},
  energy:function(qid,d){S.E[qid]=d;S.hint=false;renderApp();},
  val:function(k){var a=(S.V||[]).slice();var i=a.indexOf(k);if(i>=0)a.splice(i,1);else if(a.length<3)a.push(k);S.V=a;S.hint=false;renderApp();},
- komp:function(qid,v){S.K[qid]=v;S.hint=false;renderApp();},
  start:function(){var el=document.getElementById('nm');if(el)S.name=el.value;S.phase='assess';S.step=0;renderApp();window.scrollTo(0,0);},
  resume:function(){var c;try{c=localStorage.getItem('meus.last');}catch(e){}var st=unpackAnswers(c);if(st){try{st.name=localStorage.getItem('meus.name')||'';}catch(e){}S=st;S.phase='result';renderApp();window.scrollTo(0,0);}},
  next:function(){var st=STEPS[S.step];if(!done(st)){S.hint=true;renderApp();return;}if(S.step<STEPS.length-1){S.step++;S.hint=false;}else{S.phase='result';try{localStorage.setItem('meus.last',packAnswers(S));localStorage.setItem('meus.name',S.name||'');}catch(e){}}renderApp();window.scrollTo(0,0);},
@@ -449,22 +407,22 @@ function renderApp(){
   '<div class="head"><span class="ix">ME</span><div><div class="kicker" style="margin-bottom:5px">개인 진단 · 12 facet 모델</div><h1>나를 움직이는 힘을<br>한 장으로 읽다.</h1></div></div>'+
   '<p style="color:var(--ink-soft);font-size:clamp(16px,2.2vw,19px);line-height:1.65;margin:16px 0 0;max-width:30em">당신이 일할 때 어떤 사람인지 진단합니다. "지지는 잘 하는데 아무나 믿진 않는다" 같은 결까지, 잘게 나눠서.</p>'+
   '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:24px">'+dh+'</div>'+
-  '<div class="card" style="margin-top:22px"><div class="mono" style="font-size:12px;color:var(--faint);letter-spacing:.06em;margin-bottom:16px">약 68문항 · 20–25분 · 동력·가치관·역량까지 · 발표·인쇄용 결과지</div><label style="font-weight:700;display:block;margin-bottom:8px;font-size:15px">이름 <span style="font-weight:400;color:var(--faint)">(결과지·워크숍용, 선택)</span></label><input id="nm" oninput="MEUS.nm(this.value)" placeholder="예) 김수민" value="'+esc(S.name)+'"><button class="btn dark" onclick="MEUS.start()" style="width:100%;margin-top:14px;font-size:16px">진단 시작하기 →</button>'+resumed+'</div>'+
+  '<div class="card" style="margin-top:22px"><div class="mono" style="font-size:12px;color:var(--faint);letter-spacing:.06em;margin-bottom:16px">약 57문항 · 약 15분 · 5점 척도 중심 · 발표·인쇄용 결과지</div><label style="font-weight:700;display:block;margin-bottom:8px;font-size:15px">이름 <span style="font-weight:400;color:var(--faint)">(결과지·워크숍용, 선택)</span></label><input id="nm" oninput="MEUS.nm(this.value)" placeholder="예) 김수민" value="'+esc(S.name)+'"><button class="btn dark" onclick="MEUS.start()" style="width:100%;margin-top:14px;font-size:16px">진단 시작하기 →</button>'+resumed+'</div>'+
   '<p style="text-align:center;font-size:13px;color:var(--faint);margin-top:18px">자기보고식 진단 · 채용·평가가 아닌 상호 이해를 위한 도구 · <a href="#/decoder" style="color:var(--mute)">먼저 해독표 보기</a></p></div>';
   return;
  }
  if(S.phase==='assess'){
   var st=STEPS[S.step],body='',pct=Math.round(S.step/STEPS.length*100);
   var selBadge='background:var(--ink);color:var(--screen);border-color:var(--ink)';
-  if(st.type==='sjt'){var q=st.item;var ranks=S.A[q.id]||[];var oh='';q.o.forEach(function(o,oi){var idx=ranks.indexOf(oi);var on=idx>=0;oh+='<button class="rank" onclick="MEUS.sjt(\''+q.id+'\','+oi+')" style="'+(on?'border:1.5px solid var(--ink);background:var(--panel)':'')+'"><span class="rdot" style="'+(on?selBadge:'')+'">'+(on?idx+1:'·')+'</span><span style="font-size:clamp(15px,2.1vw,17px)">'+o.t+'</span></button>';});
-   body='<div class="kicker" style="margin-bottom:11px">Situation</div><h3 style="font-size:clamp(21px,3.2vw,30px);line-height:1.35;letter-spacing:-.02em;margin:0 0 7px;max-width:18em">'+q.t+'</h3><p style="margin:0 0 24px;color:var(--mute);font-size:15px">가장 나다운 1순위, 그다음 2순위를 탭하세요. (다시 탭하면 취소)</p>'+oh;}
-  else if(st.type==='pair'){body+='<p style="color:var(--mute);margin:2px 2px 16px;font-size:15px">둘 중 <b style="color:var(--ink)">더 나다운 쪽</b> 하나를 고르세요.</p>';st.items.forEach(function(q){var v=S.B[q.id];body+='<div style="margin-bottom:12px"><div class="pair"><button class="popt'+(v===0?' on':'')+'" onclick="MEUS.pair(\''+q.id+'\',0)" style="'+(v===0?'background:var('+DR[FC[q.a.f].d].v+')':'')+'">'+q.a.t+'</button><button class="popt'+(v===1?' on':'')+'" onclick="MEUS.pair(\''+q.id+'\',1)" style="'+(v===1?'background:var('+DR[FC[q.b.f].d].v+')':'')+'">'+q.b.t+'</button></div></div>';});}
-  else if(st.type==='dial'){body+='<p style="color:var(--mute);margin:2px 2px 16px;font-size:15px">최근 한 달, 아래와 같았던 적이 <b style="color:var(--ink)">몇 번</b> 있었나요? 솔직할수록 정확해집니다.</p>';st.items.forEach(function(q){var v=S.C[q.id];var fh='';FREQ.forEach(function(lab,fi){var on=v===fi;fh+='<button class="fq'+(on?' on':'')+'" onclick="MEUS.dial(\''+q.id+'\','+fi+')" style="'+(on?'background:var(--ink)':'')+'">'+lab+'</button>';});body+='<div class="card" style="padding:18px"><p style="margin:0 0 13px;font-weight:600;line-height:1.45">'+q.t+'</p><div class="freq">'+fh+'</div></div>';});}
+  if(st.type==='likert'||st.type==='over'){var store=st.type==='over'?S.OV:S.LK;
+   if(st.type==='over')body+='<p style="color:var(--mute);margin:2px 2px 16px;font-size:15px">아래가 평소 나에게 얼마나 해당되나요? 솔직할수록 정확해요.</p>';
+   st.items.forEach(function(q){var v=store[q.id];var fh='';LIK.forEach(function(lab,li){var val=li+1;var on=v===val;fh+='<button class="fq'+(on?' on':'')+'" onclick="MEUS.lik(\''+st.type+'\',\''+q.id+'\','+val+')" style="'+(on?'background:var(--ink)':'')+'">'+lab+'</button>';});body+='<div class="card" style="padding:16px 18px"><p style="margin:0 0 13px;font-weight:600;line-height:1.45;font-size:16px">'+q.t+'</p><div class="freq">'+fh+'</div></div>';});}
+  else if(st.type==='sjt'){var q=st.item;var ranks=S.A[q.id]||[];var oh='';q.o.forEach(function(o,oi){var idx=ranks.indexOf(oi);var on=idx>=0;oh+='<button class="rank" onclick="MEUS.sjt(\''+q.id+'\','+oi+')" style="'+(on?'border:1.5px solid var(--ink);background:var(--panel)':'')+'"><span class="rdot" style="'+(on?selBadge:'')+'">'+(on?idx+1:'·')+'</span><span style="font-size:clamp(15px,2.1vw,17px)">'+o.t+'</span></button>';});
+   body='<div class="kicker" style="margin-bottom:11px">Situation</div><h3 style="font-size:clamp(21px,3.2vw,30px);line-height:1.35;letter-spacing:-.02em;margin:0 0 7px;max-width:18em">'+q.t+'</h3><p style="margin:0 0 24px;color:var(--mute);font-size:15px">가장 나다운 것부터 골라요. 1개만 골라도 되고, 2순위까지 매겨도 좋아요.</p>'+oh;}
   else if(st.type==='conflict'){var c=st.item;var ord=S.D[c.id]||[];var oh='';c.o.forEach(function(o){var idx=ord.indexOf(o.m);var on=idx>=0;oh+='<button class="rank" onclick="MEUS.conf(\''+c.id+'\',\''+o.m+'\')" style="'+(on?'border:1.5px solid '+MD[o.m].hex:'')+'"><span class="rdot" style="'+(on?'background:'+MD[o.m].hex+';color:var(--screen);border-color:'+MD[o.m].hex:'')+'">'+(on?idx+1:'·')+'</span><span>'+o.t+'</span></button>';});
-   body='<div class="kicker" style="margin-bottom:9px">'+c.s+'</div><h3 style="font-size:clamp(20px,3vw,27px);line-height:1.35;letter-spacing:-.02em;margin:0 0 7px">'+c.t+'</h3><p style="margin:0 0 22px;color:var(--mute);font-size:15px">나와 가까운 순서대로 1 → 2 → 3을 탭하세요.</p>'+oh;}
+   body='<div class="kicker" style="margin-bottom:9px">'+c.s+'</div><h3 style="font-size:clamp(20px,3vw,27px);line-height:1.35;letter-spacing:-.02em;margin:0 0 7px">'+c.t+'</h3><p style="margin:0 0 22px;color:var(--mute);font-size:15px">나와 가까운 것부터. 1순위만 골라도 됩니다.</p>'+oh;}
   else if(st.type==='energy'){st.items.forEach(function(q){var v=S.E[q.id];var oh='';q.o.forEach(function(o){var on=v===o.d;oh+='<button class="rank" onclick="MEUS.energy(\''+q.id+'\',\''+o.d+'\')" style="'+(on?'border:1.5px solid var('+DR[o.d].v+')':'')+'"><span class="rdot" style="'+(on?'background:var('+DR[o.d].v+');color:var(--screen);border-color:transparent':'')+'">'+(on?'●':'·')+'</span><span>'+o.t+'</span></button>';});body+='<div style="margin-bottom:22px"><h3 style="margin:0 0 13px;font-size:17px">'+q.t+'</h3>'+oh+'</div>';});}
-  else if(st.type==='values'){var oh='';VAL.forEach(function(v){var idx=(S.V||[]).indexOf(v.k);var on=idx>=0;oh+='<button class="rank" onclick="MEUS.val(\''+v.k+'\')" style="'+(on?'border:1.5px solid var(--ink);background:var(--panel)':'')+'"><span class="rdot" style="'+(on?selBadge:'')+'">'+(on?idx+1:'·')+'</span><span><b>'+v.t+'</b> <span style="color:var(--mute);font-weight:400;font-size:14.5px">'+v.d+'</span></span></button>';});body='<div class="kicker" style="margin-bottom:11px">Values · 결정의 렌즈</div><h3 style="font-size:clamp(20px,3vw,27px);line-height:1.35;letter-spacing:-.02em;margin:0 0 7px">일할 때 더 중요하게 지키는 것</h3><p style="margin:0 0 22px;color:var(--mute);font-size:15px">가장 중요한 1·2·3순위를 차례로 탭하세요. 충돌은 보통 "누가 옳냐"가 아니라 여기 1순위가 달라서 생깁니다.</p>'+oh;}
-  else if(st.type==='competency'){body+='<p style="color:var(--mute);margin:2px 2px 16px;font-size:15px">최근 한 달, 아래와 같았던 적이 <b style="color:var(--ink)">몇 번</b> 있었나요? 솔직히 — 자기를 후하게 보지 마세요.</p>';st.items.forEach(function(q){var v=S.K[q.id];var fh='';FREQ.forEach(function(lab,fi){var on=v===fi;fh+='<button class="fq'+(on?' on':'')+'" onclick="MEUS.komp(\''+q.id+'\','+fi+')" style="'+(on?'background:var(--ink)':'')+'">'+lab+'</button>';});body+='<div class="card" style="padding:18px"><p style="margin:0 0 13px;font-weight:600;line-height:1.45">'+q.t+'</p><div class="freq">'+fh+'</div></div>';});}
+  else if(st.type==='values'){var oh='';VAL.forEach(function(v){var idx=(S.V||[]).indexOf(v.k);var on=idx>=0;oh+='<button class="rank" onclick="MEUS.val(\''+v.k+'\')" style="'+(on?'border:1.5px solid var(--ink);background:var(--panel)':'')+'"><span class="rdot" style="'+(on?selBadge:'')+'">'+(on?idx+1:'·')+'</span><span><b>'+v.t+'</b> <span style="color:var(--mute);font-weight:400;font-size:14.5px">'+v.d+'</span></span></button>';});body='<div class="kicker" style="margin-bottom:11px">Values · 결정의 렌즈</div><h3 style="font-size:clamp(20px,3vw,27px);line-height:1.35;letter-spacing:-.02em;margin:0 0 7px">일할 때 더 중요하게 지키는 것</h3><p style="margin:0 0 22px;color:var(--mute);font-size:15px">가장 중요한 것부터. 1순위만 골라도 됩니다.</p>'+oh;}
   else{body='<div class="kicker" style="margin-bottom:11px">Closing note</div><h3 style="font-size:22px;margin:0 0 6px">마무리 메모 <span style="font-weight:400;font-size:16px;color:var(--faint)">(선택)</span></h3><p style="margin:0 0 14px;color:var(--mute);font-size:15px">동료들에게 꼭 알려주고 싶은 나의 한 가지가 있다면?</p><textarea rows="4" oninput="MEUS.rf(this.value)" placeholder="예) 저는 말이 없어질 때가 화난 게 아니라 생각 정리 중인 거예요.">'+esc(S.reflection)+'</textarea><p style="margin:18px 0 0;color:var(--connect);font-weight:700">거의 다 왔어요. 결과를 확인해 보세요.</p>';}
   var hint=(S.hint&&!done(st))?'<p style="margin:11px 0 0;text-align:center;font-size:14px;color:#B0391F">이 화면의 항목을 모두 채워주세요.</p>':'';
   var last=S.step===STEPS.length-1;
@@ -484,8 +442,7 @@ function renderResult(){
  var r=compute(S);
  var nm=S.name?esc(S.name):'';
  // facet dial 위치(0–100): 점수 정규화 + C 빈도 가감
- var fvals=FK.map(function(f){return r.fs[f];});var fmn=Math.min.apply(null,fvals),fmx=Math.max.apply(null,fvals);
- function fpos(f){var base=fmx>fmn?22+(r.fs[f]-fmn)/(fmx-fmn)*58:50;var nud=0;if(r.dial[f]&&r.dial[f].has)nud=((r.dial[f].over||0)-(r.dial[f].under||0))*6;return Math.max(10,Math.min(90,base+nud));}
+ function fpos(f){var base=r.fs[f];var nud=(r.dial[f]&&r.dial[f].ov!=null)?(r.dial[f].ov-3)*7:0;return Math.max(8,Math.min(92,base+nud));}
  // 갈리는 동력
  var lop=null,best=-1;DK.forEach(function(d){var fs=FK.filter(function(f){return FC[f].d===d;});var vals=fs.map(function(f){return r.fs[f];});var sp=Math.max.apply(null,vals)-Math.min.apply(null,vals);if(sp>best){best=sp;lop={d:d,hi:fs[vals.indexOf(Math.max.apply(null,vals))],lo:fs[vals.indexOf(Math.min.apply(null,vals))]};}});
  var dt=new Date(),ym=dt.getFullYear()+'.'+String(dt.getMonth()+1).padStart(2,'0');
@@ -529,7 +486,7 @@ function renderResult(){
   H+='<div style="margin-top:clamp(28px,4vw,44px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,28px)"><div class="sec" style="margin:0 0 6px">Strength portrait · 강점 포트레이트 (최근 행동)</div><p style="margin:0 0 16px;color:var(--mute);font-size:14.5px">동력이 "왜 움직이나"라면, 이건 최근 행동에서 실제로 자주 나온 강점입니다.</p>'+crh+'<p style="margin:12px 0 0;color:var(--ink-soft);font-size:15px">요즘 가장 자주 발휘되는 강점은 <b>'+top2+'</b>입니다.</p></div>';}
  // 나 사용설명서 (4블록)
  var pf=PF[r.p];var anti=ANTI[r.p].map(function(d){return '<b style="color:var('+DR[d].v+')">'+DR[d].name+'</b>';}).join('·');
- var shadF=FK.filter(function(f){return r.dial[f]&&dialZone(r.dial[f].over||0,r.dial[f].under||0)==='over';});
+ var shadF=FK.filter(function(f){return r.dial[f]&&r.dial[f].ov!=null&&r.dial[f].ov>=4;});
  var measured=shadF.length?' 특히 '+shadF.map(function(f){return FC[f].name;}).join('·')+'에서 과용이 잡혔어요.':'';
  function blk(t,b){return '<div><div style="font-weight:800;font-size:15px;margin-bottom:7px">'+t+'</div><p style="font-size:14px;line-height:1.65;color:var(--ink-soft);margin:0">'+b+'</p></div>';}
  var man='<div class="kv">'+blk('이렇게 대해 주세요',pf.cm+' '+pf.nd+'.')+blk('제가 빛나는 순간',pf.m)+blk('주의 신호 — 그림자',pf.tr+' 스트레스 땐 '+({drive:'말이 세지고 급해집니다',connect:'조용히 참고 맞춥니다',order:'더 깐깐·완벽해집니다',explore:'딴 데 한눈팝니다'}[r.p])+'.'+measured)+blk('과용 조절',DR[r.p].name+' 과용은 '+anti+'가 눌러 줍니다. 옆에 이 동력이 강한 동료를 두세요.')+'</div>';
@@ -562,7 +519,7 @@ function renderLanding(){
  app.innerHTML='<div class="wrap fade">'+
  '<div style="border-top:2px solid var(--ink);padding-top:18px"><div class="kicker" style="color:var(--drive);margin-bottom:18px">업무성향 진단 · 12 facet 모델</div><h1 style="font-size:clamp(34px,7vw,68px);line-height:1.05;letter-spacing:-.03em;max-width:13em">나를 알고,<br>너를 읽고,<br>우리를 맞춘다.</h1><p style="font-size:clamp(16px,2.3vw,20px);line-height:1.65;color:var(--ink-soft);margin:22px 0 0;max-width:30em">나는 일할 때 어떤 사람인지, 팀 안에서 어떤 존재인지. 각자 진단하고, 모아서 같이 읽어봅니다.</p></div>'+
  '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(212px,1fr));gap:14px;margin:clamp(36px,6vw,56px) 0 0">'+cards+'</div>'+
- '<div style="display:flex;gap:24px;flex-wrap:wrap;margin-top:clamp(30px,4vw,44px);border-top:1px solid var(--hairline);padding-top:16px" class="mono"><span style="font-size:12px;letter-spacing:.06em;color:var(--faint)">약 68문항</span><span style="font-size:12px;letter-spacing:.06em;color:var(--faint)">20–25 분</span><span style="font-size:12px;letter-spacing:.06em;color:var(--faint)">자기보고식</span><span style="font-size:12px;letter-spacing:.06em;color:var(--faint)">채용·평가 아님</span><a href="#/decoder" style="font-size:12px;letter-spacing:.06em;color:var(--mute);margin-left:auto">해독표 읽기 →</a></div>'+
+ '<div style="display:flex;gap:24px;flex-wrap:wrap;margin-top:clamp(30px,4vw,44px);border-top:1px solid var(--hairline);padding-top:16px" class="mono"><span style="font-size:12px;letter-spacing:.06em;color:var(--faint)">약 57문항</span><span style="font-size:12px;letter-spacing:.06em;color:var(--faint)">약 15 분</span><span style="font-size:12px;letter-spacing:.06em;color:var(--faint)">자기보고식</span><span style="font-size:12px;letter-spacing:.06em;color:var(--faint)">채용·평가 아님</span><a href="#/decoder" style="font-size:12px;letter-spacing:.06em;color:var(--mute);margin-left:auto">해독표 읽기 →</a></div>'+
  '<p style="text-align:center;font-size:13px;color:var(--faint);margin-top:22px">자기보고식 진단 · 채용·평가가 아닌 상호 이해를 위한 도구</p></div>';
 }
 
@@ -744,24 +701,26 @@ route();
 if(location.hash==='#/selftest'){(function(){
  var log=[],ok=0,fail=0;function t(name,cond){if(cond)ok++;else fail++;log.push((cond?'✓':'✗')+' '+name);}
  // 1) 순수 응답 → 코드 라운드트립
- var s=blank();A.forEach(function(q){s.A[q.id]=[0,1];});B.forEach(function(q){s.B[q.id]=q.id.length%2;});C.forEach(function(q,i){s.C[q.id]=i%4;});D.forEach(function(q){s.D[q.id]=['assert','accommodate','analyze'];});E.forEach(function(q,i){s.E[q.id]=DK[i%4];});s.V=['speed','people','quality'];KMP.forEach(function(q,i){s.K[q.id]=i%4;});
+ var s=blank();A.forEach(function(q){s.A[q.id]=[0,1];});LK.forEach(function(q,i){s.LK[q.id]=(i%5)+1;});OV.forEach(function(q,i){s.OV[q.id]=(i%5)+1;});D.forEach(function(q){s.D[q.id]=['assert','accommodate','analyze'];});E.forEach(function(q,i){s.E[q.id]=DK[i%4];});s.V=['speed','people','quality'];
  var code=packAnswers(s);var s2=unpackAnswers(code);
- t('round-trip A',JSON.stringify(s.A)===JSON.stringify(s2.A));
- t('round-trip B',JSON.stringify(s.B)===JSON.stringify(s2.B));
- t('round-trip C',JSON.stringify(s.C)===JSON.stringify(s2.C));
- t('round-trip D',JSON.stringify(s.D)===JSON.stringify(s2.D));
- t('round-trip E',JSON.stringify(s.E)===JSON.stringify(s2.E));
+ t('round-trip A(상황)',JSON.stringify(s.A)===JSON.stringify(s2.A));
+ t('round-trip LK(성향)',JSON.stringify(s.LK)===JSON.stringify(s2.LK));
+ t('round-trip OV(과용)',JSON.stringify(s.OV)===JSON.stringify(s2.OV));
+ t('round-trip D(갈등)',JSON.stringify(s.D)===JSON.stringify(s2.D));
+ t('round-trip E(에너지)',JSON.stringify(s.E)===JSON.stringify(s2.E));
  t('round-trip V(가치관)',JSON.stringify(s.V)===JSON.stringify(s2.V));
- t('round-trip K(역량)',JSON.stringify(s.K)===JSON.stringify(s2.K));
- // 2) 전부 drive로 답하면 추진 최상위
- var sd=blank();A.forEach(function(q){var di=q.o.map(function(o){return FC[o.f].d;}).indexOf('drive');var ord=[];if(di>=0)ord.push(di);q.o.forEach(function(o,oi){if(oi!==di&&ord.length<3)ord.push(oi);});sd.A[q.id]=ord;});B.forEach(function(q){sd.B[q.id]=FC[q.a.f].d==='drive'?0:1;});E.forEach(function(q){sd.E[q.id]='drive';});
+ // 2) facet 동력별로 Likert 높게 → 해당 동력 1위
+ var sd=blank();LK.forEach(function(q){sd.LK[q.id]=(FC[q.f].d==='drive')?(q.rev?1:5):3;});
  var rd=compute(sd);t('drive 편향 → 추진 1위',rd.rk[0]==='drive');
  // 3) blend 합 100
  t('blend 합 = 100',DK.reduce(function(a,k){return a+rd.bl[k];},0)===100);
- // 4) 모든 facet이 어떤 A 보기엔 등장
- var seen={};A.forEach(function(q){q.o.forEach(function(o){seen[o.f]=1;});});t('12 facet 모두 A에 등장',FK.every(function(f){return seen[f];}));
+ // 4) 12 facet 모두 Likert 3문항 + 역문항 1개씩
+ var fcount={};FK.forEach(function(f){fcount[f]=0;});LK.forEach(function(q){fcount[q.f]++;});
+ t('12 facet × 3 Likert',FK.every(function(f){return fcount[f]===3;}));
+ var revOk=FK.every(function(f){return LK.filter(function(q){return q.f===f&&q.rev;}).length===1;});
+ t('facet마다 역문항 1개',revOk);
  // 5) code 길이 합리적
- t('코드 길이 < 60자',code.length<60);
+ t('코드 길이 < 90자',code.length<90);
  document.body.innerHTML='<div class="wrap"><div class="card"><h2>MEUS 셀프테스트</h2><p class="mono" style="font-size:14px;color:'+(fail?'#C0392B':'var(--connect)')+'">'+ok+' passed · '+fail+' failed</p><pre class="mono" style="font-size:13.5px;white-space:pre-wrap">'+log.join('\n')+'</pre><p class="mono" style="font-size:12px;color:var(--faint)">code = '+code+'</p></div></div>';
 })();}
 </script>
