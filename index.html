@@ -343,7 +343,7 @@ function compute(s){
  if(diff){var top=DK.slice().sort(function(a,b){return bl[b]-bl[a];})[0];bl[top]+=diff;}
  var rk=DK.slice().sort(function(a,b){return bl[b]-bl[a]||DK.indexOf(a)-DK.indexOf(b);});
  var p=rk[0],sd=rk[1],lo=rk[3];
- var bal=(bl[rk[0]]-bl[rk[3]])<=7;
+ var bal=(bl[rk[0]]-bl[rk[1]])<=5&&(bl[rk[0]]-bl[rk[3]])<=15;
  var arch=bal?'통역자':AR[p+'_'+sd];
  // 다이얼: facet 점수 위치 + 과용(OV) 가산
  var ovv={};OV.forEach(function(q){var v=s.OV[q.id];if(v!=null)ovv[q.f]=v;});
