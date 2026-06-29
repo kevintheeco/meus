@@ -816,6 +816,10 @@ function renderUs(){
 
 /* ---------- 렌더: 강사용 퍼실리테이터 가이드 ---------- */
 function renderLead(){
+ if(!isFacilitator()){
+  app.innerHTML='<div class="wrap fade" style="text-align:center;padding-top:60px"><div class="sec" style="margin-bottom:12px">강사 전용 페이지</div><p style="color:var(--mute);font-size:15px;line-height:1.7">'+FACILITATOR_EMAIL+'<br>계정으로 로그인해야 볼 수 있습니다.</p><button class="btn dark" onclick="MEUS.authclick()" style="margin-top:18px">Google 로그인</button></div>';
+  return;
+ }
  function row(l,v){return '<div style="display:grid;grid-template-columns:84px 1fr;gap:14px;padding:10px 0;border-top:1px solid var(--hairline)"><div class="mono" style="font-size:11px;color:var(--mute);padding-top:2px">'+l+'</div><div style="font-size:14.5px;line-height:1.6;color:var(--ink-soft)">'+v+'</div></div>';}
  function phase(t,g,goal,script){return '<div style="border:1px solid var(--rule);border-radius:2px;background:var(--panel);padding:16px 18px;margin-bottom:10px"><div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:8px"><span class="pill" style="background:var(--ink);color:var(--screen)">'+t+'</span><span class="mono" style="font-size:11px;color:var(--mute)">'+g+'</span></div><div style="font-weight:700;font-size:15px;margin-bottom:5px">'+goal+'</div><div style="font-size:14px;line-height:1.65;color:var(--ink-soft)">'+script+'</div></div>';}
  function reading(name,mean,tip){return '<div style="border-top:1px solid var(--hairline);padding:11px 0"><div style="font-weight:700;font-size:14.5px;margin-bottom:3px">'+name+'</div><div style="font-size:13.5px;line-height:1.6;color:var(--ink-soft)">'+mean+' <span style="color:var(--mute)">— 강사 팁: '+tip+'</span></div></div>';}
