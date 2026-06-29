@@ -462,6 +462,27 @@ function renderResult(){
  H+='<div style="margin-top:clamp(22px,3vw,34px)"><div class="kicker" style="color:var('+DR[r.p].v+');letter-spacing:.18em;margin-bottom:10px">주 '+DR[r.p].name+' + 부 '+DR[r.s].name+' · Archetype</div><h3 class="display" style="font-weight:900;font-size:clamp(40px,8vw,80px);line-height:.9;letter-spacing:-.03em;margin:0">'+r.arch+'</h3><p style="font-weight:500;font-size:clamp(16px,2.4vw,20px);color:var(--ink-soft);margin:10px 0 0">'+AD[r.arch]+'.'+(r.bal?' 네 동력이 고른 균형형(허브)입니다.':'')+'</p>';
  var seg='',lab='';r.rk.forEach(function(k){seg+='<div style="width:'+r.bl[k]+'%;background:'+DR[k].hex+'"></div>';lab+='<span style="width:'+r.bl[k]+'%">'+DR[k].name+' '+r.bl[k]+'</span>';});
  H+='<div style="margin-top:26px"><div style="display:flex;height:14px;border-radius:2px;overflow:hidden">'+seg+'</div><div class="mono" style="display:flex;font-size:12px;color:var(--mute);margin-top:8px">'+lab+'</div></div></div>';
+ // ===== 종합 분석 (narrative) — 데이터를 엮은 해석 =====
+ var fOf=function(d){return FK.filter(function(f){return FC[f].d===d;});};
+ var NAR=[];
+ (function(){var ff=fOf(r.p).slice().sort(function(a,b){return r.fs[b]-r.fs[a];});var hi=ff[0],loF=ff[ff.length-1];
+  if(r.fs[hi]-r.fs[loF]>=16)NAR.push('주 동력 <b style="color:var('+DR[r.p].v+')">'+DR[r.p].name+'</b> 안에서도 <b>'+FC[hi].name+'</b>('+r.fs[hi]+')'+eb(FC[hi].name)+' 두드러지지만 <b>'+FC[loF].name+'</b>('+r.fs[loF]+')'+eb(FC[loF].name)+' 낮습니다 — 같은 색이라도 결이 다릅니다.');
+  else NAR.push('주 동력은 <b style="color:var('+DR[r.p].v+')">'+DR[r.p].name+'</b>, 그 안의 세 결('+ff.map(function(f){return FC[f].name;}).join('·')+')이 고르게 받쳐 줍니다.');})();
+ NAR.push('두 번째로 강한 건 <b style="color:var('+DR[r.s].v+')">'+DR[r.s].name+'</b>('+r.bl[r.s]+'). '+DR[r.p].name+'를 '+DR[r.s].name+'가 받치는 조합이라 '+AD[r.arch]+' 모습으로 드러납니다.');
+ NAR.push('가장 덜 쓰는 힘은 <b style="color:var('+DR[r.lo].v+')">'+DR[r.lo].name+'</b>('+r.bl[r.lo]+') — 약점이라기보다 사각지대입니다. 이 힘이 강한 동료가 당신을 보완합니다.');
+ var T=[];
+ if(r.fs.achieve>=62&&r.fs.empathy>=62)T.push('성과 욕심과 사람 배려가 둘 다 높아, 둘이 부딪히는 순간 내적 갈등이 큽니다.');
+ if(r.fs.idea>=62&&r.fs.precision<=46)T.push('아이디어는 풍부하지만 정밀이 낮아 — 벌이는 건 빠르되 마무리가 새기 쉽습니다.');
+ if(r.fs.decision>=62&&r.fs.caution<=46)T.push('빠르게 결정하지만 리스크 점검이 약해, 가끔 성급할 수 있습니다.');
+ if(r.fs.lead>=62&&r.fs.empathy<=46)T.push('끌고 가는 힘은 강하나 감정 읽기가 덜해, 본의 아니게 독주로 비칠 수 있습니다.');
+ if(r.fs.support>=62&&r.fs.trust<=46)T.push('잘 돕지만 쉽게 믿진 않습니다 — 곁은 주되 신뢰는 천천히 여는 편.');
+ if(r.fs.plan>=62&&r.fs.flex<=46)T.push('계획은 탄탄하나 변화 적응이 약해, 갑작스런 변수에 경직될 수 있습니다.');
+ if(r.fs.vision>=62&&r.fs.precision<=46)T.push('큰 그림은 잘 보지만 디테일이 약해, 실행 단계에선 받쳐줄 사람이 필요합니다.');
+ if(r.fs.caution>=62&&r.fs.decision<=46)T.push('신중하게 따지는 만큼 결정이 늦어져 타이밍을 놓칠 수 있습니다.');
+ T.slice(0,2).forEach(function(t){NAR.push('<b>내적 긴장 ·</b> '+t);});
+ if(r.seq[0])NAR.push('갈등이 시작되면 <b>'+MD[r.seq[0]].name+'</b>으로 반응합니다 — '+(r.seq[0]==='assert'?'분명히 말하고 밀어붙이는':r.seq[0]==='accommodate'?'먼저 맞추고 양보하는':'한 발 물러나 사실을 따져보는')+' 쪽. (단계별 변화는 아래 갈등 시퀀스 참고)');
+ if(r.vals&&r.vals[0]){var v0n=VAL.filter(function(v){return v.k===r.vals[0];})[0];if(v0n)NAR.push('결정의 1순위 가치는 <b style="color:var('+DR[v0n.drv].v+')">'+v0n.t+'</b> — 선택이 갈릴 땐 이 기준이 먼저 작동합니다.');}
+ H+='<div style="margin-top:clamp(26px,3vw,36px);border-top:2px solid var(--ink);padding-top:clamp(18px,2.5vw,24px)"><div class="sec" style="margin:0 0 14px">종합 분석 · Reading</div>'+NAR.map(function(t){return '<p style="margin:0 0 11px;font-size:15px;line-height:1.7;color:var(--ink-soft)">▸ '+t+'</p>';}).join('')+'</div>';
  // 컴퍼스 + facet 12눈금
  var mx=Math.max(40,Math.max(r.bl.drive,r.bl.connect,r.bl.order,r.bl.explore));
  function cv(v){return 100*v/mx;}
