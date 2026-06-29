@@ -266,10 +266,10 @@ var COMP=[
 
 /* ---------- 결과 텍스트 ---------- */
 var PF={
- drive:{m:'목표 달성·성과·속도·영향력으로 움직인다. 정체와 무능을 가장 못 견딘다.',nd:'명확한 목표 · 자율성 · 빠른 결정 · 결과 인정',tr:'우유부단 · 시간 낭비 · 통제권 상실',cm:'결론부터, 간결하게.',wk:'큰 목표와 데드라인을 주고 방법은 맡겨라. 결정 전 "한 박자 점검" 신호를 합의해두면 독주를 막는다.',sh:['결단 → 독단·성급','주도 → 통제·마이크로매니징','성취 → 과속·과정 무시']},
- connect:{m:'사람·신뢰·팀 화합·동료의 성장으로 움직인다. 누군가 상처받는 게 가장 불편하다.',nd:'감사·인정 · 심리적 안전감 · 관계 먼저',tr:'다툼 · 무례함 · 배제 · 차가운 분위기',cm:'따뜻하게, 관계 확인부터.',wk:'결정 전 "네 생각은?"으로 먼저 물어라. 부정 피드백은 1:1로.',sh:['지지 → 과잉헌신·거절 못함','신뢰 → 과신','공감 → 솔직한 피드백 회피']},
- order:{m:'정확성·품질·질서·원칙·예측가능성으로 움직인다. 졸속과 즉흥을 못 견딘다.',nd:'충분한 정보·시간 · 명확한 기준 · 사전 공유',tr:'무계획 · 졸속 · 모호함 · 즉흥적 변경',cm:'논리·데이터 기반으로 정확하게.',wk:'변경은 미리·이유와 함께 공유하라. "지금은 80%면 된다"는 기준을 주면 완벽주의를 막는다.',sh:['정밀 → 완벽주의','계획 → 경직','신중 → 분석마비·결정 지연']},
- explore:{m:'새로움·아이디어·변화·학습·큰 그림·자율로 움직인다. 반복을 못 견딘다.',nd:'자율 · 실험 허용 · 큰 그림 공유',tr:'반복·루틴 · 관료주의 · 제약 · 디테일 강요',cm:'개념·가능성 중심으로.',wk:'"왜·무엇을"의 큰 그림을 먼저 주고 방법은 열어둬라. 마무리가 약하면 체계형 동료를 파트너로 붙여라.',sh:['발상 → 산만·마무리 약함','유연 → 변덕','비전 → 현실성 부족']}
+ drive:{m:'목표·성과·속도·영향력으로 움직입니다. 정체와 무능을 가장 못 견디죠.',nd:'명확한 목표 · 자율성 · 빠른 결정 · 결과 인정',tr:'우유부단 · 시간 낭비 · 통제권 상실',cm:'결론부터, 간결하게.',wk:'큰 목표와 데드라인을 주고 방법은 맡겨라. 결정 전 "한 박자 점검" 신호를 합의해두면 독주를 막는다.',sh:['결단 → 독단·성급','주도 → 통제·마이크로매니징','성취 → 과속·과정 무시']},
+ connect:{m:'사람·신뢰·팀 화합·동료의 성장으로 움직입니다. 누군가 상처받는 게 가장 불편합니다.',nd:'감사·인정 · 심리적 안전감 · 관계 먼저',tr:'다툼 · 무례함 · 배제 · 차가운 분위기',cm:'따뜻하게, 관계 확인부터.',wk:'결정 전 "네 생각은?"으로 먼저 물어라. 부정 피드백은 1:1로.',sh:['지지 → 과잉헌신·거절 못함','신뢰 → 과신','공감 → 솔직한 피드백 회피']},
+ order:{m:'정확성·품질·질서·원칙·예측가능성으로 움직입니다. 졸속과 즉흥을 못 견디죠.',nd:'충분한 정보·시간 · 명확한 기준 · 사전 공유',tr:'무계획 · 졸속 · 모호함 · 즉흥적 변경',cm:'논리·데이터 기반으로 정확하게.',wk:'변경은 미리·이유와 함께 공유하라. "지금은 80%면 된다"는 기준을 주면 완벽주의를 막는다.',sh:['정밀 → 완벽주의','계획 → 경직','신중 → 분석마비·결정 지연']},
+ explore:{m:'새로움·아이디어·변화·학습·큰 그림·자율로 움직입니다. 반복을 못 견디죠.',nd:'자율 · 실험 허용 · 큰 그림 공유',tr:'반복·루틴 · 관료주의 · 제약 · 디테일 강요',cm:'개념·가능성 중심으로.',wk:'"왜·무엇을"의 큰 그림을 먼저 주고 방법은 열어둬라. 마무리가 약하면 체계형 동료를 파트너로 붙여라.',sh:['발상 → 산만·마무리 약함','유연 → 변덕','비전 → 현실성 부족']}
 };
 var AR={drive_connect:'캡틴',drive_order:'집행관',drive_explore:'개척자',connect_drive:'코치',connect_order:'살림꾼',connect_explore:'촉진자',order_drive:'관리자',order_connect:'지킴이',order_explore:'설계자',explore_drive:'비저너리',explore_connect:'영감가',explore_order:'아키텍트'};
 var AD={캡틴:'사람을 끌고 결과를 내는 리더',집행관:'강하게 밀되 빈틈없이 관철하는',개척자:'빠르게 새 길을 여는',코치:'사람을 챙기며 끌고 가는',살림꾼:'사람도 빈틈도 함께 챙기는',촉진자:'사람을 모아 새 시도를 끌어내는',관리자:'원칙 위에서 결과를 내는',지킴이:'신뢰와 안정으로 팀을 받치는',설계자:'구조와 아이디어를 잇는',비저너리:'비전을 추진력으로 밀어붙이는',영감가:'사람을 설득해 변화를 이끄는',아키텍트:'새 아이디어를 정교하게 구현하는',통역자:'상황 따라 역할을 바꾸며 사람들을 잇는'};
@@ -313,6 +313,7 @@ function batchim(w){if(!w)return false;var c=w.charCodeAt(w.length-1)-0xAC00;ret
 function eun(w){return w+(batchim(w)?'은':'는');}
 function eb(w){return batchim(w)?'은':'는';}
 function ig(w){return batchim(w)?'이':'가';}
+function el(w){return batchim(w)?'을':'를';}
 
 function done(st){
  if(st.type==='likert')return st.items.every(function(q){return S.LK[q.id]!=null;});
@@ -538,7 +539,7 @@ function renderResult(){
  var tiers=[[0,3,'시그니처 — 가장 자연스러운 강점'],[3,6,'주력'],[6,9,'보조'],[9,12,'거의 안 쓰는']];
  var py='';tiers.forEach(function(t){var row='';ranked.slice(t[0],t[1]).forEach(function(f){var od=(r.dial[f]&&r.dial[f].ov!=null&&r.dial[f].ov>=4);row+='<span class="pych" style="background:var('+DR[FC[f].d].v+')">'+FC[f].str+(od&&t[0]<6?' ⚠':'')+'</span>';});py+='<div style="margin-bottom:12px"><div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:var(--mute);margin-bottom:7px">'+t[2]+'</div><div style="display:flex;flex-wrap:wrap;gap:7px">'+row+'</div></div>';});
  var odF=FK.filter(function(f){return r.dial[f]&&r.dial[f].ov!=null&&r.dial[f].ov>=4;});
- var odNote=odF.length?'<div style="border:1px solid var(--rule-strong);border-radius:2px;background:var(--fill);padding:13px 16px;margin-top:6px;font-size:14px;color:var(--ink-soft)"><b>⚠ 과용주의(overdone)</b> — <b>'+odF.map(function(f){return FC[f].str;}).join(' · ')+'</b>은(는) 강할 때 빛나지만, 지나치면 같은 강점이 약점이 됩니다.</div>':'<p style="margin:8px 0 0;font-size:13px;color:var(--mute)">강점이 지나쳐 약점이 되는(overdone) 신호는 약하게 나왔어요.</p>';
+ var odStr=odF.map(function(f){return FC[f].str;}).join(' · ');var odNote=odF.length?'<div style="border:1px solid var(--rule-strong);border-radius:2px;background:var(--fill);padding:13px 16px;margin-top:6px;font-size:14px;color:var(--ink-soft)"><b>⚠ 과용주의(overdone)</b> — <b>'+odStr+'</b>'+eb(odStr)+' 강할 때 빛나지만, 지나치면 같은 강점이 약점이 됩니다.</div>':'<p style="margin:8px 0 0;font-size:13px;color:var(--mute)">강점이 지나쳐 약점이 되는(overdone) 신호는 약하게 나왔어요.</p>';
  H+='<div style="margin-top:clamp(28px,4vw,44px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,28px)"><div class="sec" style="margin:0 0 6px">Strength pyramid · 강점 피라미드</div><p style="margin:0 0 16px;color:var(--mute);font-size:13.5px">위로 갈수록 더 자연스럽게 쓰는 강점입니다. ⚠는 지나치면 그림자가 되는 과용강점.</p>'+py+odNote+'</div>';
  // 갈등 대처 유형 + 삼각형 화살표 (SDI식: 초기→한계 이동)
  function conflictType(seq){if(!seq[0])return null;
@@ -579,7 +580,7 @@ function renderResult(){
  var shadF=FK.filter(function(f){return r.dial[f]&&r.dial[f].ov!=null&&r.dial[f].ov>=4;});
  var measured=shadF.length?' 특히 '+shadF.map(function(f){return FC[f].name;}).join('·')+'에서 과용이 잡혔어요.':'';
  function blk(t,b){return '<div><div style="font-weight:800;font-size:15px;margin-bottom:7px">'+t+'</div><p style="font-size:14px;line-height:1.65;color:var(--ink-soft);margin:0">'+b+'</p></div>';}
- var man='<div class="kv">'+blk('이렇게 대해 주세요',pf.cm+' '+pf.nd+'.')+blk('제가 빛나는 순간',pf.m)+blk('주의 신호 — 그림자',pf.tr+' 스트레스 땐 '+({drive:'말이 세지고 급해집니다',connect:'조용히 참고 맞춥니다',order:'더 깐깐·완벽해집니다',explore:'딴 데 한눈팝니다'}[r.p])+'.'+measured)+blk('과용 조절',DR[r.p].name+' 과용은 '+anti+'가 눌러 줍니다. 옆에 이 동력이 강한 동료를 두세요.')+'</div>';
+ var man='<div class="kv">'+blk('이렇게 대해 주세요',pf.cm+' '+pf.nd+'.')+blk('제가 빛나는 순간',ap.shine)+blk('주의 신호 — 그림자',pf.tr+'. 스트레스 땐 '+({drive:'말이 세지고 급해집니다',connect:'조용히 참고 맞춥니다',order:'더 깐깐·완벽해집니다',explore:'딴 데 한눈팝니다'}[r.p])+'.'+measured)+blk('과용 조절',DR[r.p].name+' 과용은 '+anti+'가 눌러 줍니다. 옆에 이 동력이 강한 동료를 두세요.')+'</div>';
  var extra='';if(S.reflection)extra+='<div style="border:1px solid var(--hairline);border-radius:2px;background:var(--fill);padding:14px 16px;margin-top:12px;font-size:14.5px;color:var(--ink-soft)"><b style="color:var(--ink)">내가 남긴 메모 ·</b> '+esc(S.reflection)+'</div>';
  extra+='<p style="margin:12px 0 0;font-size:14px;color:var(--mute)">가장 덜 쓰는 근육은 <b style="color:var('+DR[r.lo].v+')">'+DR[r.lo].name+'</b> — 약점이 아니라 사각지대입니다. 이 힘이 강한 동료가 당신을 보완해 줍니다.</p>';
  H+='<div style="margin-top:clamp(28px,4vw,44px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,28px)"><div class="sec" style="margin:0 0 16px">User manual · '+(nm?esc(nm)+'님 ':'')+'사용설명서</div>'+man+extra+'</div>';
@@ -587,11 +588,11 @@ function renderResult(){
  var lowTypes=Object.keys(AR).filter(function(k){return k.split('_')[0]===r.lo;}).map(function(k){return AR[k];});
  var sameTypes=Object.keys(AR).filter(function(k){return k.split('_')[0]===r.p&&AR[k]!==r.arch;}).map(function(k){return AR[k];});
  var ovList=FK.filter(function(f){return r.dial[f]&&r.dial[f].ov!=null&&r.dial[f].ov>=4;}).sort(function(a,b){return r.dial[b].ov-r.dial[a].ov;});
- var fric=ovList.length?('당신이 <b>'+FC[ovList[0]].name+'</b>을(를) 과하게 쓸 때, <b>'+ANTI[FC[ovList[0]].d].map(function(d){return DR[d].name;}).join('·')+'</b>이(가) 강한 사람이 균형을 잡아 줍니다.'):'특정 과용이 두드러지지 않아, 대부분의 유형과 무난하게 맞춰 갑니다.';
+ var fric=ovList.length?('당신이 <b>'+FC[ovList[0]].name+'</b>'+el(FC[ovList[0]].name)+' 과하게 쓸 때, <b>'+ANTI[FC[ovList[0]].d].map(function(d){return DR[d].name;}).join('·')+'</b>가 강한 사람이 균형을 잡아 줍니다.'):'특정 과용이 두드러지지 않아, 대부분의 유형과 무난하게 맞춰 갑니다.';
  function cg(t,c,b){return '<div style="border:1px solid var(--rule);border-left:4px solid '+c+';border-radius:2px;background:var(--panel);padding:15px 17px"><div style="font-weight:800;font-size:14px;margin-bottom:6px">'+t+'</div><div style="font-size:13.5px;line-height:1.6;color:var(--ink-soft)">'+b+'</div></div>';}
  H+='<div style="margin-top:clamp(28px,4vw,44px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,28px)"><div class="sec" style="margin:0 0 6px">협업 궁합 · 누구와 잘 맞나</div><p style="margin:0 0 14px;color:var(--mute);font-size:13.5px">관계를 고정하려는 게 아니라, 어떤 결의 사람과 시너지·보완·조율이 생기는지 봅니다.</p><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">'+
-  cg('🤝 보완 (빈자리를 채움)','var('+DR[r.lo].v+')','당신이 가장 덜 쓰는 <b style="color:var('+DR[r.lo].v+')">'+DR[r.lo].name+'</b>이 강한 '+(lowTypes.length?'<b>'+lowTypes.join(' · ')+'</b> 같은 유형':'사람')+'과 짝이면, 서로의 빈자리가 채워집니다.')+
-  cg('⚡ 증폭 (잘 통함·주의)','var('+DR[r.p].v+')',(sameTypes.length?'<b>'+sameTypes.join(' · ')+'</b>처럼 ':'')+'같은 <b style="color:var('+DR[r.p].v+')">'+DR[r.p].name+'</b>이 강한 사람과는 빠르게 통합니다. 다만 같은 사각지대('+DR[r.lo].name+')를 공유하니 제3자가 필요해요.')+
+  cg('🤝 보완 (빈자리를 채움)','var('+DR[r.lo].v+')','당신이 가장 덜 쓰는 <b style="color:var('+DR[r.lo].v+')">'+DR[r.lo].name+'</b>가 강한 '+(lowTypes.length?'<b>'+lowTypes.join(' · ')+'</b> 같은 유형':'사람')+'과 짝이면, 서로의 빈자리가 채워집니다.')+
+  cg('⚡ 증폭 (잘 통함·주의)','var('+DR[r.p].v+')',(sameTypes.length?'<b>'+sameTypes.join(' · ')+'</b>처럼 ':'')+'같은 <b style="color:var('+DR[r.p].v+')">'+DR[r.p].name+'</b>가 강한 사람과는 빠르게 통합니다. 다만 같은 사각지대('+DR[r.lo].name+')를 공유하니 제3자가 필요해요.')+
   cg('⚖️ 조율 (과용 브레이크)','var(--ink)',fric)+
   '</div></div>';
  // ===== 에너지 · 스트레스 (E 응답 그대로) =====
@@ -602,7 +603,7 @@ function renderResult(){
  var grow=[];
  var loTip={drive:'가끔은 완벽하지 않아도 빠르게 결단해 밀어붙여 보세요. 멈춰 있는 것보다 낫습니다.',connect:'결정 전에 "이 결정이 사람들에게 어떻게 느껴질까"를 한 번 더 헤아려 보세요.',order:'중요한 일엔 시작 전 계획과 끝의 점검을 한 단계만 더해도 결과가 단단해집니다.',explore:'검증된 길에서 한 걸음 벗어나 새 방식을 작게 시도해보면 시야가 넓어집니다.'};
  grow.push('가장 덜 쓰는 <b style="color:var('+DR[r.lo].v+')">'+DR[r.lo].name+'</b> — '+loTip[r.lo]);
- if(ovList.length){var f0=ovList[0];grow.push('<b>'+FC[f0].name+'</b>이(가) 과용 구간 — 강점이지만, 지나치다 싶을 때 <b>'+ANTI[FC[f0].d].map(function(d){return DR[d].name;}).join('·')+'</b>의 시선을 한 번 빌려보세요.');}
+ if(ovList.length){var f0=ovList[0];grow.push('<b>'+FC[f0].name+'</b>'+ig(FC[f0].name)+' 과용 구간 — 강점이지만, 지나치다 싶을 때 <b>'+ANTI[FC[f0].d].map(function(d){return DR[d].name;}).join('·')+'</b>의 시선을 한 번 빌려보세요.');}
  var wf=fOf(r.p).slice().sort(function(a,b){return r.fs[a]-r.fs[b];})[0];
  if(r.fs[wf]<=45)grow.push('주 동력 '+DR[r.p].name+' 안에서도 <b>'+FC[wf].name+'</b>('+r.fs[wf]+')은 상대적으로 낮아 — 여기를 한 칸 키우면 강점이 더 입체적이 됩니다.');
  grow.push('약점을 없애려 애쓰기보다, <b>나를 보완하는 동료와 짝</b>을 짓는 게 더 빠릅니다. (위 협업 궁합 참고)');
@@ -693,7 +694,7 @@ function renderYou(){
   H+='<div class="sec" style="margin:clamp(26px,3vw,34px) 0 14px">결정 기준 · 가치 렌즈</div><div style="border:1px solid var(--rule);border-radius:2px;background:var(--panel);padding:16px 18px"><p style="margin:0;font-size:15.5px;color:var(--ink-soft)">'+vT+'</p></div>';}
  // 공통 사각지대
  var both=wA.filter(function(d){return wB.indexOf(d)>=0;});
- var blindT=both.length?'두 사람 모두 <b style="color:var('+DR[both[0]].v+')">'+both.map(function(d){return DR[d].name;}).join(' · ')+'</b>이(가) 약합니다 — 이 둘이 함께 일할 때의 공통 사각지대. '+(both.indexOf('order')>=0?'마감·디테일을 챙길 제3자':both.indexOf('connect')>=0?'분위기·관계를 챙길 제3자':both.indexOf('drive')>=0?'결단을 밀어줄 제3자':'새 관점을 던질 제3자')+'를 붙이면 좋아요.':'두 사람의 약점이 서로 달라, 둘이서도 네 동력을 비교적 고르게 덮습니다.';
+ var blindT=both.length?'두 사람 모두 <b style="color:var('+DR[both[0]].v+')">'+both.map(function(d){return DR[d].name;}).join(' · ')+'</b>가 약합니다 — 이 둘이 함께 일할 때의 공통 사각지대. '+(both.indexOf('order')>=0?'마감·디테일을 챙길 제3자':both.indexOf('connect')>=0?'분위기·관계를 챙길 제3자':both.indexOf('drive')>=0?'결단을 밀어줄 제3자':'새 관점을 던질 제3자')+'를 붙이면 좋아요.':'두 사람의 약점이 서로 달라, 둘이서도 네 동력을 비교적 고르게 덮습니다.';
  H+='<div class="sec" style="margin:clamp(26px,3vw,34px) 0 14px">공통 사각지대</div><div style="border:1px solid var(--rule-strong);border-radius:2px;background:var(--fill);padding:16px 18px"><p style="margin:0;font-size:15.5px;color:var(--ink-soft)">'+blindT+'</p></div>';
  H+='<div class="noprint" style="display:flex;gap:11px;flex-wrap:wrap;margin-top:18px"><button class="btn dark" onclick="MEUS.print()">인쇄 / PDF</button><button class="btn" onclick="MEUS.youReset()">다른 두 사람</button></div>';
  H+='<p style="margin-top:18px;text-align:center;font-size:13px;color:var(--faint)">관계를 고정 라벨로 보지 마세요 — "그 일에선 이렇게 보완되더라"의 도구입니다.</p></div>';
@@ -735,11 +736,11 @@ function renderUs(){
  var TN=[];var topD0=teamRk[0],topD1=teamRk[1];
  var leadByD=function(d){return M.filter(function(p){return p.r.p===d;}).map(function(p){return p.name||'멤버';});};
  var lp=leadByD(topD0);
- TN.push('이 팀의 무게중심은 <b style="color:var('+DR[topD0].v+')">'+DR[topD0].name+'</b>('+avg[topD0]+')과 <b style="color:var('+DR[topD1].v+')">'+DR[topD1].name+'</b>('+avg[topD1]+')입니다'+(lp.length?' — '+lp.map(esc).join('·')+'가 '+DR[topD0].name+'을(를) 끌어갑니다.':'.'));
+ TN.push('이 팀의 무게중심은 <b style="color:var('+DR[topD0].v+')">'+DR[topD0].name+'</b>('+avg[topD0]+')과 <b style="color:var('+DR[topD1].v+')">'+DR[topD1].name+'</b>('+avg[topD1]+')입니다'+(lp.length?' — '+lp.map(esc).join('·')+ig(lp[lp.length-1])+' '+DR[topD0].name+el(DR[topD0].name)+' 끌어갑니다.':'.'));
  var spread=avg[topD0]-avg[blind];
  TN.push(spread>=22?'동력이 <b>'+DR[topD0].name+'</b> 쪽으로 뚜렷이 쏠려 있어 — 그 방향은 강하지만, 반대편(<b style="color:var('+DR[blind].v+')">'+DR[blind].name+'</b>)이 팀의 빈자리입니다.':'네 동력이 비교적 고르게 퍼져 있어, 역할이 자연스럽게 나뉘는 균형 팀입니다.');
  var nobodyD=DK.filter(function(d){return M.every(function(p){return p.r.rk.slice(0,2).indexOf(d)<0;});});
- if(nobodyD.length)TN.push('특히 <b style="color:var('+DR[nobodyD[0]].v+')">'+nobodyD.map(function(d){return DR[d].name;}).join('·')+'</b>은(는) 강한 사람이 한 명도 없는 <b>집단 사각지대</b> — 의사결정 때 이 관점을 의도적으로 챙기거나 보강이 필요합니다.');
+ if(nobodyD.length)TN.push('특히 <b style="color:var('+DR[nobodyD[0]].v+')">'+nobodyD.map(function(d){return DR[d].name;}).join('·')+'</b>는 강한 사람이 한 명도 없는 <b>집단 사각지대</b> — 의사결정 때 이 관점을 의도적으로 챙기거나 보강이 필요합니다.');
  var vc={};M.forEach(function(p){var v=(p.r.vals||[])[0];if(v)vc[v]=(vc[v]||0)+1;});var vk=Object.keys(vc).sort(function(a,b){return vc[b]-vc[a];});
  if(vk.length){var v0=VAL.filter(function(x){return x.k===vk[0];})[0];TN.push('가장 많은 1순위 가치는 <b>'+v0.t+'</b>('+vc[vk[0]]+'명)'+(vk.length>=4?' — 다만 1순위가 '+vk.length+'갈래로 흩어져, 결정 기준을 명시하지 않으면 충돌이 잦을 수 있어요.':'. 결정이 엇갈릴 땐 1순위 가치 차이를 먼저 보세요.'));}
  var oneLine={drive:'결정과 추진',connect:'사람과 화합',order:'정확과 체계',explore:'새 시도와 변화'};
