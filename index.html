@@ -163,52 +163,58 @@ var A=[
 /* ---------- PART 1. 성향 (36) — 5점 Likert (12 facet × 3, rev=역문항) ---------- */
 var LIK=['전혀 아니다','아니다','보통','그렇다','매우 그렇다'];
 var LK=[
- {f:'decision',t:'무언가 결정할 일이 생기면 빠르게 정하고 움직인다'},
- {f:'decision',t:'고민을 길게 끌기보다 일단 정하는 편이 낫다고 본다'},
- {f:'decision',t:'중요한 결정일수록 한참을 망설이다 미루곤 한다',rev:1},
- {f:'lead',t:'일이 흐지부지될 때 내가 나서서 끌고 가는 편이다'},
- {f:'lead',t:'모임에서 자연스럽게 방향을 잡는 역할을 맡게 된다'},
- {f:'lead',t:'누군가 이끌어주길 기다리는 편이다',rev:1},
- {f:'achieve',t:'눈에 보이는 성과를 낼 때 가장 살아있다고 느낀다'},
- {f:'achieve',t:'무엇이든 실행했으면 결과물이 나와야 한다고 생각한다'},
- {f:'achieve',t:'결과보다 과정 자체로 충분히 만족하는 편이다',rev:1},
- {f:'support',t:'동료가 어려우면 내 일을 미뤄서라도 돕는 편이다'},
- {f:'support',t:'함께 일하는 사람들의 입장과 상황을 먼저 배려한다'},
- {f:'support',t:'내 할 일에 집중하느라 남 챙기는 건 뒷전이 된다',rev:1},
+ {f:'decision',t:'결정할 일이 생기면 오래 끌지 않고 빠르게 정한다'},
+ {f:'decision',t:'정보가 완벽하지 않아도 일단 결정하고 가는 데 부담이 적다'},
+ {f:'decision',t:'결정한 뒤에도 "다른 선택이 나았을까" 오래 곱씹는다',rev:1},
+ {f:'lead',t:'방향이 안 잡힐 때 내가 나서서 끌고 가는 편이다'},
+ {f:'lead',t:'여럿이 모이면 자연스럽게 주도하는 위치에 서게 된다'},
+ {f:'lead',t:'앞에 나서기보다 뒤에서 따라가는 게 편하다',rev:1},
+ {f:'achieve',t:'눈에 보이는 성과와 결과로 인정받고 싶은 마음이 크다'},
+ {f:'achieve',t:'한번 시작한 일은 끝까지 해내 결과물을 내야 직성이 풀린다'},
+ {f:'achieve',t:'경쟁이나 1등에는 큰 관심이 없다',rev:1},
+ {f:'support',t:'동료가 힘들면 내 일을 미뤄서라도 돕는 편이다'},
+ {f:'support',t:'내 의견을 내세우기보다 모두가 편한 쪽을 택할 때가 많다'},
+ {f:'support',t:'팀보다 내 몫을 먼저 챙기는 편이다',rev:1},
  {f:'trust',t:'잘 모르는 사람에게도 일단 믿고 맡겨보는 편이다'},
- {f:'trust',t:'사람은 기본적으로 믿을 만하다고 생각한다'},
- {f:'trust',t:'확실해지기 전엔 쉽게 사람을 믿지 않는다',rev:1},
- {f:'empathy',t:'상대의 표정·말투에서 감정 변화를 잘 알아챈다'},
- {f:'empathy',t:'결정할 때 사람들이 어떻게 느낄지를 먼저 생각한다'},
- {f:'empathy',t:'감정보다 사실과 논리가 먼저다',rev:1},
- {f:'precision',t:'업무를 꼼꼼하고 체계적으로 진행하는 편이다'},
- {f:'precision',t:'작은 오류나 빈틈도 그냥 넘어가지 못한다'},
+ {f:'trust',t:'사람은 기본적으로 선의를 갖고 있다고 본다'},
+ {f:'trust',t:'확실히 검증되기 전엔 쉽게 마음을 열지 않는다',rev:1},
+ {f:'empathy',t:'상대의 표정·말투에서 기분 변화를 빨리 알아챈다'},
+ {f:'empathy',t:'결정할 때 사람들이 어떻게 느낄지를 먼저 헤아린다'},
+ {f:'empathy',t:'감정보다 사실과 논리가 먼저 눈에 들어온다',rev:1},
+ {f:'precision',t:'작은 오류나 빈틈이 보이면 그냥 지나치지 못한다'},
+ {f:'precision',t:'결과물의 완성도와 정확성에 특히 신경 쓴다'},
  {f:'precision',t:'디테일보다 일단 굴러가게 하는 게 우선이다',rev:1},
- {f:'plan',t:'시작 전에 계획과 순서를 정리해야 마음이 놓인다'},
- {f:'plan',t:'즉흥적으로 바꾸기보다 정해둔 대로 가는 게 편하다'},
- {f:'plan',t:'계획 없이도 상황 봐가며 잘 해내는 편이다',rev:1},
- {f:'caution',t:'결정 전에 위험요소를 미리 따져보는 게 습관이다'},
- {f:'caution',t:'충분한 정보와 근거가 있어야 마음이 놓인다'},
- {f:'caution',t:'깊이 따지기보다 일단 부딪혀 보는 편이다',rev:1},
- {f:'idea',t:'새로운 아이디어를 떠올리고 시도하는 게 즐겁다'},
- {f:'idea',t:'"원래 이렇게 해왔다"를 들으면 다른 방법을 찾고 싶다'},
- {f:'idea',t:'검증된 방식이 있으면 굳이 새 시도를 하지 않는다',rev:1},
- {f:'flex',t:'상황이 바뀌면 계획을 빠르게 바꿔 적응하는 편이다'},
- {f:'flex',t:'예상 못 한 변수도 비교적 유연하게 받아들인다'},
+ {f:'plan',t:'일을 시작하기 전에 계획과 순서를 정리해야 마음이 놓인다'},
+ {f:'plan',t:'예정된 일정과 절차대로 흘러갈 때 일이 가장 잘 된다'},
+ {f:'plan',t:'계획 없이 즉흥적으로도 잘 해내는 편이다',rev:1},
+ {f:'caution',t:'결정 전에 잘못될 가능성부터 따져보는 게 습관이다'},
+ {f:'caution',t:'돌다리도 두드려 보고, 충분한 근거가 있어야 움직인다'},
+ {f:'caution',t:'리스크를 깊이 재기보다 일단 부딪혀 본다',rev:1},
+ {f:'idea',t:'새로운 아이디어나 방식을 떠올리고 시도하는 게 즐겁다'},
+ {f:'idea',t:'"원래 이렇게 해왔다"는 말을 들으면 다른 길을 찾고 싶다'},
+ {f:'idea',t:'검증된 방식이 있으면 굳이 새로 시도하지 않는다',rev:1},
+ {f:'flex',t:'상황이 바뀌면 계획을 빠르게 갈아타 적응한다'},
+ {f:'flex',t:'예상 못 한 변수가 생겨도 비교적 태연하게 대처한다'},
  {f:'flex',t:'한번 정한 방식을 도중에 바꾸는 건 불편하다',rev:1},
- {f:'vision',t:'눈앞의 일보다 큰 그림과 먼 미래를 먼저 본다'},
- {f:'vision',t:'지금 하는 일이 어디로 향하는지가 늘 궁금하다'},
- {f:'vision',t:'큰 방향보다 당장의 구체적인 일이 더 와닿는다',rev:1}
+ {f:'vision',t:'눈앞의 일보다 큰 그림과 먼 미래를 먼저 떠올린다'},
+ {f:'vision',t:'지금 하는 일이 결국 어디로 향하는지가 늘 궁금하다'},
+ {f:'vision',t:'큰 방향보다 당장의 구체적인 할 일이 더 와닿는다',rev:1}
 ];
 
 /* ---------- PART 2. 강점·그림자 (6) — 5점 Likert (과용 신호) ---------- */
 var OV=[
- {f:'decision',t:'급하게 밀어붙이다 과정을 건너뛴 적이 있다'},
- {f:'lead',t:'내 방식대로 하려다 사람을 답답하게 한 적이 있다'},
- {f:'support',t:'거절을 못 해 일을 떠안곤 한다'},
+ {f:'decision',t:'급하게 밀어붙이다 과정을 건너뛰거나 일을 그르친 적이 있다'},
+ {f:'lead',t:'내 방식대로 끌고 가려다 사람을 답답하게 한 적이 있다'},
+ {f:'achieve',t:'성과에 집착하다 사람이나 과정을 놓친 적이 있다'},
+ {f:'support',t:'거절을 못 해 일을 떠안거나 손해를 본 적이 있다'},
+ {f:'trust',t:'사람을 너무 믿었다가 뒤통수를 맞은 적이 있다'},
+ {f:'empathy',t:'남 감정에 너무 휘말려 내 페이스를 잃은 적이 있다'},
  {f:'precision',t:'완벽을 기하다 결정·제출이 늦어지곤 한다'},
+ {f:'plan',t:'계획에 매여 더 나은 변화를 놓친 적이 있다'},
  {f:'caution',t:'이것저것 너무 따지다 시작이 늦어질 때가 있다'},
- {f:'idea',t:'새것에 끌려 벌이다 마무리가 약해지곤 한다'}
+ {f:'idea',t:'새것에 끌려 벌이다 마무리가 약해지곤 한다'},
+ {f:'flex',t:'그때그때 맞추다 보니 일관성이 흔들린 적이 있다'},
+ {f:'vision',t:'큰 그림에 빠져 당장의 현실을 놓친 적이 있다'}
 ];
 
 
@@ -274,7 +280,7 @@ var LKO=[];(function(){var byF={};FK.forEach(function(f){byF[f]=LK.filter(functi
 var STEPS=[];
 for(var i=0;i<LKO.length;i+=4)STEPS.push({type:'likert',sec:'성향 진단',items:LKO.slice(i,i+4)});
 A.forEach(function(q){STEPS.push({type:'sjt',sec:'상황 판단',item:q});});
-STEPS.push({type:'over',sec:'강점·그림자',items:OV});
+for(var o=0;o<OV.length;o+=4)STEPS.push({type:'over',sec:'강점·그림자',items:OV.slice(o,o+4)});
 D.forEach(function(q){STEPS.push({type:'conflict',sec:'갈등 시퀀스',item:q});});
 for(var k=0;k<E.length;k+=3)STEPS.push({type:'energy',sec:'에너지·소진',items:E.slice(k,k+3)});
 STEPS.push({type:'values',sec:'가치관 · 결정의 렌즈'});
@@ -356,11 +362,11 @@ function packAnswers(s){
  VAL.forEach(function(vd){var pos=(s.V||[]).indexOf(vd.k);slots.push(pos<0?0:pos+1);});
  var bytes=[];for(var i=0;i<slots.length;i+=2)bytes.push((slots[i]||0)|((slots[i+1]||0)<<4));
  var bin='';bytes.forEach(function(b){bin+=String.fromCharCode(b);});
- return 'M4'+btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+ return 'M5'+btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 }
 function unpackAnswers(code){
  try{
-  if(!code||code.slice(0,2)!=='M4')return null;
+  if(!code||code.slice(0,2)!=='M5')return null;
   var b64=code.slice(2).replace(/-/g,'+').replace(/_/g,'/');var bin=atob(b64);
   var slots=[];for(var i=0;i<bin.length;i++){var b=bin.charCodeAt(i);slots.push(b&15,(b>>4)&15);}
   var s=blank(),idx=0;
@@ -475,6 +481,13 @@ function renderResult(){
  // 갈등 시퀀스
  var stl=['처음 부딪힐 때','평행선일 때','더는 못 참을 때'];var seqc='';r.seq.forEach(function(m,idx){seqc+='<div style="flex:1;min-width:148px;border:1px solid var(--hairline);border-radius:2px;padding:14px 16px;background:var(--panel)"><div class="mono" style="font-size:11px;color:var(--faint);margin-bottom:8px">'+(idx+1)+'단계 · '+stl[idx]+'</div><div style="display:flex;align-items:center;gap:7px"><span style="width:9px;height:9px;border-radius:50%;background:'+(m?MD[m].hex:'var(--faint)')+'"></span><span style="font-weight:700;font-size:16px">'+(m?MD[m].name:'-')+'</span><span class="display" style="font-size:13px;color:var(--mute)">'+(m?MD[m].en:'')+'</span></div></div>';if(idx<2)seqc+='<div style="display:flex;align-items:center;color:var(--rule-strong);font-family:var(--font-mono)">→</div>';});
  var seqL='';seqText(r.seq).forEach(function(t){seqL+='<p style="margin:8px 0 0;color:var(--mute);font-size:14.5px">▸ '+t+'</p>';});
+ // 강점 피라미드 (SDI식) — facet 순위 + 과용(overdone)
+ var ranked=FK.slice().sort(function(a,b){return r.fs[b]-r.fs[a]||FK.indexOf(a)-FK.indexOf(b);});
+ var tiers=[[0,3,'시그니처 — 가장 자연스러운 강점'],[3,6,'주력'],[6,9,'보조'],[9,12,'거의 안 쓰는']];
+ var py='';tiers.forEach(function(t){var row='';ranked.slice(t[0],t[1]).forEach(function(f){var od=(r.dial[f]&&r.dial[f].ov!=null&&r.dial[f].ov>=4);row+='<span class="pych" style="background:var('+DR[FC[f].d].v+')">'+FC[f].str+(od&&t[0]<6?' ⚠':'')+'</span>';});py+='<div style="margin-bottom:12px"><div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:var(--mute);margin-bottom:7px">'+t[2]+'</div><div style="display:flex;flex-wrap:wrap;gap:7px">'+row+'</div></div>';});
+ var odF=FK.filter(function(f){return r.dial[f]&&r.dial[f].ov!=null&&r.dial[f].ov>=4;});
+ var odNote=odF.length?'<div style="border:1px solid var(--rule-strong);border-radius:2px;background:var(--fill);padding:13px 16px;margin-top:6px;font-size:14px;color:var(--ink-soft)"><b>⚠ 과용주의(overdone)</b> — <b>'+odF.map(function(f){return FC[f].str;}).join(' · ')+'</b>은(는) 강할 때 빛나지만, 지나치면 같은 강점이 약점이 됩니다.</div>':'<p style="margin:8px 0 0;font-size:13px;color:var(--mute)">강점이 지나쳐 약점이 되는(overdone) 신호는 약하게 나왔어요.</p>';
+ H+='<div style="margin-top:clamp(28px,4vw,44px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,28px)"><div class="sec" style="margin:0 0 6px">Strength pyramid · 강점 피라미드</div><p style="margin:0 0 16px;color:var(--mute);font-size:13.5px">위로 갈수록 더 자연스럽게 쓰는 강점입니다. ⚠는 지나치면 그림자가 되는 과용강점.</p>'+py+odNote+'</div>';
  H+='<div style="margin-top:clamp(28px,4vw,44px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,28px)"><div class="sec" style="margin:0 0 16px">Conflict sequence · 갈등 시퀀스</div><div style="display:flex;align-items:stretch;gap:10px;flex-wrap:wrap">'+seqc+'</div>'+seqL+'</div>';
  // 결정의 렌즈 (가치관)
  if(r.vals&&r.vals.length){var vh='';r.vals.forEach(function(k,i){var vd=VAL.filter(function(v){return v.k===k;})[0];if(!vd)return;vh+='<span style="display:inline-flex;align-items:center;gap:8px;border:1px solid var(--rule);border-radius:2px;padding:9px 14px;margin:0 9px 9px 0;'+(i===0?'background:var('+DR[vd.drv].v+');color:var(--screen);border-color:transparent':'')+'"><span class="mono" style="font-size:12px;'+(i===0?'':'color:var(--faint)')+'">'+(i+1)+'</span> <b>'+vd.t+'</b></span>';});
