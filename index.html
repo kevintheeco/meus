@@ -167,43 +167,56 @@ var A=[
 
 /* ---------- PART 1. 성향 (36) — 5점 Likert (12 facet × 3, rev=역문항) ---------- */
 var LIK=['전혀 아니다','아니다','보통','그렇다','매우 그렇다'];
+/* x = 교차 베타 가중치. 양수: 같은 방향 기여. 음수: 역방향 기여(높은 응답 → 낮은 점수) */
 var LK=[
- {f:'decision',t:'결정할 일이 생기면 오래 끌지 않고 빠르게 정한다'},
- {f:'decision',t:'정보가 완벽하지 않아도 일단 결정하고 가는 데 부담이 적다'},
- {f:'decision',t:'결정한 뒤에도 "다른 선택이 나았을까" 오래 곱씹는다',rev:1},
- {f:'lead',t:'방향이 안 잡힐 때 내가 나서서 끌고 가는 편이다'},
- {f:'lead',t:'여럿이 모이면 자연스럽게 주도하는 위치에 서게 된다'},
- {f:'lead',t:'앞에 나서기보다 뒤에서 따라가는 게 편하다',rev:1},
- {f:'achieve',t:'눈에 보이는 성과와 결과로 인정받고 싶은 마음이 크다'},
- {f:'achieve',t:'한번 시작한 일은 끝까지 해내 결과물을 내야 직성이 풀린다'},
- {f:'achieve',t:'경쟁이나 1등에는 큰 관심이 없다',rev:1},
- {f:'support',t:'동료가 힘들면 내 일을 미뤄서라도 돕는 편이다'},
- {f:'support',t:'내 의견을 내세우기보다 모두가 편한 쪽을 택할 때가 많다'},
- {f:'support',t:'팀보다 내 몫을 먼저 챙기는 편이다',rev:1},
- {f:'trust',t:'잘 모르는 사람에게도 일단 믿고 맡겨보는 편이다'},
- {f:'trust',t:'사람은 기본적으로 선의를 갖고 있다고 본다'},
- {f:'trust',t:'확실히 검증되기 전엔 쉽게 마음을 열지 않는다',rev:1},
- {f:'empathy',t:'상대의 표정·말투에서 기분 변화를 빨리 알아챈다'},
- {f:'empathy',t:'결정할 때 사람들이 어떻게 느낄지를 먼저 헤아린다'},
- {f:'empathy',t:'감정보다 사실과 논리가 먼저 눈에 들어온다',rev:1},
- {f:'precision',t:'작은 오류나 빈틈이 보이면 그냥 지나치지 못한다'},
- {f:'precision',t:'결과물의 완성도와 정확성에 특히 신경 쓴다'},
- {f:'precision',t:'디테일보다 일단 굴러가게 하는 게 우선이다',rev:1},
- {f:'plan',t:'일을 시작하기 전에 계획과 순서를 정리해야 마음이 놓인다'},
- {f:'plan',t:'예정된 일정과 절차대로 흘러갈 때 일이 가장 잘 된다'},
- {f:'plan',t:'계획 없이 즉흥적으로도 잘 해내는 편이다',rev:1},
- {f:'caution',t:'결정 전에 잘못될 가능성부터 따져보는 게 습관이다'},
- {f:'caution',t:'돌다리도 두드려 보고, 충분한 근거가 있어야 움직인다'},
- {f:'caution',t:'리스크를 깊이 재기보다 일단 부딪혀 본다',rev:1},
- {f:'idea',t:'새로운 아이디어나 방식을 떠올리고 시도하는 게 즐겁다'},
- {f:'idea',t:'"원래 이렇게 해왔다"는 말을 들으면 다른 길을 찾고 싶다'},
- {f:'idea',t:'검증된 방식이 있으면 굳이 새로 시도하지 않는다',rev:1},
- {f:'flex',t:'상황이 바뀌면 계획을 빠르게 갈아타 적응한다'},
- {f:'flex',t:'예상 못 한 변수가 생겨도 비교적 태연하게 대처한다'},
- {f:'flex',t:'한번 정한 방식을 도중에 바꾸는 건 불편하다',rev:1},
- {f:'vision',t:'눈앞의 일보다 큰 그림과 먼 미래를 먼저 떠올린다'},
- {f:'vision',t:'지금 하는 일이 결국 어디로 향하는지가 늘 궁금하다'},
- {f:'vision',t:'큰 방향보다 당장의 구체적인 할 일이 더 와닿는다',rev:1}
+ /* DRIVE — Decision */
+ {f:'decision',t:'결정할 일이 생기면 오래 끌지 않고 빠르게 정한다',          x:{caution:-0.25}},
+ {f:'decision',t:'정보가 완벽하지 않아도 일단 결정하고 가는 데 부담이 적다', x:{caution:-0.40,precision:-0.20}},
+ {f:'decision',t:'결정한 뒤에도 "다른 선택이 나았을까" 오래 곱씹는다',rev:1, x:{caution:0.30}},
+ /* DRIVE — Lead */
+ {f:'lead',t:'방향이 안 잡힐 때 내가 나서서 끌고 가는 편이다',               x:{decision:0.25}},
+ {f:'lead',t:'여럿이 모이면 자연스럽게 주도하는 위치에 서게 된다',            x:{decision:0.20}},
+ {f:'lead',t:'앞에 나서기보다 뒤에서 따라가는 게 편하다',rev:1,               x:{support:0.25,trust:0.15}},
+ /* DRIVE — Achieve */
+ {f:'achieve',t:'눈에 보이는 성과와 결과로 인정받고 싶은 마음이 크다',        x:{lead:0.15}},
+ {f:'achieve',t:'한번 시작한 일은 끝까지 해내 결과물을 내야 직성이 풀린다',   x:{precision:0.25,plan:0.15}},
+ {f:'achieve',t:'경쟁이나 1등에는 큰 관심이 없다',rev:1,                      x:{support:0.20}},
+ /* CONNECT — Support */
+ {f:'support',t:'동료가 힘들면 내 일을 미뤄서라도 돕는 편이다',               x:{empathy:0.30,achieve:-0.20}},
+ {f:'support',t:'내 의견을 내세우기보다 모두가 편한 쪽을 택할 때가 많다',     x:{lead:-0.30,decision:-0.20}},
+ {f:'support',t:'팀보다 내 몫을 먼저 챙기는 편이다',rev:1,                    x:{achieve:0.25}},
+ /* CONNECT — Trust */
+ {f:'trust',t:'잘 모르는 사람에게도 일단 믿고 맡겨보는 편이다',               x:{caution:-0.35,decision:0.20}},
+ {f:'trust',t:'사람은 기본적으로 선의를 갖고 있다고 본다',                     x:{empathy:0.20}},
+ {f:'trust',t:'확실히 검증되기 전엔 쉽게 마음을 열지 않는다',rev:1,           x:{caution:0.35}},
+ /* CONNECT — Empathy */
+ {f:'empathy',t:'상대의 표정·말투에서 기분 변화를 빨리 알아챈다',             x:{support:0.20}},
+ {f:'empathy',t:'결정할 때 사람들이 어떻게 느낄지를 먼저 헤아린다',           x:{support:0.25,decision:-0.20}},
+ {f:'empathy',t:'감정보다 사실과 논리가 먼저 눈에 들어온다',rev:1,            x:{caution:0.25,precision:0.20}},
+ /* ORDER — Precision */
+ {f:'precision',t:'작은 오류나 빈틈이 보이면 그냥 지나치지 못한다',           x:{caution:0.30}},
+ {f:'precision',t:'결과물의 완성도와 정확성에 특히 신경 쓴다',                x:{caution:0.25,plan:0.15}},
+ {f:'precision',t:'디테일보다 일단 굴러가게 하는 게 우선이다',rev:1,          x:{decision:0.25,flex:0.20}},
+ /* ORDER — Plan */
+ {f:'plan',t:'일을 시작하기 전에 계획과 순서를 정리해야 마음이 놓인다',       x:{caution:0.30,precision:0.20}},
+ {f:'plan',t:'예정된 일정과 절차대로 흘러갈 때 일이 가장 잘 된다',            x:{caution:0.20,precision:0.15}},
+ {f:'plan',t:'계획 없이 즉흥적으로도 잘 해내는 편이다',rev:1,                 x:{flex:0.35,decision:0.20}},
+ /* ORDER — Caution */
+ {f:'caution',t:'결정 전에 잘못될 가능성부터 따져보는 게 습관이다',           x:{precision:0.25,plan:0.20,decision:-0.25}},
+ {f:'caution',t:'돌다리도 두드려 보고, 충분한 근거가 있어야 움직인다',        x:{precision:0.30,decision:-0.30}},
+ {f:'caution',t:'리스크를 깊이 재기보다 일단 부딪혀 본다',rev:1,              x:{decision:0.30,flex:0.20}},
+ /* EXPLORE — Idea */
+ {f:'idea',t:'새로운 아이디어나 방식을 떠올리고 시도하는 게 즐겁다',          x:{flex:0.25,vision:0.20}},
+ {f:'idea',t:'"원래 이렇게 해왔다"는 말을 들으면 다른 길을 찾고 싶다',       x:{flex:0.30,plan:-0.25}},
+ {f:'idea',t:'검증된 방식이 있으면 굳이 새로 시도하지 않는다',rev:1,          x:{plan:0.25,caution:0.20}},
+ /* EXPLORE — Flex */
+ {f:'flex',t:'상황이 바뀌면 계획을 빠르게 갈아타 적응한다',                   x:{decision:0.20,plan:-0.25}},
+ {f:'flex',t:'예상 못 한 변수가 생겨도 비교적 태연하게 대처한다',             x:{caution:-0.20,decision:0.15}},
+ {f:'flex',t:'한번 정한 방식을 도중에 바꾸는 건 불편하다',rev:1,              x:{plan:0.30,caution:0.20}},
+ /* EXPLORE — Vision */
+ {f:'vision',t:'눈앞의 일보다 큰 그림과 먼 미래를 먼저 떠올린다',            x:{idea:0.25,plan:-0.20}},
+ {f:'vision',t:'지금 하는 일이 결국 어디로 향하는지가 늘 궁금하다',           x:{idea:0.20}},
+ {f:'vision',t:'큰 방향보다 당장의 구체적인 할 일이 더 와닿는다',rev:1,       x:{plan:0.25,precision:0.20}}
 ];
 
 /* ---------- PART 2. 강점·그림자 (6) — 5점 Likert (과용 신호) ---------- */
@@ -329,7 +342,16 @@ function done(st){
 function compute(s){
  // facet 점수 = Likert 평균(역문항 반전) → 0~100
  var fsum={},fcnt={};FK.forEach(function(f){fsum[f]=0;fcnt[f]=0;});
- LK.forEach(function(q){var v=s.LK[q.id];if(v==null)return;var val=q.rev?(6-v):v;fsum[q.f]+=val;fcnt[q.f]++;});
+ LK.forEach(function(q){
+  var v=s.LK[q.id];if(v==null)return;
+  var val=q.rev?(6-v):v;           // primary-direction normalized value (1-5)
+  fsum[q.f]+=val; fcnt[q.f]+=1;   // primary facet: full weight
+  if(q.x)Object.keys(q.x).forEach(function(f2){
+   var beta=q.x[f2];
+   if(beta>0){fsum[f2]+=val*beta;fcnt[f2]+=beta;}          // same direction
+   else{fsum[f2]+=(6-val)*(-beta);fcnt[f2]+=(-beta);}      // reverse: high primary → low secondary
+  });
+ });
  var fs={};FK.forEach(function(f){var m=fcnt[f]?fsum[f]/fcnt[f]:3;fs[f]=Math.round((m-1)/4*100);});
  // 상황판단(SJT) 보조 가산 (1순위 +6, 2순위 +3)
  A.forEach(function(q){var r=s.A[q.id]||[];r.forEach(function(oi,pos){if(pos>1)return;var f=q.o[oi]&&q.o[oi].f;if(f)fs[f]=Math.min(100,fs[f]+(pos===0?6:3));});});
