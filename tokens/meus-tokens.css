@@ -1,0 +1,53 @@
+/* ============================================================
+   MEUS · Design Tokens (CSS custom properties)
+   Single source of truth for color + type + structure.
+   Names match the data model (drive/connect/order/explore) so
+   design ↔ code stay in sync. Import this once at app root.
+   ============================================================ */
+
+:root {
+  /* ---- 4 Drives (accent only — never page background) ---- */
+  --drive:        #D85A30;  --drive-deep:   #B84A26;  /* 추진 Drive   "되게 만든다" */
+  --connect:      #1D9E75;  --connect-deep: #178A66;  /* 조화 Connect "이어준다"   */
+  --order:        #378ADD;  --order-deep:   #2F78C2;  /* 체계 Order   "정확히 채운다" */
+  --explore:      #7F77DD;  --explore-deep: #6B63C4;  /* 탐구 Explore "새 길을 연다" */
+
+  /* ---- Neutral · warm paper scale (light) ---- */
+  --ink:          #1C1814;  /* primary text, 2px section rules */
+  --ink-soft:     #4A4339;  /* body paragraph text */
+  --mute:         #7C7263;  /* secondary text */
+  --faint:        #A99E8B;  /* mono kickers, captions */
+  --rule:         #D8CFBE;  /* default 1px card border */
+  --rule-strong:  #C8BDA8;  /* screen-frame border, dim glyphs */
+  --hairline:     #E2D9C8;  /* inner hairlines, dividers */
+  --paint:        #E8E0D0;  /* dial "부족" zone, muted wells */
+  --fill:         #EFE8DA;  /* lighter fill / highlight rows */
+  --panel:        #FBF7EE;  /* card / panel surface */
+  --screen:       #F6F1E6;  /* in-app screen background */
+  --paper:        #F1EBDF;  /* page / canvas background */
+  --paper-pure:   #FFFDF8;  /* result sheet / print surface */
+  --chrome:       #EAE2D2;  /* browser-frame title bar */
+
+  /* ---- Type ---- */
+  --font-display: 'Archivo','Pretendard','Apple SD Gothic Neo',sans-serif; /* Latin display */
+  --font-sans:    'Pretendard','Apple SD Gothic Neo',sans-serif;           /* KO + body */
+  --font-mono:    'JetBrains Mono',monospace;                              /* data / kickers */
+
+  /* ---- Structure ---- */
+  --r-card:       2px;
+  --r-screen:     4px;
+  --border-rule:  1px solid var(--rule);
+  --rule-section: 2px solid var(--ink);
+  --shadow-screen:0 18px 48px -28px rgba(28,24,20,.5);
+  --shadow-paper: 0 30px 70px -40px rgba(28,24,20,.55);
+  --maxw:         1180px;
+}
+
+/* ---- Dark mode (defined; not applied to key screens this round) ---- */
+[data-theme="dark"] {
+  --ink:#EDE7D9; --ink-soft:#CFC6B5; --mute:#9A8E7A; --faint:#7C7263;
+  --rule:#322C22; --rule-strong:#3D3527; --hairline:#2A2419;
+  --paint:#241F18; --fill:#201B14; --panel:#1F1B14;
+  --screen:#1A160F; --paper:#15120D; --paper-pure:#1A160F; --chrome:#211C14;
+  /* drive hexes are unchanged — they read well on the dark ground */
+}
