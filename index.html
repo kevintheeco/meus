@@ -333,9 +333,22 @@ function compute(s){
  var fs={};FK.forEach(function(f){var m=fcnt[f]?fsum[f]/fcnt[f]:3;fs[f]=Math.round((m-1)/4*100);});
  // 상황판단(SJT) 보조 가산 (1순위 +6, 2순위 +3)
  A.forEach(function(q){var r=s.A[q.id]||[];r.forEach(function(oi,pos){if(pos>1)return;var f=q.o[oi]&&q.o[oi].f;if(f)fs[f]=Math.min(100,fs[f]+(pos===0?6:3));});});
- // 동력 = facet 평균 (E 에너지 응답은 표시용만, 점수 제외)
+ // 동력 = facet 평균 (1차)
  var ds={drive:0,connect:0,order:0,explore:0};
  DK.forEach(function(d){var ff=FK.filter(function(f){return FC[f].d===d;});ds[d]=ff.reduce(function(a,f){return a+fs[f];},0)/ff.length;});
+ // ── 다각화 신호: E·D·V·OV → 동력 점수 보조 ──
+ // E 에너지 (e1 살아있다·e2 힘빠짐·e3 기준·e4 스트레스·e5 회복) — 5문항 × 가중치
+ var eWt={e1:6,e2:4,e3:4,e4:3,e5:4};
+ E.forEach(function(q){var d=s.E[q.id];if(d)ds[d]+=(eWt[q.id]||4);});
+ // D 갈등 시퀀스 — assert→drive, accommodate→connect, analyze→order (각 단계 +3)
+ var dMap={assert:'drive',accommodate:'connect',analyze:'order'};
+ D.forEach(function(q){var m=(s.D[q.id]||[])[0];if(m&&dMap[m])ds[dMap[m]]+=3;});
+ // V 가치관 우선순위 — 1위 +5, 2위 +3, 3위 +1
+ var vMap={speed:'drive',people:'connect',quality:'order',novel:'explore',auto:'explore',stable:'order'};
+ var vPts=[5,3,1];
+ (s.V||[]).slice(0,3).forEach(function(k,i){var d=vMap[k];if(d)ds[d]+=vPts[i];});
+ // OV 과용강점 — 높은 자기보고(≥4) = 해당 facet 강하게 사용 중 → 동력 확인
+ OV.forEach(function(q){var v=s.OV[q.id];if(v>=4)ds[FC[q.f].d]+=2;else if(v===3)ds[FC[q.f].d]+=1;});
  var sum=DK.reduce(function(a,k){return a+ds[k];},0)||1;
  var bl={};DK.forEach(function(k){bl[k]=Math.round(ds[k]/sum*100);});
  var diff=100-DK.reduce(function(a,k){return a+bl[k];},0);
@@ -513,7 +526,7 @@ function renderResult(){
    else NAR.push('주 동력은 <b style="color:var('+DR[r.p].v+')">'+DR[r.p].name+'</b>, 그 안의 세 결('+ff.map(function(f){return FC[f].name;}).join('·')+')이 고르게 받쳐 줍니다.');})();
   if(r.secStr){NAR.push('두 번째로 강한 건 <b style="color:var('+DR[r.s].v+')">'+DR[r.s].name+'</b>('+r.bl[r.s]+'). '+DR[r.p].name+'를 '+DR[r.s].name+'가 받치는 조합이라 '+AD[r.arch]+' 모습으로 드러납니다.');}
   else{NAR.push('<b style="color:var('+DR[r.p].v+')">'+DR[r.p].name+'</b>('+r.bl[r.p]+')이 뚜렷이 앞서고, 나머지 세 동력은 비슷하게 분포됩니다('+r.rk.slice(1).map(function(d){return DR[d].name+' '+r.bl[d];}).join(' / ')+'). 주 동력 중심으로 읽으세요.');}
-  NAR.push('가장 덜 쓰는 힘은 <b style="color:var('+DR[r.lo].v+')">'+DR[r.lo].name+'</b>('+r.bl[r.lo]+') — 약점이라기보다 사각지대입니다. 이 힘이 강한 동료가 당신을 보완합니다.');
+  (function(){var loBlend=r.bl[r.lo];var loLabel=loBlend<18?'사각지대 — 의식하지 않으면 놓치기 쉬운 영역':loBlend<24?'상대적으로 덜 앞세우는 힘 — 약점이라기보다 우선순위가 뒤에 있는 것':'네 힘 중 가장 조용한 편이지만 완전히 비어 있지는 않습니다';NAR.push('가장 덜 쓰는 힘은 <b style="color:var('+DR[r.lo].v+')">'+DR[r.lo].name+'</b>('+loBlend+'%) — '+loLabel+'. 이 힘이 강한 동료가 당신을 보완합니다.');})();
  }
  var T=[];
  if(r.fs.achieve>=62&&r.fs.empathy>=62)T.push('성과 욕심과 사람 배려가 둘 다 높아, 둘이 부딪히는 순간 내적 갈등이 큽니다.');
@@ -668,7 +681,8 @@ function renderResult(){
  function blk(t,b){return '<div><div style="font-weight:800;font-size:15px;margin-bottom:7px">'+t+'</div><p style="font-size:14px;line-height:1.65;color:var(--ink-soft);margin:0">'+b+'</p></div>';}
  var man='<div class="kv">'+blk('이렇게 대해 주세요',pf.cm+' '+pf.nd+'.')+blk('제가 빛나는 순간',ap.shine)+blk('주의 신호 — 그림자',pf.tr+'. 스트레스 땐 '+({drive:'말이 세지고 급해집니다',connect:'조용히 참고 맞춥니다',order:'더 깐깐·완벽해집니다',explore:'딴 데 한눈팝니다'}[r.p])+'.'+measured)+blk('과용 조절',DR[r.p].name+' 과용은 '+anti+'가 눌러 줍니다. 옆에 이 동력이 강한 동료를 두세요.')+'</div>';
  var extra='';if(S.reflection)extra+='<div style="border:1px solid var(--hairline);border-radius:2px;background:var(--fill);padding:14px 16px;margin-top:12px;font-size:14.5px;color:var(--ink-soft)"><b style="color:var(--ink)">내가 남긴 메모 ·</b> '+esc(S.reflection)+'</div>';
- extra+='<p style="margin:12px 0 0;font-size:14px;color:var(--mute)">가장 덜 쓰는 근육은 <b style="color:var('+DR[r.lo].v+')">'+DR[r.lo].name+'</b> — 약점이 아니라 사각지대입니다. 이 힘이 강한 동료가 당신을 보완해 줍니다.</p>';
+ var loBlend2=r.bl[r.lo];var loLabel2=loBlend2<18?'사각지대':loBlend2<24?'상대적으로 덜 쓰는 힘':'가장 조용한 힘';
+ extra+='<p style="margin:12px 0 0;font-size:14px;color:var(--mute)">가장 덜 쓰는 근육은 <b style="color:var('+DR[r.lo].v+')">'+DR[r.lo].name+'</b>('+loBlend2+'%) — '+loLabel2+'. 이 힘이 강한 동료가 당신을 보완해 줍니다.</p>';
  H+='<div style="margin-top:clamp(28px,4vw,44px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,28px)"><div class="sec" style="margin:0 0 16px">User manual · '+(nm?esc(nm)+'님 ':'')+'사용설명서</div>'+man+extra+'</div>';
  // ===== 협업 궁합 =====
  var lowTypes=Object.keys(AR).filter(function(k){return k.split('_')[0]===r.lo;}).map(function(k){return AR[k];});
