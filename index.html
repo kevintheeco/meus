@@ -983,7 +983,17 @@ window.MEUSsync=function(code,name){try{if(_db&&_user)meusRef(_user.uid).set({k:
  if(!window.firebase||!firebase.initializeApp){console.warn('[firebase] SDK 미로딩');return;}
  if(!firebase.apps.length)firebase.initializeApp({apiKey:"AIzaSyD0ObaK3aKotOjKjtg1MGz_SB4qHX0DhdA",authDomain:"yourprofessor-94a2d.firebaseapp.com",projectId:"yourprofessor-94a2d",storageBucket:"yourprofessor-94a2d.firebasestorage.app",messagingSenderId:"307018527457",appId:"1:307018527457:web:83c46611055283c427bda0"});
  _auth=firebase.auth();_db=firebase.firestore();
- _auth.onAuthStateChanged(function(u){_user=u||null;updateAuthBtn();if(u)loadCloud(u);});
+ _auth.onAuthStateChanged(function(u){
+  _user=u||null;updateAuthBtn();
+  if(u){
+   loadCloud(u);
+   // 결과 페이지에서 로그인하면 제출 버튼 즉시 활성화
+   var tb=document.getElementById('teambtn');
+   if(tb&&tb.disabled){tb.outerHTML='<button class="btn dark" id="teambtn" onclick="MEUS.teamSubmit()" style="width:100%;margin-top:10px;background:var(--connect)">팀에 제출하기 →</button>';}
+   // 팀 현황 패널도 갱신
+   if(document.getElementById('team-status-panel'))MEUS.teamCheck();
+  }
+ });
 }catch(e){console.warn('[firebase] 초기화 실패 — 로그인 비활성',e);_auth=null;_db=null;}})();
 
 /* ---------- 셀프테스트 (#/selftest) ---------- */
