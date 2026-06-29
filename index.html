@@ -347,6 +347,8 @@ function compute(s){
  var fsum={},fcnt={};FK.forEach(function(f){fsum[f]=0;fcnt[f]=0;});
 
  // ① LK Likert(36) — primary w=1.0 + 교차 베타
+ // 부정 베타(모순 답변)는 NEG_MULT로 증폭: 기준선에서 더 강하게 깎임
+ var NEG_MULT=1.6;
  LK.forEach(function(q){
   var v=s.LK[q.id];if(v==null)return;
   var val=q.rev?(6-v):v;
@@ -354,7 +356,7 @@ function compute(s){
   if(q.x)Object.keys(q.x).forEach(function(f2){
    var beta=q.x[f2];
    if(beta>0){fsum[f2]+=val*beta;fcnt[f2]+=beta;}
-   else{fsum[f2]+=(6-val)*(-beta);fcnt[f2]+=(-beta);}
+   else{var aw=(-beta)*NEG_MULT;fsum[f2]+=(6-val)*aw;fcnt[f2]+=aw;}
   });
  });
 
@@ -366,7 +368,7 @@ function compute(s){
    if(!opt.f)return;
    var pi=pos[oi];
    var val=(pi===0)?5:(pi===1)?4:2;
-   var w=(pi===0)?0.60:(pi===1)?0.50:0.25;
+   var w=(pi===0)?0.60:(pi===1)?0.50:0.38;
    fsum[opt.f]+=val*w;fcnt[opt.f]+=w;
   });
  });
