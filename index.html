@@ -432,7 +432,8 @@ function fillbar(pct,grad){return '<div class="bar"><div class="dialfill" style=
 
 function renderApp(){
  if(S.phase==='intro'){
-  var dh='';DK.forEach(function(k){dh+='<div style="border:1px solid var(--rule);border-top:3px solid '+DR[k].hex+';border-radius:2px;background:var(--panel);padding:14px 6px;text-align:center"><div style="font-weight:700;font-size:15px">'+DR[k].name+'</div><div class="mono" style="font-size:11px;color:var(--faint);letter-spacing:.08em;text-transform:uppercase;margin-top:3px">'+DR[k].en+'</div></div>';});
+  var dhDesc={drive:'결과를 향해 밀어붙이는 힘',connect:'사람을 챙기고 팀을 잇는 힘',order:'정확하게 맞추고 빈틈 없애는 힘',explore:'새 길을 열고 큰 그림 보는 힘'};
+  var dh='';DK.forEach(function(k){dh+='<div style="border:1px solid var(--rule);border-top:3px solid '+DR[k].hex+';border-radius:2px;background:var(--panel);padding:14px 10px"><div style="font-weight:700;font-size:14px">'+DR[k].name+'</div><div style="font-size:12px;color:var(--mute);margin-top:4px;line-height:1.4">'+dhDesc[k]+'</div></div>';});
   var resumed='';try{if(localStorage.getItem('meus.last'))resumed='<button class="btn" onclick="MEUS.resume()" style="width:100%;margin-top:9px">지난 결과 다시 보기 →</button>';}catch(e){}
   app.innerHTML='<div class="wrap fade">'+
   '<div class="head"><span class="ix">ME</span><div><div class="kicker" style="margin-bottom:5px">개인 진단 · 약 15분</div><h1>나를 움직이는 힘을<br>한 장으로 읽다.</h1></div></div>'+
@@ -616,7 +617,8 @@ function renderResult(){
  H+='</div>'; // /paper
  // 공유 코드 + 액션
  if(!S.shared){var code=packAnswers(S);
-  H+='<div class="card noprint" style="margin-top:14px"><div class="sec" style="margin:0 0 7px">내 코드 · 너(You)·우리(Us) 입력</div><p style="margin:0 0 12px;color:var(--mute);font-size:14.5px">이 코드를 동료에게 주거나 다음 모듈에 넣으면 보완·팀 분석이 됩니다. (서버 저장 없음)</p><div class="mono" style="background:var(--fill);border:1px solid var(--rule);border-radius:2px;padding:11px 13px;font-size:13.5px;word-break:break-all;color:var(--mute);margin-bottom:11px">'+code+'</div><div style="display:flex;gap:9px;flex-wrap:wrap"><button class="btn dark" id="copybtn" onclick="MEUS.copy()">코드 복사</button><button class="btn" id="copyurlbtn" onclick="MEUS.copyurl()">결과 링크 복사</button></div></div>';}
+  var submitBtn=_user?'<button class="btn dark" id="teambtn" onclick="MEUS.teamSubmit()" style="width:100%;margin-top:10px;background:var(--connect)">팀에 제출하기 →</button>':'<button class="btn" style="width:100%;margin-top:10px;color:var(--mute);cursor:default" disabled>팀 제출은 구글 로그인 후 가능합니다</button>';
+  H+='<div class="card noprint" style="margin-top:14px"><div class="sec" style="margin:0 0 7px">내 코드 · 너(You)·우리(Us) 입력</div><p style="margin:0 0 12px;color:var(--mute);font-size:14.5px">이 코드를 동료에게 주거나 다음 모듈에 넣으면 보완·팀 분석이 됩니다.</p><div class="mono" style="background:var(--fill);border:1px solid var(--rule);border-radius:2px;padding:11px 13px;font-size:13.5px;word-break:break-all;color:var(--mute);margin-bottom:11px">'+code+'</div><div style="display:flex;gap:9px;flex-wrap:wrap"><button class="btn dark" id="copybtn" onclick="MEUS.copy()">코드 복사</button><button class="btn" id="copyurlbtn" onclick="MEUS.copyurl()">결과 링크 복사</button></div>'+submitBtn+'</div>';}
  H+='<div class="noprint" style="display:flex;gap:11px;flex-wrap:wrap;margin-top:14px"><button class="btn dark" onclick="MEUS.print()">결과지 인쇄 / PDF 저장</button>'+(S.shared?'<a class="btn" href="#/me" style="text-decoration:none">내 진단 하러 가기</a>':'<button class="btn" onclick="MEUS.reset()">처음으로</button>')+'</div>';
  H+='<p style="margin-top:18px;text-align:center;font-size:13px;color:var(--faint)">사람을 한 글자로 가두지 마세요 — "넌 추진형이라 그래"(✕), "그 상황에선 추진이 세게 나왔네"(○)</p></div>';
  app.innerHTML=H;
@@ -704,6 +706,27 @@ function renderYou(){
 /* ===== US ===== */
 var US={members:[],err:'',res:false};
 function syncUs(){}
+var FACILITATOR_EMAIL='soomin020114@gmail.com';
+function teamRef(uid){return _db.collection('team').doc(uid);}
+function isFacilitator(){return _user&&_user.email===FACILITATOR_EMAIL;}
+MEUS.teamSubmit=function(){
+ if(!_user||!_db){alert('로그인이 필요합니다.');return;}
+ var code=packAnswers(S);var name=S.name||_user.displayName||_user.email.split('@')[0];
+ var btn=document.getElementById('teambtn');if(btn){btn.textContent='제출 중…';btn.disabled=true;}
+ teamRef(_user.uid).set({name:name,code:code,email:_user.email,ts:Date.now()},{merge:true})
+  .then(function(){if(btn){btn.textContent='✓ 제출 완료';btn.style.background='var(--ink)';btn.disabled=false;}})
+  .catch(function(e){if(btn){btn.textContent='오류 — 다시 시도';btn.disabled=false;}console.warn('[team submit]',e);});
+};
+MEUS.teamLoad=function(){
+ if(!_db){alert('로그인이 필요합니다.');return;}
+ var btn=document.getElementById('teamloadbtn');if(btn){btn.textContent='불러오는 중…';btn.disabled=true;}
+ _db.collection('team').get().then(function(snap){
+  US={members:[],err:'',res:false};
+  snap.forEach(function(doc){var d=doc.data();if(!d.code)return;var p=personFromCode(d.code,d.name||'');if(p)US.members.push(p);});
+  if(!US.members.length){alert('제출한 팀원이 없어요. 각자 결과지에서 "팀에 제출하기"를 눌러야 합니다.');if(btn){btn.textContent='팀 결과 자동 불러오기';btn.disabled=false;}return;}
+  renderUs();window.scrollTo(0,0);
+ }).catch(function(e){if(btn){btn.textContent='권한 오류 — Firestore 규칙 확인';btn.disabled=false;}console.warn('[team load]',e);});
+};
 MEUS.usAdd=function(){var ne=document.getElementById('us_name'),ce=document.getElementById('us_code');var name=ne?ne.value:'',code=ce?ce.value:'';var p=personFromCode(code,name);if(!p){US.err='코드를 확인해 주세요. (M1로 시작하는 결과 코드)';renderUs();return;}US.err='';US.members.push(p);renderUs();var c2=document.getElementById('us_code');if(c2)c2.focus();};
 MEUS.usMine=function(){var c='',n='';try{c=localStorage.getItem('meus.last')||'';n=localStorage.getItem('meus.name')||'';}catch(e){}if(!c){alert('저장된 내 결과가 없어요.');return;}var ce=document.getElementById('us_code');if(ce)ce.value=c;var ne=document.getElementById('us_name');if(ne&&!ne.value&&n)ne.value=n;};
 MEUS.usDel=function(i){US.members.splice(i,1);if(US.members.length<2)US.res=false;renderUs();};
@@ -715,7 +738,9 @@ function renderUs(){
  if(!US.res){
   var list='';US.members.forEach(function(p,i){list+='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--soft);border-radius:11px;padding:10px 13px;margin-bottom:8px"><div><b>'+esc(p.name||('멤버 '+(i+1)))+'</b> <span style="color:var(--faint);font-size:14px">· '+p.r.arch+'</span> <span style="margin-left:6px">'+pillsMini(p.r)+'</span></div><button class="btn" style="padding:5px 10px;font-size:13px" onclick="MEUS.usDel('+i+')">삭제</button></div>';});
   var err=US.err?'<p style="margin:0 0 12px;color:#C0392B;font-size:14.5px">'+US.err+'</p>':'';
+  var facilitatorPanel=isFacilitator()?'<div class="card" style="margin-bottom:14px;border-left:4px solid var(--drive);background:var(--panel)"><div style="font-weight:800;font-size:14px;margin-bottom:6px">강사 전용 · 팀 결과 자동 불러오기</div><p style="font-size:13.5px;color:var(--mute);margin:0 0 10px">각자 결과지에서 "팀에 제출하기"를 누른 팀원만 불러옵니다.</p><button id="teamloadbtn" class="btn dark" onclick="MEUS.teamLoad()" style="width:100%">팀 결과 자동 불러오기 →</button></div>':'';
   app.innerHTML='<div class="wrap fade"><div class="head"><span class="ix">US</span><div><div class="kicker" style="margin-bottom:4px">팀 분포 지도 · 보완 매트릭스</div><h1>우리를 맞춘다.</h1></div></div><p style="color:var(--ink-soft);font-size:16px;line-height:1.6;margin:14px 0 18px;max-width:34em">여러 명을 한 평면에 놓으면 팀의 무게중심과 비어 있는 자리가 드러납니다. 누가 누구의 사각지대를 채우는지까지.</p>'+
+  facilitatorPanel+
   err+
   '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:11px"><h3 style="margin:0">팀원 추가 <span class="mono" style="color:var(--faint);font-weight:400;font-size:14px">'+US.members.length+'명</span></h3><button class="btn" style="padding:7px 12px;font-size:14px" onclick="MEUS.usMine()">내 코드 넣기</button></div>'+
   '<input id="us_name" placeholder="이름 (선택)" style="margin-bottom:8px"><textarea id="us_code" rows="2" placeholder="결과 코드 (M1…)" style="font-family:\'JetBrains Mono\',monospace;font-size:13.5px;margin-bottom:9px"></textarea><button class="btn dark" onclick="MEUS.usAdd()" style="width:100%">+ 추가</button></div>'+
