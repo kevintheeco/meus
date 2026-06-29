@@ -741,6 +741,7 @@ MEUS.teamSubmit=function(){
   .then(function(){if(btn){btn.textContent='✓ 제출 완료';btn.style.background='var(--ink)';btn.disabled=false;}})
   .catch(function(e){if(btn){btn.textContent='오류 — 다시 시도';btn.disabled=false;}console.warn('[team submit]',e);});
 };
+MEUS._teamRows=[];
 MEUS.teamCheck=function(){
  if(!_db){alert('로그인이 필요합니다.');return;}
  var panel=document.getElementById('team-status-panel');
@@ -748,37 +749,37 @@ MEUS.teamCheck=function(){
  _db.collection('ws_team').get().then(function(snap){
   var rows=[];
   snap.forEach(function(doc){var d=doc.data();if(!d.code)return;var p=personFromCode(d.code,d.name||'');if(!p)return;var ts=d.ts?new Date(d.ts).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'';rows.push({p:p,name:d.name||'이름없음',ts:ts,email:d.email||'',code:d.code});});
+  MEUS._teamRows=rows;
   if(!rows.length){if(panel)panel.innerHTML='<p style="color:var(--mute);font-size:14px">아직 제출한 팀원이 없습니다. 각자 결과지 하단 "팀에 제출하기"를 눌러야 합니다.</p>';return;}
-  var listHtml=rows.map(function(r){
+  var listHtml=rows.map(function(r,i){
    var rv=r.p.r;
    var driveBar=DK.map(function(d){return '<span style="margin-right:6px;font-size:11px"><span style="color:var('+DR[d].v+')">'+DR[d].name.slice(0,2)+'</span><span class="mono" style="color:var(--mute);margin-left:2px">'+rv.bl[d]+'</span></span>';}).join('');
    var topF=(rv.topFacets||[]).slice(0,3).map(function(f){return (FC[f]&&FC[f].name)||f;}).join(' · ');
    var resultUrl=location.origin+location.pathname+'#/r/'+encodeURIComponent(r.code);
-   return '<div style="padding:10px 0;border-top:1px solid var(--hairline)">'+
+   return '<label style="display:flex;gap:10px;padding:10px 0;border-top:1px solid var(--hairline);cursor:pointer;align-items:flex-start">'+
+    '<input type="checkbox" id="tm_'+i+'" checked style="margin-top:3px;accent-color:var(--drive);width:15px;height:15px;flex-shrink:0">'+
+    '<div style="flex:1;min-width:0">'+
     '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">'+
     '<div><b style="font-size:14px">'+esc(r.name)+'</b> <span class="pill" style="background:var(--fill);color:var(--ink-soft);font-size:11px">'+rv.arch+'</span></div>'+
     '<div style="display:flex;align-items:center;gap:8px">'+
     '<span class="mono" style="font-size:10px;color:var(--faint)">'+r.ts+'</span>'+
-    '<a href="'+resultUrl+'" target="_blank" style="font-size:12px;color:var(--drive);text-decoration:none;border:1px solid var(--drive);border-radius:6px;padding:3px 8px;white-space:nowrap">결과 보기 →</a>'+
+    '<a href="'+resultUrl+'" target="_blank" onclick="event.stopPropagation()" style="font-size:12px;color:var(--drive);text-decoration:none;border:1px solid var(--drive);border-radius:6px;padding:3px 8px;white-space:nowrap">결과 보기 →</a>'+
     '</div></div>'+
     '<div style="margin:2px 0 1px">'+driveBar+'</div>'+
     (topF?'<div style="font-size:11px;color:var(--mute)">▲ '+topF+'</div>':'')+
-    '</div>';
+    '</div></label>';
   }).join('');
-  var loadBtn='<button class="btn dark" style="width:100%;margin-top:12px" onclick="MEUS.teamLoad()">'+rows.length+'명 데이터로 팀 분석 시작 →</button>';
-  if(panel)panel.innerHTML='<div style="font-size:13px;color:var(--mute);margin-bottom:4px">'+rows.length+'명 제출 완료</div>'+listHtml+loadBtn;
+  var loadBtn='<button class="btn dark" id="teamloadbtn" style="width:100%;margin-top:12px" onclick="MEUS.teamLoadSelected()">선택 인원 팀 분석 →</button>';
+  if(panel)panel.innerHTML='<div style="font-size:13px;color:var(--mute);margin-bottom:6px">'+rows.length+'명 제출 완료 — 분석할 인원 선택</div>'+listHtml+loadBtn;
  }).catch(function(e){if(panel)panel.innerHTML='<p style="color:#C0392B;font-size:13px">오류: '+e.message+'</p>';console.warn('[team check]',e);});
 };
-MEUS.teamLoad=function(){
- if(!_db){alert('로그인이 필요합니다.');return;}
- var btn=document.getElementById('teamloadbtn');if(btn){btn.textContent='불러오는 중…';btn.disabled=true;}
- _db.collection('ws_team').get().then(function(snap){
-  US={members:[],err:'',res:false};
-  snap.forEach(function(doc){var d=doc.data();if(!d.code)return;var p=personFromCode(d.code,d.name||'');if(p)US.members.push(p);});
-  if(!US.members.length){if(btn){btn.textContent='팀 결과 자동 불러오기';btn.disabled=false;}MEUS.teamCheck();return;}
-  US.res=true;renderUs();window.scrollTo(0,0);
- }).catch(function(e){if(btn){btn.textContent='권한 오류 (콘솔 확인)';btn.disabled=false;}console.warn('[team load]',e);});
+MEUS.teamLoadSelected=function(){
+ var selected=[];
+ (MEUS._teamRows||[]).forEach(function(r,i){var cb=document.getElementById('tm_'+i);if(cb&&cb.checked)selected.push(r.p);});
+ if(selected.length<2){alert('두 명 이상 선택해야 팀 분석이 가능합니다.');return;}
+ US={members:selected,err:'',res:true};renderUs();window.scrollTo(0,0);
 };
+MEUS.teamLoad=function(){MEUS.teamLoadSelected();};
 MEUS.usAdd=function(){var ne=document.getElementById('us_name'),ce=document.getElementById('us_code');var name=ne?ne.value:'',code=ce?ce.value:'';var p=personFromCode(code,name);if(!p){US.err='코드를 확인해 주세요. (M1로 시작하는 결과 코드)';renderUs();return;}US.err='';US.members.push(p);renderUs();var c2=document.getElementById('us_code');if(c2)c2.focus();};
 MEUS.usMine=function(){var c='',n='';try{c=localStorage.getItem('meus.last')||'';n=localStorage.getItem('meus.name')||'';}catch(e){}if(!c){alert('저장된 내 결과가 없어요.');return;}var ce=document.getElementById('us_code');if(ce)ce.value=c;var ne=document.getElementById('us_name');if(ne&&!ne.value&&n)ne.value=n;};
 MEUS.usDel=function(i){US.members.splice(i,1);if(US.members.length<2)US.res=false;renderUs();};
