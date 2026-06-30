@@ -809,7 +809,7 @@ function renderResult(){
   if(seq[2]==='analyze'&&seq[0]!=='analyze')return{n:'끝엔 거리두는형',d:'부딪히다가도 한계에선 한 발 물러나 거리를 둡니다.'};
   return{n:'국면 전환형',d:'단계마다 방식이 바뀌는, 상황에 맞춰 유연한 패턴입니다.'};}
  // ── SDI 대응형 갈등 삼각형: 동기 위치(○) → 갈등 위치(●), 화살표 길이가 사람마다 다름 ──
- var CC={assert:{x:120,y:28},accommodate:{x:30,y:196},analyze:{x:210,y:196}};
+ var CC={assert:{x:130,y:42},accommodate:{x:42,y:198},analyze:{x:218,y:198}};
  var off={assert:{dx:0,dy:-20},accommodate:{dx:-18,dy:18},analyze:{dx:18,dy:18}};
  // ① 동기 위치: 4 동력 → 3축 바리센트릭 (bl² 비선형 — 지배 동력일수록 꼭짓점에 가깝게)
  // bl² 를 쓰면 지배 동력이 강할수록 해당 꼭짓점으로 강하게 끌림
@@ -834,42 +834,27 @@ function renderResult(){
  var labels=P.map(function(p,i){return p?{x:p.x,y:p.y,m:p.m,ns:[i+1]}:null;});
  for(var ii=0;ii<labels.length;ii++){if(!labels[ii])continue;for(var jj=ii+1;jj<labels.length;jj++){if(labels[jj]&&labels[jj].x===labels[ii].x&&labels[jj].y===labels[ii].y){labels[ii].ns.push(labels[jj].ns[0]);labels[jj]=null;}}}
  // ⑤ SVG 조립
- var ctri='<svg viewBox="0 0 240 232" width="100%" style="max-width:300px" fill="none">'+
-  '<defs><marker id="ah" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="var(--ink)"/></marker></defs>';
- ctri+='<text x="120" y="13" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="'+MD.assert.hex+'">주장</text>';
- ctri+='<text x="17" y="222" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="'+MD.accommodate.hex+'">수용</text>';
- ctri+='<text x="223" y="222" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="'+MD.analyze.hex+'">분석</text>';
- ctri+='<polygon points="120,28 30,196 210,196" fill="none" stroke="var(--hairline)" stroke-width="1.5"/>';
- ctri+='<circle cx="120" cy="28" r="4" fill="'+MD.assert.hex+'"/>';
- ctri+='<circle cx="30" cy="196" r="4" fill="'+MD.accommodate.hex+'"/>';
- ctri+='<circle cx="210" cy="196" r="4" fill="'+MD.analyze.hex+'"/>';
- // 단계 경로 점선
- var ptsv=P.filter(Boolean);
- if(ptsv.length>1){var pathD='M'+ptsv[0].x+' '+ptsv[0].y;for(var pi=1;pi<ptsv.length;pi++)pathD+=' L'+ptsv[pi].x+' '+ptsv[pi].y;ctri+='<path d="'+pathD+'" stroke="var(--rule)" stroke-width="1" stroke-dasharray="3 3" fill="none"/>';}
- // 동기 위치 (열린 원)
- ctri+='<circle cx="'+motX.toFixed(1)+'" cy="'+motY.toFixed(1)+'" r="9" fill="var(--paper-pure)" stroke="var(--ink)" stroke-width="2.5"/>';
- // 동기→갈등 화살표 (연속 길이)
- if(arrowLen>5){
-  var adx=cX-motX,ady=cY-motY,adist=arrowLen;
-  var ax1=motX+adx*(11/adist),ay1=motY+ady*(11/adist);
-  var ax2=cX-adx*(11/adist),ay2=cY-ady*(11/adist);
-  ctri+='<line x1="'+ax1.toFixed(1)+'" y1="'+ay1.toFixed(1)+'" x2="'+ax2.toFixed(1)+'" y2="'+ay2.toFixed(1)+'" stroke="var(--ink)" stroke-width="2.5" marker-end="url(#ah)"/>';
- }
- // 갈등 위치 (채운 원, 최종 단계 색)
- var conflCol=r.seq[2]?MD[r.seq[2]].hex:r.seq[0]?MD[r.seq[0]].hex:'var(--ink)';
- ctri+='<circle cx="'+cX.toFixed(1)+'" cy="'+cY.toFixed(1)+'" r="9" fill="'+conflCol+'" stroke="var(--paper-pure)" stroke-width="2"/>';
- // 단계 번호
- labels.forEach(function(lb){if(!lb)return;var od=off[lb.m]||{dx:0,dy:0};var lx=lb.x+od.dx,ly=lb.y+od.dy;var txt=lb.ns.join('·');var rr=txt.length>1?13:11;ctri+='<circle cx="'+lx+'" cy="'+ly+'" r="'+rr+'" fill="var(--panel)" stroke="'+MD[lb.m].hex+'" stroke-width="1.5"/><text x="'+lx+'" y="'+(ly+4)+'" text-anchor="middle" font-size="10" font-weight="700" fill="var(--ink)">'+txt+'</text>';});
+ var cen={x:(CC.assert.x+CC.accommodate.x+CC.analyze.x)/3,y:(CC.assert.y+CC.accommodate.y+CC.analyze.y)/3};
+ function inward(v){return{x:v.x+(cen.x-v.x)*0.17,y:v.y+(cen.y-v.y)*0.17};}
+ var ctri='<svg viewBox="0 0 260 250" width="100%" style="max-width:300px" fill="none">'+
+  '<defs><marker id="ah" markerWidth="8" markerHeight="8" refX="5.5" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="var(--ink-soft)"/></marker></defs>';
+ ctri+='<polygon points="'+CC.assert.x+','+CC.assert.y+' '+CC.accommodate.x+','+CC.accommodate.y+' '+CC.analyze.x+','+CC.analyze.y+'" fill="none" stroke="var(--hairline)" stroke-width="1.5"/>';
+ [['assert','주장',CC.assert.x,CC.assert.y-16],['accommodate','수용',CC.accommodate.x-10,CC.accommodate.y+22],['analyze','분석',CC.analyze.x+10,CC.analyze.y+22]].forEach(function(L){ctri+='<circle cx="'+CC[L[0]].x+'" cy="'+CC[L[0]].y+'" r="3.5" fill="'+MD[L[0]].hex+'"/><text x="'+L[2]+'" y="'+L[3]+'" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" font-weight="700" fill="'+MD[L[0]].hex+'">'+L[1]+'</text>';});
+ // 단계 트래젝토리: 연속 같은 모드는 묶고(1·2), 코너 안쪽 배지 + 1→2→3 화살표
+ var seqModes=[(S.D.d1||[])[0],(S.D.d2||[])[0],(S.D.d3||[])[0]];
+ var byMode={};seqModes.forEach(function(m,i){if(!m||!CC[m])return;(byMode[m]=byMode[m]||[]).push(i+1);});
+ var nodes=Object.keys(byMode).map(function(m){return{m:m,ns:byMode[m],pos:inward(CC[m])};});
+ var seqC=seqModes.filter(function(m){return m&&CC[m];}),drawn={};
+ for(var si=0;si<seqC.length-1;si++){var m1=seqC[si],m2=seqC[si+1];if(m1===m2)continue;var key=[m1,m2].sort().join('-');if(drawn[key])continue;drawn[key]=1;var a=inward(CC[m1]),b=inward(CC[m2]),dx=b.x-a.x,dy=b.y-a.y,L=Math.hypot(dx,dy)||1,ux=dx/L,uy=dy/L;ctri+='<line x1="'+(a.x+ux*14).toFixed(1)+'" y1="'+(a.y+uy*14).toFixed(1)+'" x2="'+(b.x-ux*15).toFixed(1)+'" y2="'+(b.y-uy*15).toFixed(1)+'" stroke="var(--ink-soft)" stroke-width="2" marker-end="url(#ah)"/>';}
+ nodes.forEach(function(nd){var txt=nd.ns.join('·'),rr=txt.length>1?13:11;ctri+='<circle cx="'+nd.pos.x.toFixed(1)+'" cy="'+nd.pos.y.toFixed(1)+'" r="'+rr+'" fill="var(--paper-pure)" stroke="'+MD[nd.m].hex+'" stroke-width="2"/><text x="'+nd.pos.x.toFixed(1)+'" y="'+(nd.pos.y+3.7).toFixed(1)+'" text-anchor="middle" font-size="11" font-weight="800" fill="'+MD[nd.m].hex+'">'+txt+'</text>';});
  ctri+='</svg>';
  // 범례 + 해석
  var maxTriDist=168;
  var ratio=arrowLen/maxTriDist;
- var arrowCap=arrowLen<5?'갈등에서도 평소 방식 그대로 — 일관성이 높습니다.':ratio<0.20?'갈등 상황에서 소폭 이동 — 평소 스타일을 대체로 유지합니다.':ratio<0.50?'갈등이 깊어지면 동기 상태에서 눈에 띄게 이탈합니다.':'동기 상태와 갈등 상태 사이 폭이 큽니다 — 주변이 "갑자기 달라졌다"고 느낄 수 있으니, 전환 전에 신호를 주세요.';
- var triLegend='<div style="display:inline-flex;align-items:center;gap:18px;font-size:11.5px;color:var(--mute);margin-bottom:10px;flex-wrap:wrap">'+
-  '<span style="display:flex;align-items:center;gap:6px"><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="7" fill="none" stroke="var(--ink)" stroke-width="2"/></svg>동기 위치</span>'+
-  '<span style="display:flex;align-items:center;gap:6px"><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="7" fill="var(--ink)"/></svg>갈등 위치</span>'+
-  '<span style="display:flex;align-items:center;gap:6px"><svg width="24" height="10" viewBox="0 0 24 10"><line x1="2" y1="5" x2="18" y2="5" stroke="var(--ink)" stroke-width="2.5"/><path d="M14,2 L22,5 L14,8 Z" fill="var(--ink)"/></svg>이동 벡터</span>'+
-  '<span style="display:flex;align-items:center;gap:6px"><line stroke="var(--rule)" stroke-dasharray="3 3"/>점선: 1→2→3 단계 경로</span>'+
+ var arrowCap=arrowLen<5?'갈등이 깊어져도 반응이 거의 그대로 — 일관성이 높습니다.':ratio<0.20?'단계가 진행돼도 반응이 크게 변하지 않습니다.':ratio<0.50?'갈등이 깊어지면 평소(블렌드 성향)와 반응이 눈에 띄게 달라집니다.':'평소 성향과 갈등 반응의 폭이 큽니다 — 주변이 "갑자기 달라졌다"고 느낄 수 있으니, 전환 전에 신호를 주세요.';
+ var triLegend='<div style="display:inline-flex;align-items:center;gap:16px;font-size:11.5px;color:var(--mute);margin-bottom:10px;flex-wrap:wrap">'+
+  '<span style="display:flex;align-items:center;gap:6px"><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="7" fill="none" stroke="var(--ink-soft)" stroke-width="2"/><text x="9" y="12.5" text-anchor="middle" font-size="9" font-weight="800" fill="var(--ink-soft)">1</text></svg>단계별 반응 위치</span>'+
+  '<span style="display:flex;align-items:center;gap:6px"><svg width="26" height="10" viewBox="0 0 26 10"><line x1="2" y1="5" x2="18" y2="5" stroke="var(--ink-soft)" stroke-width="2"/><path d="M14,2 L22,5 L14,8 Z" fill="var(--ink-soft)"/></svg>1→2→3 갈등 심화 경로</span>'+
   '</div>';
  var ct=conflictType(r.seq);var ctHtml=ct?'<div style="margin:0 0 16px"><span class="pill" style="background:var(--ink);color:var(--screen)">'+ct.n+'</span> <span style="color:var(--ink-soft);font-size:14.5px">'+ct.d+'</span></div>':'';
  // 역피라미드 — 갈등 단계 (넓은 꼭대기→좁은 끝: 갈등 심화될수록 선택지 줄어듦)
@@ -877,7 +862,7 @@ function renderResult(){
  var cpyHtml='<div style="display:flex;flex-direction:column;align-items:center;gap:2px">';
  r.seq.forEach(function(m,idx){var col=m?MD[m].hex:'var(--rule)';var name=m?MD[m].name:'미응답';var desc=m?{assert:'직접 표현·주장',accommodate:'맞추고 수용',analyze:'물러나·분석'}[m]||m:'';cpyHtml+='<div style="width:'+cpyWidths[idx]+';border:1px solid '+col+';border-radius:2px;background:color-mix(in srgb,'+col+' 9%,var(--paper-pure));padding:8px 12px"><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px"><div style="display:flex;align-items:center;gap:7px"><span style="width:8px;height:8px;border-radius:50%;background:'+col+'"></span><span style="font-weight:800;font-size:14px">'+name+'</span><span style="font-size:12px;color:var(--mute)">'+desc+'</span></div><span style="font-family:var(--font-mono);font-size:10px;color:var(--faint)">'+cpyLabels[idx]+'</span></div></div>';});
  cpyHtml+='</div>';
- H+='<div style="margin-top:clamp(28px,4vw,44px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,28px)"><div class="sec" style="margin:0 0 14px">Conflict map · 갈등 대처 유형</div>'+ctHtml+'<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;margin-bottom:16px"><div style="text-align:center">'+triLegend+ctri+'<p style="margin:10px auto 0;font-size:12.5px;color:var(--mute);max-width:28em">○ 동기 위치는 평소 성향, ● 갈등 위치는 압박 상황에서의 반응. '+arrowCap+'</p></div><div><p style="margin:0 0 10px;font-size:13px;color:var(--mute)">갈등이 깊어질수록 선택지가 좁아집니다.</p>'+cpyHtml+'</div></div><div style="display:flex;align-items:stretch;gap:10px;flex-wrap:wrap">'+seqc+'</div>'+seqL+'</div>';
+ H+='<div style="margin-top:clamp(28px,4vw,44px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,28px)"><div class="sec" style="margin:0 0 14px">Conflict map · 갈등 대처 유형</div>'+ctHtml+'<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;margin-bottom:16px"><div style="text-align:center">'+triLegend+ctri+'<p style="margin:10px auto 0;font-size:12.5px;color:var(--mute);max-width:28em">①②③은 갈등이 깊어지는 단계마다 내가 어디로 반응하는지 — 화살표를 따라가며 읽으세요. '+arrowCap+'</p></div><div><p style="margin:0 0 10px;font-size:13px;color:var(--mute)">갈등이 깊어질수록 선택지가 좁아집니다.</p>'+cpyHtml+'</div></div><div style="display:flex;align-items:stretch;gap:10px;flex-wrap:wrap">'+seqc+'</div>'+seqL+'</div>';
  // 결정의 렌즈 (가치관)
  if(r.vals&&r.vals.length){var vh='';r.vals.forEach(function(k,i){var vd=VAL.filter(function(v){return v.k===k;})[0];if(!vd)return;vh+='<span style="display:inline-flex;align-items:center;gap:8px;border:1px solid var(--rule);border-radius:2px;padding:9px 14px;margin:0 9px 9px 0;'+(i===0?'background:var('+DR[vd.drv].v+');color:var(--screen);border-color:transparent':'')+'"><span class="mono" style="font-size:12px;'+(i===0?'':'color:var(--faint)')+'">'+(i+1)+'</span> <b>'+vd.t+'</b></span>';});
   var v0=VAL.filter(function(v){return v.k===r.vals[0];})[0];
