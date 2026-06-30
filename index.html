@@ -580,6 +580,54 @@ function field(l,v){return '<div style="margin-bottom:11px"><div style="font-siz
 function facetZones(f,small){var b=DR[FC[f].d].hex,d=DR[FC[f].d].en;var deep={drive:'#B84A26',connect:'#178A66',order:'#2F78C2',explore:'#6B63C4'}[FC[f].d];var st=small?'3px':'5px',st2=small?'6px':'10px';
  return '<div class="dialzones"><div style="width:'+(small?'34':'32')+'%;background:var(--paint)"></div><div style="width:'+(small?'38':'40')+'%;background:'+b+';opacity:.85"></div><div style="width:28%;background:repeating-linear-gradient(45deg,'+b+','+b+' '+st+','+deep+' '+st+','+deep+' '+st2+')"></div></div>';}
 
+/* ---------- 12-facet 레이더 컴퍼스 (나 vs 팀 평균) ---------- */
+function compassSVG(r,avg){
+ var cx=190,cy=190,R=118,LR=148;
+ function ang(i){return(-90+i*30)*Math.PI/180;}
+ function cl(v){v=+v;if(isNaN(v))v=0;return Math.max(0,Math.min(100,v));}
+ function pt(i,v){var a=ang(i),rr=R*cl(v)/100;return[cx+rr*Math.cos(a),cy+rr*Math.sin(a)];}
+ var hasAvg=!!(avg&&avg.n);
+ // 그리드: 동심원 + 12 스포크
+ var grid='';[0.25,0.5,0.75,1].forEach(function(g){grid+='<circle cx="'+cx+'" cy="'+cy+'" r="'+(R*g).toFixed(1)+'" fill="none" stroke="var(--hairline)" stroke-width="1"/>';});
+ FK.forEach(function(f,i){var e=pt(i,100);grid+='<line x1="'+cx+'" y1="'+cy+'" x2="'+e[0].toFixed(1)+'" y2="'+e[1].toFixed(1)+'" stroke="var(--hairline)" stroke-width="1"/>';});
+ // 팀 평균 폴리곤(점선)
+ var teamPoly='';
+ if(hasAvg){var tp=FK.map(function(f,i){return pt(i,avg[f]);});teamPoly='<polygon points="'+tp.map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1);}).join(' ')+'" fill="none" stroke="var(--mute)" stroke-width="1.5" stroke-dasharray="4 3" stroke-linejoin="round"/>';}
+ // 나 폴리곤
+ var mp=FK.map(function(f,i){return pt(i,r.fs[f]);});
+ var mePoly='<polygon points="'+mp.map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1);}).join(' ')+'" fill="'+DR[r.p].hex+'" fill-opacity="0.12" stroke="var(--ink)" stroke-width="1.8" stroke-linejoin="round"/>';
+ // 점 + 라벨(동력색) + ▲▼(팀 대비)
+ var dots='',labels='';
+ FK.forEach(function(f,i){
+  var p=mp[i],hex=DR[FC[f].d].hex,a=ang(i),cs=Math.cos(a),sn=Math.sin(a);
+  dots+='<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="3.8" fill="'+hex+'"/>';
+  var lx=cx+LR*cs,ly=cy+LR*sn;
+  var anch=Math.abs(cs)<0.35?'middle':(cs>0?'start':'end');
+  var dy=sn>0.5?'0.92em':sn<-0.5?'-0.35em':'0.32em';
+  var arrow='';
+  if(hasAvg){var diff=r.fs[f]-avg[f];if(diff>=3)arrow='<tspan dx="2" fill="'+hex+'" font-weight="800">▲</tspan>';else if(diff<=-3)arrow='<tspan dx="2" fill="var(--faint)">▼</tspan>';}
+  labels+='<text x="'+lx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="'+anch+'" dy="'+dy+'" font-size="11.5" font-weight="700" fill="'+hex+'" font-family="Pretendard,sans-serif">'+FC[f].name+arrow+'</text>';
+ });
+ var svg='<svg width="100%" viewBox="0 0 380 380" style="max-width:300px" fill="none">'+grid+teamPoly+mePoly+dots+'<circle cx="'+cx+'" cy="'+cy+'" r="2.5" fill="var(--ink)"/>'+labels+'</svg>';
+ var legend='<div style="display:flex;justify-content:center;gap:13px;flex-wrap:wrap;margin-top:8px;font-size:11.5px;color:var(--mute)">'+
+  '<span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:8px;background:'+DR[r.p].hex+';opacity:.45;border:1.5px solid var(--ink);display:inline-block"></span>나</span>'+
+  (hasAvg?'<span style="display:flex;align-items:center;gap:5px"><span style="width:16px;border-top:1.5px dashed var(--mute);display:inline-block"></span>팀 평균 '+avg.n+'명</span><span style="color:var(--faint)">facet별 ▲ 평균↑ · ▼ 평균↓</span>':'<span style="color:var(--faint)">팀 평균은 로그인·팀 제출이 모이면 표시돼요</span>')+
+ '</div>';
+ return svg+legend;
+}
+function loadTeamAvg(cb){
+ if(typeof _db==='undefined'||!_db){cb&&cb();return;}
+ MEUS._teamAvgLoading=true;
+ _db.collection('ws_team').get().then(function(snap){
+  var sums={},cnt=0;FK.forEach(function(f){sums[f]=0;});
+  var myCode='';try{myCode=localStorage.getItem('meus.last')||'';}catch(e){}
+  snap.forEach(function(doc){var d=doc.data();if(!d||!d.code)return;if(myCode&&d.code===myCode)return;var p=personFromCode(d.code,d.name||'');if(!p)return;FK.forEach(function(f){sums[f]+=p.r.fs[f];});cnt++;});
+  MEUS._teamAvgLoading=false;
+  if(cnt>0){var avg={n:cnt};FK.forEach(function(f){avg[f]=Math.round(sums[f]/cnt);});MEUS._teamAvg=avg;}
+  cb&&cb();
+ }).catch(function(e){MEUS._teamAvgLoading=false;console.warn('[teamAvg]',e);cb&&cb();});
+}
+
 function renderResult(){
  var r=compute(S);
  var nm=S.name?esc(S.name):'';
@@ -641,17 +689,8 @@ function renderResult(){
   var facLine=ff.map(function(f){var mk=r.fs[f]>=62?' <span style="color:var('+DR[d].v+')">↑</span>':(r.fs[f]<=42?' <span style="color:var(--faint)">↓</span>':'');return '<span style="display:inline-block;margin-right:12px;font-size:13.5px">'+FC[f].name+' <span class="mono" style="color:var(--mute)">'+r.fs[f]+'</span>'+mk+'</span>';}).join('');
   deep+='<div style="'+(di?'border-top:1px solid var(--hairline);margin-top:16px;padding-top:16px':'')+'"><div style="display:flex;align-items:baseline;gap:9px;margin-bottom:8px"><span class="pill" style="background:var('+DR[d].v+');color:#fff">'+(di?'부 동력':'주 동력')+' · '+DR[d].name+'</span><span class="mono" style="font-size:12px;color:var(--mute)">'+r.bl[d]+'</span></div><p style="margin:0 0 10px;font-size:14.5px;line-height:1.65;color:var(--ink-soft)">'+pf.m+'</p><div style="margin:0 0 10px">'+facLine+'</div><div class="kv"><div><div class="mono" style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:3px">필요한 것</div><div style="font-size:13.5px;line-height:1.55;color:var(--ink-soft)">'+pf.nd+'</div></div><div><div class="mono" style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:3px">스트레스 트리거</div><div style="font-size:13.5px;line-height:1.55;color:var(--ink-soft)">'+pf.tr+'</div></div></div></div>';});
  H+='<div style="margin-top:clamp(26px,3vw,36px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,26px)"><div class="sec" style="margin:0 0 14px">동력 심층 해설</div>'+deep+'</div>';
- // 컴퍼스 + facet 12눈금
- var mx=Math.max(40,Math.max(r.bl.drive,r.bl.connect,r.bl.order,r.bl.explore));
- function cv(v){return 100*v/mx;}
- var px={drive:[130,130-cv(r.bl.drive)],explore:[130+cv(r.bl.explore),130],order:[130,130+cv(r.bl.order)],connect:[130-cv(r.bl.connect),130]};
- var poly=[px.drive,px.explore,px.order,px.connect].map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1);}).join(' ');
- var compass='<svg width="100%" viewBox="0 0 260 260" style="max-width:260px" fill="none">'+
-  [100,75,50,25].map(function(rr){return '<circle cx="130" cy="130" r="'+rr+'" stroke="var(--hairline)" stroke-width="1"/>';}).join('')+
-  '<line x1="130" y1="30" x2="130" y2="230" stroke="var(--hairline)"/><line x1="30" y1="130" x2="230" y2="130" stroke="var(--hairline)"/>'+
-  '<polygon points="'+poly+'" fill="'+DR[r.p].hex+'" fill-opacity="0.08" stroke="var(--ink)" stroke-width="1.5" stroke-linejoin="round"/>'+
-  '<circle cx="'+px.drive[0].toFixed(1)+'" cy="'+px.drive[1].toFixed(1)+'" r="5" fill="'+DR.drive.hex+'"/><circle cx="'+px.explore[0].toFixed(1)+'" cy="'+px.explore[1].toFixed(1)+'" r="5" fill="'+DR.explore.hex+'"/><circle cx="'+px.order[0].toFixed(1)+'" cy="'+px.order[1].toFixed(1)+'" r="5" fill="'+DR.order.hex+'"/><circle cx="'+px.connect[0].toFixed(1)+'" cy="'+px.connect[1].toFixed(1)+'" r="5" fill="'+DR.connect.hex+'"/>'+
-  '<text x="130" y="20" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="var(--ink)">Drive</text><text x="240" y="134" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="var(--ink)">Explore</text><text x="130" y="248" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="var(--ink)">Order</text><text x="22" y="134" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="var(--ink)">Connect</text></svg>';
+ // 컴퍼스 — 12-facet 레이더 + 팀 평균
+ var compass=compassSVG(r,(window.MEUS&&MEUS._teamAvg)||null);
  var dials='';DK.forEach(function(d){var fs=FK.filter(function(f){return FC[f].d===d;});var vals=fs.map(function(f){return r.fs[f];});var hi=fs[vals.indexOf(Math.max.apply(null,vals))],loF=fs[vals.indexOf(Math.min.apply(null,vals))];
    var note=(lop&&lop.d===d&&best>0)?'<span class="mono" style="font-size:11px;color:var(--faint);margin-left:auto">'+FC[lop.hi].name+'↑ · '+FC[lop.lo].name+'↓</span>':'';
    var rows='';fs.forEach(function(f){
@@ -675,7 +714,7 @@ function renderResult(){
   '<span style="display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--mute)"><span style="width:2px;height:12px;background:var(--ink);display:inline-block"></span>현재 위치</span>'+
   '<span style="display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--mute)">점수 0–100 (높을수록 강한 특성)</span>'+
  '</div>';
- H+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:clamp(20px,3vw,40px);margin-top:clamp(28px,4vw,44px);align-items:start"><div><div class="sec" style="margin:0 0 14px">Compass · 동력 균형</div><div style="text-align:center">'+compass+'</div></div><div><div class="sec" style="margin:0 0 10px">Facet dials · 12 눈금</div>'+dialLegend+'<div style="display:flex;flex-direction:column;gap:14px">'+dials+'</div></div></div>';
+ H+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:clamp(20px,3vw,40px);margin-top:clamp(28px,4vw,44px);align-items:start"><div><div class="sec" style="margin:0 0 14px">Compass · 12 facet · 나 vs 팀</div><div id="compassBox" style="text-align:center">'+compass+'</div></div><div><div class="sec" style="margin:0 0 10px">Facet dials · 12 눈금</div>'+dialLegend+'<div style="display:flex;flex-direction:column;gap:14px">'+dials+'</div></div></div>';
  // 갈등 시퀀스
  var stl=['처음 부딪힐 때','평행선일 때','더는 못 참을 때'];var seqc='';r.seq.forEach(function(m,idx){seqc+='<div style="flex:1;min-width:148px;border:1px solid var(--hairline);border-radius:2px;padding:14px 16px;background:var(--panel)"><div class="mono" style="font-size:11px;color:var(--faint);margin-bottom:8px">'+(idx+1)+'단계 · '+stl[idx]+'</div><div style="display:flex;align-items:center;gap:7px"><span style="width:9px;height:9px;border-radius:50%;background:'+(m?MD[m].hex:'var(--faint)')+'"></span><span style="font-weight:700;font-size:16px">'+(m?MD[m].name:'-')+'</span><span class="display" style="font-size:13px;color:var(--mute)">'+(m?MD[m].en:'')+'</span></div></div>';if(idx<2)seqc+='<div style="display:flex;align-items:center;color:var(--rule-strong);font-family:var(--font-mono)">→</div>';});
  var seqL='';seqText(r.seq).forEach(function(t){seqL+='<p style="margin:8px 0 0;color:var(--mute);font-size:14.5px">▸ '+t+'</p>';});
@@ -937,6 +976,10 @@ function renderResult(){
  H+='<div class="noprint" style="display:flex;gap:11px;flex-wrap:wrap;margin-top:14px"><button class="btn dark" onclick="MEUS.print()">결과지 인쇄 / PDF 저장</button>'+(S.shared?'<a class="btn" href="#/me" style="text-decoration:none">내 진단 하러 가기</a>':'<button class="btn" onclick="MEUS.reset()">처음으로</button>')+'</div>';
  H+='<p style="margin-top:18px;text-align:center;font-size:13px;color:var(--faint)">사람을 한 글자로 가두지 마세요 — "넌 추진형이라 그래"(✕), "그 상황에선 추진이 세게 나왔네"(○)</p></div>';
  app.innerHTML=H;
+ // 팀 평균: 캐시 없고 로그인 상태면 비동기로 가져와 컴퍼스만 다시 그림 (실패해도 개인 도형 유지)
+ if(window.MEUS&&!MEUS._teamAvg&&!MEUS._teamAvgLoading&&typeof _db!=='undefined'&&_db){
+  loadTeamAvg(function(){var box=document.getElementById('compassBox');if(box&&MEUS._teamAvg)box.innerHTML=compassSVG(r,MEUS._teamAvg);});
+ }
 }
 
 /* ---------- 렌더: 랜딩 ---------- */
