@@ -1582,8 +1582,12 @@ function renderUs(){
    if(s2)shineP='도드라지는 강점이 둘이에요 — <b style="color:'+col+'">'+s1.label+'</b>('+s1.sc+')와 <b style="color:'+col+'">'+s2.label+'</b>('+s2.sc+'). 각각 '+s1.adj+'<b>'+FC[s1.df].name+'</b>('+r.fs[s1.df]+')와 '+s2.adj+'<b>'+FC[s2.df].name+'</b>('+r.fs[s2.df]+')가 바탕이죠. '+s1.desc+'.';
    else shineP='가장 도드라지는 강점은 <b style="color:'+col+'">'+s1.label+'</b>('+s1.sc+')이에요 — 그 바탕엔 '+s1.adj+'<b>'+FC[s1.df].name+'</b>('+r.fs[s1.df]+')가 있어요. '+s1.desc+'.';
   } else shineP=(AP[r.arch]&&AP[r.arch].shine)||'';
-  var workP=(PF_MANUAL[r.p]&&PF_MANUAL[r.p][0])||'';
-  var shadowP='강점이 과해지면 <b>'+FC[topFac].name+'</b>('+r.fs[topFac]+')'+ig(FC[topFac].name)+' <b>'+FC[topFac].ov+'</b>로 흐를 수 있어요 — '+(OV_FIX[topFac]||'');
+  // 이렇게 대해주세요: 주동력 1줄(같은 동력이면 동일) → 개인의 상위 facet 기반 COMM_FACET로 개인화
+  var wRank=FK.slice().sort(function(a,b){return r.fs[b]-r.fs[a];}),w1=wRank[0],w2=wRank[1];
+  var workP='<b>'+FC[w1].name+'</b>('+r.fs[w1]+')'+ig(FC[w1].name)+' 강한 사람이라 — '+(COMM_FACET[w1]||'')+(r.fs[w2]>=64&&COMM_FACET[w2]?' 또 <b>'+FC[w2].name+'</b>('+r.fs[w2]+')도 높아요: '+COMM_FACET[w2]:'');
+  // 과용주의: 최고 facet 1개(겹침) → 그 사람의 시그니처 facet(팀 유일 배정)로 사람마다 다르게
+  var sf=(sigMap[i]!==undefined&&r.fs[sigMap[i]]>=58)?sigMap[i]:w1;
+  var shadowP='가장 도드라지는 <b>'+FC[sf].name+'</b>('+r.fs[sf]+')도 과해지면 <b>'+FC[sf].ov+'</b>로 흐를 수 있어요 — '+(OV_FIX[sf]||'');
   H+='<div style="border:1px solid var(--rule);border-top:3px solid '+col+';border-radius:2px;background:var(--panel);padding:16px 18px;margin-bottom:11px">'+
    '<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px"><span style="font-weight:900;font-size:17px">'+nm+'</span><span style="font-size:13px;color:'+col+';font-weight:700">'+r.arch+'</span><span style="font-size:12px;color:var(--faint)">'+(AD[r.arch]||'')+'</span></div>'+
    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(228px,1fr));gap:11px 18px">'+
