@@ -277,6 +277,21 @@ var COMP=[
  {k:'detail',label:'꼼꼼함',fac:['precision','caution']}
 ];
 
+/* ---------- facet별 관계 역학 텍스트 (미시 분석) — #H#높은쪽 #L#낮은쪽 #Hn/#Ln 은·는 #Hg/#Lg 이·가 #hv/#lv 점수 ---------- */
+var FREL={
+ decision:{n:'결단',gap:'#H#(#hv#)#Hn# 빠르게 결정하고 #L#(#lv#)#Ln# 충분히 재는 편 — #H# 입장에선 #L#의 속도가 굼떠, #L# 입장에선 #H#의 속도가 성급해 보입니다. 되돌릴 수 있는 결정은 #H##Hg# 바로, 되돌리기 어려운 결정은 #L#의 점검을 거치면 둘의 장점이 삽니다.',both:'둘 다 결단이 빨라 추진은 잘 나오지만, 성급·과정 생략이라는 같은 위험을 함께 안습니다 — 한 명이 "한 박자 점검"을 맡으세요.',low:'둘 다 결정을 미루는 편이라 일이 표류하기 쉽습니다 — 사안마다 결정자·기한을 못 박으세요.'},
+ achieve:{n:'성취',gap:'#H#(#hv#)#Hn# 성과·완수에 강하게 끌리고 #L#(#lv#)#Ln# 결과보다 과정·균형을 봅니다 — #H#의 드라이브가 #L#에겐 압박이 될 수 있어요. 목표 수준을 처음에 함께 정하세요.',both:'둘 다 성과 욕구가 강해 강력한 팀이지만, 과정·사람·번아웃을 함께 놓치기 쉽습니다 — 속도 점검 지점을 정해두세요.',low:'둘 다 성과 압박이 약한 편 — 편안하지만 끝까지 밀어붙일 추진력이 부족할 수 있어, 마일스톤을 외부에서 걸어두면 좋습니다.'},
+ support:{n:'지지',gap:'#H#(#hv#)#Hn# 남을 먼저 챙기고 #L#(#lv#)#Ln# 자기 몫을 먼저 지키는 편 — #H##Hg# #L##Le# 위해 더 희생하다 손해 볼 수 있어요. 도움을 주고받는 균형을 명시적으로 맞추세요.',both:'둘 다 잘 도와 따뜻하지만, 둘 다 거절을 못 해 일을 떠안다 지칠 수 있습니다 — "이건 네 일"의 경계를 분명히 하세요.',low:'둘 다 자기 일에 집중하는 편 — 효율적이지만 서로를 받쳐주는 손길은 적으니, 의식적으로 도움을 주고받으세요.'},
+ trust:{n:'신뢰',gap:'#H#(#hv#)#Hn# 먼저 믿고 맡기고 #L#(#lv#)#Ln# 검증 후에야 마음을 엽니다 — 신뢰는 개인의 성향 특질이라(신뢰성향 모델) 위임 속도가 어긋납니다. #L#의 신중함은 "못 믿어서"가 아니라 증거가 더 필요한 것 — 초기엔 #H##Hg# 일관된 약속 이행으로 신뢰를 쌓아주면 빠르게 풀립니다.',both:'둘 다 빠르게 믿고 맡겨 협업이 매끄럽지만, 검증을 건너뛰어 뒤늦게 문제를 발견할 수 있습니다 — 중요한 건은 한 번 더 확인하세요.',low:'둘 다 쉽게 마음을 열지 않아 신뢰 형성이 느립니다 — 작은 약속을 지키는 경험을 쌓아야 협업이 풀립니다.'},
+ empathy:{n:'공감',gap:'#H#(#hv#)#Hn# 감정 신호를 빨리 읽고 #L#(#lv#)#Ln# 사실·논리가 먼저예요 — #L##Lg# 무심코 #H#에게 상처를 줄 수 있고, #H# 입장에선 #L##Lg# 차갑게 느껴질 수 있어요. #L##Ln# 결론 전 "어떻게 느낄까"를 한 번 묻고, #H##Hn# 감정을 말로 직접 전하세요.',both:'둘 다 공감이 높아 정서적으로 깊지만, 솔직한 피드백·객관적 판단이 뒤로 밀릴 수 있습니다 — 불편한 진실도 다루는 안전한 통로를 만드세요.',low:'둘 다 사실 중심이라 군더더기 없지만, 서로의 기분 변화를 놓쳐 마찰이 조용히 쌓일 수 있습니다.'},
+ precision:{n:'정밀',gap:'#H#(#hv#)#Hn# 오차·빈틈을 못 견디고 #L#(#lv#)#Ln# 일단 굴러가는 걸 우선합니다 — #H# 입장에선 #L#의 결과물이 엉성해 보이고, #L# 입장에선 #H##Hg# 깐깐하게 느껴집니다. 최종 검수·품질은 #H#, 초안·속도는 #L#로 나누면 마찰이 시너지로 바뀝니다.',both:'둘 다 정밀해 품질은 최고지만, 상호 완벽주의로 마감이 늦어지기 쉽습니다 — "이번 일은 80%면 출시"의 기준을 함께 정하세요.',low:'둘 다 디테일에 약해 빠르지만, 오류·누락이 공통 사각지대입니다 — 체크리스트나 제3자 검수를 붙이세요.'},
+ plan:{n:'계획',gap:'#H#(#hv#)#Hn# 절차·구조부터 세우고 #L#(#lv#)#Ln# 즉흥적으로 굴립니다 — 계획의 정도에서 부딪힙니다. 큰 틀·일정은 #H##Hg#, 실행 중 변형은 #L##Lg# 맡으면 됩니다.',both:'둘 다 계획적이라 안정적이지만, 예상 밖 변수에 함께 경직될 수 있습니다 — "계획 변경 트리거"를 미리 합의하세요.',low:'둘 다 즉흥을 선호 — 민첩하지만 큰 일에선 일정·역할이 엉킬 수 있어, 최소한의 뼈대는 잡아두세요.'},
+ caution:{n:'신중',gap:'#H#(#hv#)#Hn# 리스크부터 따지고 #L#(#lv#)#Ln# 일단 부딪힙니다 — #H##Hg# 브레이크, #L##Lg# 액셀이라 좋은 보완이지만, #H#의 "잠깐"을 #L##Lg# 답답해할 수 있어요. "어디까지 검토하고 갈지" 선을 미리 정하세요.',both:'둘 다 신중해 실수는 적지만, 함께 재기만 하다 시작이 늦는 분석마비에 빠질 수 있습니다 — "여기까지 보면 간다"는 결정선을 정하세요.',low:'둘 다 리스크 점검이 약해 속도는 빠르지만, 같은 함정을 함께 놓칠 수 있습니다 — 중요한 결정엔 점검 단계를 넣으세요.'},
+ idea:{n:'발상',gap:'#H#(#hv#)#Hn# 새 아이디어를 쏟아내고 #L#(#lv#)#Ln# 검증된 방식을 선호합니다 — #H# 입장에선 #L##Lg# 보수적으로, #L# 입장에선 #H##Hg# 산만하게 느껴질 수 있어요. 발산은 #H#, 선별·정착은 #L#로 가면 좋습니다.',both:'둘 다 발상이 풍부해 아이디어가 폭발하지만, 마무리·선별이 함께 약해 실행 공백이 생기기 쉽습니다 — finisher 역할을 정하세요.',low:'둘 다 익숙한 방식을 택해 안정적이지만, 혁신 신호를 놓칠 수 있습니다.'},
+ flex:{n:'유연',gap:'#H#(#hv#)#Hn# 상황 따라 빠르게 갈아타고 #L#(#lv#)#Ln# 일관성을 지킵니다 — #H# 입장에선 #L##Lg# 경직돼, #L# 입장에선 #H##Hg# 변덕스러워 보입니다. 안정이 필요한 영역은 #L#, 변화 대응은 #H#로 나누세요.',both:'둘 다 유연해 변화에 강하지만, 방식을 자주 바꿔 일관성·예측가능성이 흔들릴 수 있습니다 — 바꾸지 않을 기준 한두 개는 고정하세요.',low:'둘 다 정한 방식을 고수해 안정적이지만, 갑작스런 변수에 함께 경직될 수 있습니다.'},
+ vision:{n:'비전',gap:'#H#(#hv#)#Hn# 먼 그림·방향을 보고 #L#(#lv#)#Ln# 당장의 구체적 할 일에 강합니다 — #H# 입장에선 #L##Lg# 근시안적으로, #L# 입장에선 #H##Hg# 뜬구름처럼 느껴질 수 있어요. 방향 설정은 #H#, 실행·구체화는 #L#로 가면 강력합니다.',both:'둘 다 비전이 높아 큰 그림을 공유하지만, 현실성·디테일·실행이 함께 약할 수 있습니다 — 실행을 책임질 파트너·단계를 붙이세요.',low:'둘 다 당장의 일에 강해 실행력은 좋지만, 장기 방향이 빌 수 있어 가끔 "이게 결국 어디로 가나"를 함께 점검하세요.'}
+};
+
 /* ---------- 결과 텍스트 ---------- */
 var PF={
  drive:{m:'목표·성과·속도·영향력으로 움직입니다. 정체와 무능을 가장 못 견디죠.',nd:'명확한 목표 · 자율성 · 빠른 결정 · 결과 인정',tr:'우유부단 · 시간 낭비 · 통제권 상실',cm:'결론부터, 간결하게.',wk:'큰 목표와 데드라인을 주고 방법은 맡겨라. 결정 전 "한 박자 점검" 신호를 합의해두면 독주를 막는다.',sh:['결단 → 독단·성급','주도 → 통제·마이크로매니징','성취 → 과속·과정 무시']},
@@ -592,7 +607,7 @@ function compassSVG(r,avg){
  FK.forEach(function(f,i){var e=pt(i,100);grid+='<line x1="'+cx+'" y1="'+cy+'" x2="'+e[0].toFixed(1)+'" y2="'+e[1].toFixed(1)+'" stroke="var(--hairline)" stroke-width="1"/>';});
  // 팀 평균 폴리곤(점선)
  var teamPoly='';
- if(hasAvg){var tp=FK.map(function(f,i){return pt(i,avg[f]);});teamPoly='<polygon points="'+tp.map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1);}).join(' ')+'" fill="none" stroke="var(--mute)" stroke-width="1.5" stroke-dasharray="4 3" stroke-linejoin="round"/>';}
+ if(hasAvg){var tp=FK.map(function(f,i){return pt(i,avg[f]);});teamPoly='<polygon points="'+tp.map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1);}).join(' ')+'" fill="var(--mute)" fill-opacity="0.05" stroke="var(--mute)" stroke-opacity="0.55" stroke-width="1.5" stroke-dasharray="4 3" stroke-linejoin="round"/>';}
  // 나 폴리곤
  var mp=FK.map(function(f,i){return pt(i,r.fs[f]);});
  var mePoly='<polygon points="'+mp.map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1);}).join(' ')+'" fill="'+DR[r.p].hex+'" fill-opacity="0.12" stroke="var(--ink)" stroke-width="1.8" stroke-linejoin="round"/>';
@@ -612,6 +627,30 @@ function compassSVG(r,avg){
  var legend='<div style="display:flex;justify-content:center;gap:13px;flex-wrap:wrap;margin-top:8px;font-size:11.5px;color:var(--mute)">'+
   '<span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:8px;background:'+DR[r.p].hex+';opacity:.45;border:1.5px solid var(--ink);display:inline-block"></span>나</span>'+
   (hasAvg?'<span style="display:flex;align-items:center;gap:5px"><span style="width:16px;border-top:1.5px dashed var(--mute);display:inline-block"></span>팀 평균 '+avg.n+'명</span><span style="color:var(--faint)">facet별 ▲ 평균↑ · ▼ 평균↓</span>':'<span style="color:var(--faint)">팀 평균은 로그인·팀 제출이 모이면 표시돼요</span>')+
+ '</div>';
+ return svg+legend;
+}
+/* 두 사람 + 팀 평균 레이더 (YOU 탭) */
+function youRadarSVG(ra,rb,na,nb,avg){
+ var cx=190,cy=190,R=118,LR=148;
+ function ang(i){return(-90+i*30)*Math.PI/180;}
+ function cl(v){v=+v;if(isNaN(v))v=0;return Math.max(0,Math.min(100,v));}
+ function pt(i,v){var a=ang(i),rr=R*cl(v)/100;return[cx+rr*Math.cos(a),cy+rr*Math.sin(a)];}
+ function poly(get){return FK.map(function(f,i){return pt(i,get(f));}).map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1);}).join(' ');}
+ var grid='';[0.25,0.5,0.75,1].forEach(function(g){grid+='<circle cx="190" cy="190" r="'+(R*g).toFixed(1)+'" fill="none" stroke="var(--hairline)" stroke-width="1"/>';});
+ FK.forEach(function(f,i){var ee=pt(i,100);grid+='<line x1="190" y1="190" x2="'+ee[0].toFixed(1)+'" y2="'+ee[1].toFixed(1)+'" stroke="var(--hairline)" stroke-width="1"/>';});
+ var hasAvg=!!(avg&&avg.n);
+ var teamPoly=hasAvg?'<polygon points="'+poly(function(f){return avg[f];})+'" fill="var(--mute)" fill-opacity="0.06" stroke="var(--mute)" stroke-opacity="0.5" stroke-width="1.5" stroke-linejoin="round"/>':'';
+ var ca=DR[ra.p].hex,cbk=DR[rb.p].hex;
+ var aPoly='<polygon points="'+poly(function(f){return ra.fs[f];})+'" fill="'+ca+'" fill-opacity="0.10" stroke="'+ca+'" stroke-width="2" stroke-linejoin="round"/>';
+ var bPoly='<polygon points="'+poly(function(f){return rb.fs[f];})+'" fill="none" stroke="'+cbk+'" stroke-width="2" stroke-dasharray="5 3" stroke-linejoin="round"/>';
+ var labels='';
+ FK.forEach(function(f,i){var a2=ang(i),cs=Math.cos(a2),sn=Math.sin(a2),lx=cx+LR*cs,ly=cy+LR*sn,anch=Math.abs(cs)<0.35?'middle':(cs>0?'start':'end'),dy=sn>0.5?'0.92em':sn<-0.5?'-0.35em':'0.32em';labels+='<text x="'+lx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="'+anch+'" dy="'+dy+'" font-size="11.5" font-weight="700" fill="'+DR[FC[f].d].hex+'" font-family="Pretendard,sans-serif">'+FC[f].name+'</text>';});
+ var svg='<svg width="100%" viewBox="0 0 380 380" style="max-width:330px" fill="none">'+grid+teamPoly+aPoly+bPoly+'<circle cx="190" cy="190" r="2.5" fill="var(--ink)"/>'+labels+'</svg>';
+ var legend='<div style="display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:12px;color:var(--mute)">'+
+  '<span style="display:flex;align-items:center;gap:5px"><span style="width:16px;border-top:2px solid '+ca+';display:inline-block"></span>'+esc(na)+'</span>'+
+  '<span style="display:flex;align-items:center;gap:5px"><span style="width:16px;border-top:2px dashed '+cbk+';display:inline-block"></span>'+esc(nb)+'</span>'+
+  (hasAvg?'<span style="display:flex;align-items:center;gap:5px"><span style="width:16px;border-top:2px solid var(--mute);opacity:.5;display:inline-block"></span>팀 평균 '+avg.n+'명</span>':'')+
  '</div>';
  return svg+legend;
 }
@@ -1075,31 +1114,34 @@ function relDynamics(ra,rb,na,nb){
  if(Math.abs(la-lb)<8&&la>=55&&lb>=55)dom='⚠ <b>주도권 경쟁</b> — '+An+'('+la+')'+(batchim(na)?'과':'와')+' '+Bn+'('+lb+'), 둘 다 주도성이 높고 거의 같습니다. 대인관계에서 <b>지배는 상보가 아니라 대칭</b>으로 맞물려, 누가 키를 잡을지 정하지 않으면 정면 충돌하기 쉽습니다. <b>영역별 최종 결정권</b>을 미리 나누세요.';
  else if(Math.max(la,lb)>=55){var leader=la>lb?An:Bn,follow=la>lb?Bn:An,lh=Math.max(la,lb),ll=Math.min(la,lb);dom='주도성은 <b>'+leader+'</b>('+lh+')'+ig(leader)+' <b>'+follow+'</b>('+ll+')보다 앞섭니다. 둘 다 이끄는 힘이 있어도 <b>관계 안에서는 '+leader+ig(leader)+' 방향을 잡고 '+follow+ig(follow)+' 받치는</b> 구도가 자연스럽습니다(지배↔순응의 상보 — 가장 안정적인 짝). '+(ll>=55?follow+'도 주도성이 낮지 않으니, 자기 영역에선 키를 갖도록 보장하면 답답함이 줄어요.':'');}
  else dom='두 사람 다 주도성이 높지 않습니다('+la+' · '+lb+'). 아무도 먼저 핸들을 잡지 않아 <b>결정이 미뤄지거나 표류</b>하기 쉬워요 — 사안마다 "이번 결정자는 누구"를 정해두면 좋습니다.';
+ // 조용한 쪽의 목소리 묵살 위험 — 지배 격차 + 수용형 갈등 스타일
+ (function(){var loA=la<lb,loSeq=loA?ra.seq:rb.seq,loN=loA?An:Bn,hiN=loA?Bn:An;var acc=(loSeq||[]).filter(function(m){return m==='accommodate';}).length;if(Math.abs(la-lb)>=18&&acc>=2){dom+=' <span style="color:var(--ink)">그런데 '+loN+eb(loN)+' 갈등에서 <b>맞춰주고 양보하는(수용)</b> 편이라, 주도적인 '+hiN+' 앞에서 자기 의견·속마음이 <b>묵살되기 쉽습니다</b>. '+loN+ig(loN)+' 받쳐준다고 다 괜찮은 게 아니에요 — '+hiN+ig(hiN)+' 가끔 먼저 "네 생각은?"으로 '+loN+'의 진짜 의견을 꺼내 주는 것이 건강한 관계의 핵심입니다.</span>';}})();
  // 친화·신뢰
- var cb=band(da.connect,db.connect),conn;
- if(cb==='bothHighClose'||cb==='bothHighGap')conn='둘 다 친화가 높아 <b>따뜻하고 협력적</b>입니다 — 친화는 <b>상응적 상보</b>라(따뜻함이 따뜻함을 부릅니다) 관계는 잘 풀립니다. 다만 둘 다 갈등을 둥글게 넘기려는 경향이 겹치면, 꺼내야 할 불편한 말이 미뤄질 수 있어요.';
- else if(cb==='oneHigh'){var ch=da.connect>db.connect?An:Bn,cl=da.connect>db.connect?Bn:An;conn='<b>'+ch+'</b>'+eb(ch)+' 친화가 높고 <b>'+cl+'</b>'+eb(cl)+' 낮은 편 — 관계·감정 노동을 '+ch+ig(ch)+' 더 짊어지기 쉽습니다. '+cl+ig(cl)+' 작게라도 인정·감사를 표현해주면 '+ch+'의 소진을 막아요.';}
- else if(cb==='bothLow')conn='둘 다 관계 신호가 담백한 편 — 효율적이고 군더더기 없지만, 정서적 안전감이 저절로 쌓이진 않습니다. 의도적으로 관계에 시간을 들여야 신뢰가 자랍니다.';
- else conn='친화는 한쪽이 조금 더 앞서는 정도로, 큰 마찰 요인은 아닙니다.';
- // 저신뢰 보강
- var lowTrustName=null,lowTrustV=0;if(ra.fs.trust<46&&ra.fs.trust<=rb.fs.trust){lowTrustName=An;lowTrustV=ra.fs.trust;}else if(rb.fs.trust<46&&rb.fs.trust<ra.fs.trust){lowTrustName=Bn;lowTrustV=rb.fs.trust;}
- if(lowTrustName)conn+=' <span style="color:var(--ink)">특히 <b>'+lowTrustName+'</b>'+eb(lowTrustName)+' 신뢰(믿고 맡김)가 낮아('+lowTrustV+') 사람을 <b>검증한 뒤에야</b> 마음을 엽니다 — 신뢰는 개인의 성향 특질입니다. 상대는 "왜 날 못 믿지?"로 느끼기 쉬우니, 초기엔 약속을 지키는 <b>일관된 증거</b>로 신뢰를 쌓는 시간이 필요해요.</span>';
- // 기준·성실 (체계)
- var ob=band(da.order,db.order),ord;
- if(ob==='bothHighClose')ord='둘 다 기준·성실성이 높아 결과물이 <b>탄탄</b>합니다. 단 상호 완벽주의로 <b>속도가 느려지거나</b> 서로 기준을 더 높이 밀어붙일 수 있어요 — "이번 일은 80%면 충분"의 합의가 좋은 브레이크입니다.';
- else if(ob==='oneHigh'||ob==='bothHighGap'){var oh=da.order>db.order?An:Bn,ol=da.order>db.order?Bn:An;ord='체계·기준 차이가 납니다('+rd(da.order)+' · '+rd(db.order)+') — '+oh+'에겐 '+ol+ig(ol)+' 졸속으로, '+ol+'에겐 '+oh+ig(oh)+' 깐깐·통제로 느껴질 수 있어요. <b>이 일에 필요한 정확도</b>를 먼저 합의하면 마찰이 크게 줄어듭니다.';}
- else if(ob==='bothLow')ord='둘 다 체계·디테일이 약한 편 — 빠르고 유연하지만 <b>마감·정확성이 공통 사각</b>입니다. 체크리스트나 제3자의 점검을 붙이세요.';
- else ord='기준·성실성은 비교적 비슷해 일하는 속도 합이 무난합니다.';
- // 개방·탐구
- var eb2=band(da.explore,db.explore),exp;
- if(eb2==='bothHighClose'||eb2==='bothHighGap')exp='둘 다 탐구·개방이 높아 <b>아이디어가 풍성하고 서로를 자극</b>합니다(좋은 신호). 다만 둘 다 마무리가 약하면 <b>실행 공백</b>이 생기니 — 누가 끝까지 붙잡을지(finisher)를 정해두세요.';
- else if(eb2==='oneHigh'){var ehN=da.explore>db.explore?An:Bn,elN=da.explore>db.explore?Bn:An;exp='<b>'+ehN+'</b>'+eb(ehN)+' 발산(새 아이디어), <b>'+elN+'</b>'+eb(elN)+' 착지(현실 검증) — <b>생성적 상보</b>입니다. '+ehN+ig(ehN)+' 던지고 '+elN+ig(elN)+' 거르는 리듬이 건강하게 작동해요.';}
- else if(eb2==='bothLow')exp='둘 다 검증된 방식을 선호 — <b>안정적이지만</b> 변화·혁신 신호를 놓치기 쉽습니다. 정기적으로 "다른 방법은 없나"를 의도적으로 물으세요.';
- else exp='탐구 성향은 한쪽이 조금 더 앞서는 정도입니다.';
+ // ── 미시 분석: facet 12개 개별 비교 (동력 평균이 가린 차이를 잡는다) ──
+ function fillT(t,hiN,loN,hv,lv){return t.replace(/#Hn#/g,eb(hiN)).replace(/#Ln#/g,eb(loN)).replace(/#Hg#/g,ig(hiN)).replace(/#Lg#/g,ig(loN)).replace(/#He#/g,el(hiN)).replace(/#Le#/g,el(loN)).replace(/#H#/g,'<b>'+hiN+'</b>').replace(/#L#/g,'<b>'+loN+'</b>').replace(/#hv#/g,hv).replace(/#lv#/g,lv);}
+ var GAP_T=22,gapList=[];
+ var micro='';
+ DK.forEach(function(d){
+  var rows='';
+  FK.filter(function(f){return FC[f].d===d&&f!=='lead'&&FREL[f];}).forEach(function(f){
+   var a=ra.fs[f],b=rb.fs[f],diff=a-b,adf=Math.abs(diff),fr=FREL[f],kind=null,body='';
+   if(adf>=GAP_T){kind='gap';var hiN=a>b?An:Bn,loN=a>b?Bn:An;body=fillT(fr.gap,hiN,loN,Math.max(a,b),Math.min(a,b));gapList.push(adf);}
+   else if(Math.min(a,b)>=64){kind='both';body=fr.both;}
+   else if(Math.max(a,b)<=38){kind='low';body=fr.low;}
+   if(!kind)return;
+   var tag=kind==='gap'?('Δ'+(diff>0?'+':'')+diff):kind==='both'?'둘 다 높음':'둘 다 낮음';
+   var tagcol=kind==='gap'?DR[d].hex:kind==='both'?'var(--connect)':'var(--faint)';
+   rows+='<div style="border:1px solid var(--rule);border-left:3px solid '+DR[d].hex+';border-radius:2px;background:var(--panel);padding:12px 15px;margin-bottom:8px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap"><span style="font-weight:800;font-size:13.5px">'+fr.n+'</span><span class="mono" style="font-size:11px;color:var(--mute)">'+An+' '+a+' · '+Bn+' '+b+'</span><span class="mono" style="font-size:10.5px;color:'+tagcol+';font-weight:700;margin-left:auto">'+tag+'</span></div><p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--ink-soft)">'+body+'</p></div>';
+  });
+  if(rows)micro+='<div style="margin-top:14px"><div style="display:flex;align-items:center;gap:7px;margin-bottom:8px"><span style="width:8px;height:8px;border-radius:50%;background:'+DR[d].hex+'"></span><span style="font-weight:700;font-size:13px;color:var(--ink)">'+DR[d].name+' · '+DR[d].en+'</span></div>'+rows+'</div>';
+ });
+ if(!micro)micro='<div style="border:1px solid var(--rule);border-radius:2px;background:var(--panel);padding:14px 16px;margin-top:12px"><p style="margin:0;font-size:14px;color:var(--mute)">12개 특성이 전반적으로 비슷한 수준입니다 — 큰 마찰 facet은 적지만, 같은 강·약을 공유하니 공통 사각지대(아래)를 함께 보세요.</p></div>';
  var H='<div style="margin-top:clamp(28px,4vw,40px);border-top:2px solid var(--ink);padding-top:clamp(20px,3vw,26px)"><div class="sec" style="margin:0 0 6px">관계 역학 · Relational Dynamics</div>';
  H+='<p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:var(--ink-soft)">'+head+'</p>';
  H+='<div style="border:1px solid var(--rule-strong);border-radius:2px;background:var(--fill);padding:15px 18px;margin-bottom:14px"><div class="mono" style="font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin-bottom:7px">누가 방향을 잡나 · 상대적 주도</div><p style="margin:0;font-size:15px;line-height:1.6;color:var(--ink-soft)">'+dom+'</p></div>';
- H+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(248px,1fr));gap:12px">'+rcard('조화 · 친화와 신뢰',DR.connect.hex,conn)+rcard('체계 · 기준과 속도',DR.order.hex,ord)+rcard('탐구 · 발산과 착지',DR.explore.hex,exp)+'</div>';
+ H+='<div class="sec" style="margin:20px 0 4px;font-size:13.5px">미시 분석 · 특성별 관계 포인트</div>';
+ H+='<p style="margin:0 0 6px;font-size:12.5px;color:var(--mute)">동력 평균이 비슷해도 개별 특성에서 의미 있는 차이(Δ≥'+GAP_T+')나 공명(둘 다 높음/낮음)이 드러납니다 — 큰 차이부터 대화를 꺼내보세요.</p>';
+ H+=micro;
  H+='<div class="mono" style="font-size:10px;color:var(--faint);margin-top:12px;line-height:1.6">근거 · 대인관계 원형이론(지배=대칭·친화=상응 상보) · 유사성–매력 가설 · 신뢰성향 모델(Mayer·Davis·Schoorman) · 성실성·개방성 적합. 자기보고 기반 경향이며 고정된 진단이 아닙니다.</div>';
  H+='</div>';
  return H;
@@ -1125,6 +1167,8 @@ function renderYou(){
  // 두 프로필 (블렌드 미니바)
  function pcard(p,fb){var pnm=esc(p.name||fb);var ini=esc((p.name||fb).slice(0,1));var seg=p.r.rk.map(function(k){return '<div style="width:'+p.r.bl[k]+'%;background:'+DR[k].hex+'"></div>';}).join('');return '<div style="flex:1;min-width:220px;border:1px solid var(--rule);border-radius:2px;background:var(--panel);padding:18px 20px"><div style="display:flex;align-items:center;gap:11px;margin-bottom:14px"><span style="width:38px;height:38px;border-radius:50%;background:'+DR[p.r.p].hex+';color:var(--screen);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px">'+ini+'</span><div><div style="font-weight:800;font-size:17px">'+p.r.arch+'</div><div class="mono" style="font-size:11.5px;color:var(--mute)">'+pnm+' · '+DR[p.r.p].name+'+'+DR[p.r.s].name+'</div></div></div><div style="display:flex;height:9px;border-radius:2px;overflow:hidden">'+seg+'</div></div>';}
  H+='<div style="display:flex;align-items:stretch;gap:14px;flex-wrap:wrap;margin-top:6px">'+pcard(pa,'나')+'<div class="display" style="display:flex;align-items:center;font-weight:800;font-size:18px;color:var(--faint)">+</div>'+pcard(pb,'상대')+'</div>';
+ // 12 특성 레이더 (두 사람 + 팀 평균 반투명)
+ H+='<div style="margin-top:clamp(20px,3vw,28px)"><div class="sec" style="margin:0 0 4px">12 특성 지도 · '+esc(na)+' vs '+esc(nb)+'</div><p style="margin:0 0 8px;font-size:12.5px;color:var(--mute)">바깥으로 멀수록 강한 특성. 팀 평균(반투명)과 견주면 누가 어디서 높고 낮은지 한눈에 보입니다.</p><div id="youRadarBox" style="text-align:center">'+youRadarSVG(pa.r,pb.r,na,nb,(window.MEUS&&MEUS._teamAvg)||null)+'</div></div>';
  // 보완 짝 게임
  function gcard(d,f,dir){var col=DR[d].hex;var fromN=dir==='help'?na:nb,toN=dir==='help'?nb:na,fromP=dir==='help'?pa:pb;
   var sentence=dir==='help'?('<b>'+DR[d].name+'</b>'+eb(DR[d].name)+' '+esc(fromN)+'의 강점, '+esc(toN)+'에겐 사각지대 — '+esc(fromN)+ig(fromN)+' 끌어줄게요.'):('<b>'+DR[d].name+'</b>'+eb(DR[d].name)+' '+esc(toN)+'의 사각지대 — '+esc(fromN)+'의 <b>'+DR[d].name+'</b>('+FC[f].name+')에 기대요.');
@@ -1193,6 +1237,10 @@ function renderYou(){
  H+='<div class="noprint" style="display:flex;gap:11px;flex-wrap:wrap;margin-top:18px"><button class="btn dark" onclick="MEUS.print()">인쇄 / PDF</button><button class="btn" onclick="MEUS.youReset()">다른 두 사람</button></div>';
  H+='<p style="margin-top:18px;text-align:center;font-size:13px;color:var(--faint)">관계를 고정 라벨로 보지 마세요 — "그 일에선 이렇게 보완되더라"의 도구입니다.</p></div>';
  app.innerHTML=H;
+ // 팀 평균: 캐시 없고 로그인 상태면 비동기로 가져와 레이더만 다시 그림
+ if(window.MEUS&&!MEUS._teamAvg&&!MEUS._teamAvgLoading&&typeof _db!=='undefined'&&_db){
+  loadTeamAvg(function(){var bx=document.getElementById('youRadarBox');if(bx&&MEUS._teamAvg)bx.innerHTML=youRadarSVG(pa.r,pb.r,na,nb,MEUS._teamAvg);});
+ }
 }
 
 /* ===== US ===== */
