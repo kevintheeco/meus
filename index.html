@@ -1434,6 +1434,7 @@ MEUS.usDel=function(i){US.members.splice(i,1);if(US.members.length<2)US.res=fals
 MEUS.usGo=function(){if(US.members.length<2){US.err='두 명 이상 필요해요.';renderUs();return;}US.err='';US.res=true;renderUs();window.scrollTo(0,0);};
 MEUS.usReset=function(){US.res=false;renderUs();window.scrollTo(0,0);};
 MEUS.usClear=function(){US={members:[],err:'',res:false};renderUs();window.scrollTo(0,0);};
+MEUS.orgRel=function(idx){var arr=MEUS._orgRel||[];var html=arr[idx];if(html==null)return;var el=document.getElementById('orgRelDetail');if(el)el.innerHTML=html;var bs=document.querySelectorAll('[data-orgrel]');for(var i=0;i<bs.length;i++){var on=bs[i].getAttribute('data-orgrel')===String(idx);bs[i].style.background=on?'var(--ink)':'';bs[i].style.color=on?'var(--screen)':'';}var ln=document.getElementById('oedge'+idx);if(ln){var box=document.getElementById('orgRelDetail');}};
 
 function renderUs(){
  if(!US.res){
@@ -1879,7 +1880,8 @@ function renderOrg(){
  var assigned={};filled.forEach(function(s){assigned[s.p.name]=1;});
  var extra=M.filter(function(p){return !assigned[p.name];});
  function topFacOf(r){return FK.slice().sort(function(a,b){return r.fs[b]-r.fs[a];})[0];}
- function fitOf(p,role){var ri=p.r.rk.indexOf(role.ideal),ai=p.r.rk.indexOf(role.alt),best=Math.min(ri,ai);return best<=1?{t:'강함',c:'var(--connect)',lv:2}:best===2?{t:'보통',c:'var(--explore)',lv:1}:{t:'주의',c:'var(--drive)',lv:0};}
+ function warmth(p){return Math.round((p.r.fs.support+p.r.fs.trust+p.r.fs.empathy)/3);}
+ function fitInfo(p,role){var idv=p.r.ds[role.ideal],altv=p.r.ds[role.alt];var raw=idv*0.62+altv*0.38;var score=Math.max(55,Math.min(99,Math.round(58+(raw-38)*0.62)));var label=score>=86?'탁월':score>=74?'강함':score>=64?'무난':'보강';var col=score>=74?'var(--connect)':score>=64?'var(--explore)':'var(--drive)';var idn=DR[role.ideal].name,altn=DR[role.alt].name,reason;if(idv>=58)reason='이 자리 핵심인 <b style="color:var('+DR[role.ideal].v+')">'+idn+'</b>('+idv+')이 강점'+(altv>=55?', <b>'+altn+'</b>('+altv+')도 받쳐 줘요.':'이에요.');else reason='핵심인 <b style="color:var('+DR[role.ideal].v+')">'+idn+'</b>('+idv+')이 옅은 편이라 — '+(altv>=55?'<b>'+altn+'</b>('+altv+')로 일부 메워지지만, ':'')+'이 결을 받칠 파트너나 절차를 두면 좋아요.';return {score:score,label:label,col:col,reason:reason,idv:idv};}
  // 시그니처 = 팀 빈곳을 채우거나 압도적으로 높은 결 = 팀 평균 대비 도드라진 facet, 중복 없이 배정(모두 다름)
  var orgPpl=filled.map(function(s){return s.p;});
  var fAvgO={};FK.forEach(function(f){fAvgO[f]=orgPpl.length?orgPpl.reduce(function(a,q){return a+q.r.fs[f];},0)/orgPpl.length:50;});
@@ -1894,19 +1896,18 @@ function renderOrg(){
  H+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:11px;margin-top:14px">';
  slots.forEach(function(s){var role=s.role;
   if(!s.p){H+='<div style="border:1px dashed var(--rule-strong);border-radius:2px;background:var(--fill);padding:14px 16px"><div style="font-weight:800;font-size:15px">'+role.label+'</div><div style="font-size:12px;color:var(--mute);margin:3px 0 8px">'+role.ko+'</div><div style="font-size:12.5px;color:var(--faint)">· '+role.m+' — 결과 대기 (제출되면 반영)</div></div>';return;}
-  var p=s.p,r=p.r,col=DR[r.p].hex,sg=sigOf(p),fit=fitOf(p,role);
-  H+='<div style="border:1px solid var(--rule);border-top:3px solid '+col+';border-radius:2px;background:var(--panel);padding:14px 16px"><div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px"><span style="font-weight:800;font-size:15px">'+role.label+'</span><span class="mono" style="font-size:10px;color:'+fit.c+';font-weight:700">적합도 '+fit.t+'</span></div><div style="font-size:12px;color:var(--mute);margin:2px 0 9px">'+role.ko+'</div><div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap"><span style="font-weight:800;font-size:16px">'+esc(p.name||'')+'</span><span style="font-size:12px;color:'+col+';font-weight:700">'+r.arch+'</span></div><div style="font-size:12.5px;color:var(--ink-soft);margin-top:6px">시그니처 <b style="color:'+DR[FC[sg.prim].d].hex+'">'+FC[sg.prim].name+'</b>('+r.fs[sg.prim]+')'+(r.fs[sg.sec]>=60?' · '+FC[sg.sec].name+'('+r.fs[sg.sec]+')':'')+'</div></div>';
+  var p=s.p,r=p.r,col=DR[r.p].hex,sg=sigOf(p),fit=fitInfo(p,role);
+  H+='<div style="border:1px solid var(--rule);border-top:3px solid '+col+';border-radius:2px;background:var(--panel);padding:14px 16px"><div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px"><span style="font-weight:800;font-size:15px">'+role.label+'</span><span class="mono" style="font-size:10px;color:'+fit.col+';font-weight:800">적합도 '+fit.score+'</span></div><div style="font-size:12px;color:var(--mute);margin:2px 0 9px">'+role.ko+'</div><div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap"><span style="font-weight:800;font-size:16px">'+esc(p.name||'')+'</span><span style="font-size:12px;color:'+col+';font-weight:700">'+r.arch+'</span></div><div style="font-size:12.5px;color:var(--ink-soft);margin-top:6px">시그니처 <b style="color:'+DR[FC[sg.prim].d].hex+'">'+FC[sg.prim].name+'</b>('+r.fs[sg.prim]+')'+(r.fs[sg.sec]>=60?' · '+FC[sg.sec].name+'('+r.fs[sg.sec]+')':'')+'</div></div>';
  });
  H+='</div>';
  if(extra.length)H+='<p style="margin:10px 0 0;font-size:12.5px;color:var(--mute)">직분 미지정 · '+extra.map(function(p){return esc(p.name||'');}).join(' · ')+'</p>';
  // ② 직분 × 강점 적합도
  H+=gh('②','직분 × 강점 적합도','이 자리가 요구하는 힘 vs 그 사람의 강점');
- filled.forEach(function(s){var p=s.p,role=s.role,col=DR[role.ideal].hex,fit=fitOf(p,role);
-  var idn=DR[role.ideal].name,top=DR[p.r.rk[0]].name,msg;
-  if(fit.lv===2)msg='이 자리의 핵심인 <b style="color:'+col+'">'+idn+'</b>이 '+esc(p.name||'')+'님의 강점과 잘 맞아요 — 직분과 성향이 정렬된, 안정적인 배치입니다.';
-  else if(fit.lv===1)msg='이 자리는 <b style="color:'+col+'">'+idn+'</b>이 중심인데 '+esc(p.name||'')+'님의 주 동력은 <b>'+top+'</b>이에요. 못 맞는 건 아니지만, '+idn+'이 필요한 국면에선 <b>'+DR[role.alt].name+'</b> 강점으로 풀거나 그 결이 강한 동료와 짝지으면 매끄럽습니다.';
-  else msg='⚠ 이 자리는 <b style="color:'+col+'">'+idn+'</b>이 핵심인데 '+esc(p.name||'')+'님껜 그게 가장 뒤(4순위)예요. 약점이 아니라 <b>구조로 보완</b>할 신호 — 이 영역을 받쳐줄 사람을 옆에 두거나, 결정 절차에 그 관점을 규칙으로 넣으세요.';
-  H+='<div style="border:1px solid var(--rule);border-left:3px solid '+fit.c+';border-radius:2px;background:var(--panel);padding:13px 15px;margin-bottom:9px"><div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:5px"><span style="font-weight:800">'+role.label+' · '+esc(p.name||'')+'</span><span class="mono" style="font-size:10px;color:'+fit.c+';font-weight:700;margin-left:auto">적합도 '+fit.t+'</span></div><p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--ink-soft)">'+msg+'</p></div>';
+ H+='<p style="margin:0 0 12px;font-size:12.5px;color:var(--mute)">100점 만점 · 핵심 동력(주 0.62)+보조 동력(0.38) 기반, 후하게. 점수보다 <b>이유</b>를 보세요.</p>';
+ filled.forEach(function(s){var p=s.p,role=s.role,fit=fitInfo(p,role);
+  var topF2=FK.slice().sort(function(a,b){return p.r.fs[b]-p.r.fs[a];})[0];
+  var extra2=(fit.score>=86)?' 이 자리에 <b>제격</b>이에요.':(fit.score<64)?' 본인 최고 강점은 <b>'+FC[topF2].name+'</b>('+p.r.fs[topF2]+') 쪽이라, 그 강점을 살릴 접점을 함께 만들면 더 빛나요.':' 직분과 성향이 대체로 맞물립니다.';
+  H+='<div style="border:1px solid var(--rule);border-left:3px solid '+fit.col+';border-radius:2px;background:var(--panel);padding:13px 15px;margin-bottom:9px"><div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:5px"><span style="font-weight:800">'+role.label+' · '+esc(p.name||'')+'</span><span class="mono" style="font-size:12px;color:'+fit.col+';font-weight:800;margin-left:auto">'+fit.score+'점 · '+fit.label+'</span></div><div style="height:5px;background:var(--paint);border-radius:3px;overflow:hidden;margin-bottom:8px"><div style="height:100%;width:'+fit.score+'%;background:'+fit.col+'"></div></div><p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--ink-soft)">'+fit.reason+extra2+'</p></div>';
  });
  // ③ CEO 라인 (권한 비대칭)
  var ceoSlot=null;filled.forEach(function(s){if(s.role.key==='CEO')ceoSlot=s;});
@@ -1938,7 +1939,7 @@ function renderOrg(){
  // 2) 권한·주도 균형 — 비CEO가 CEO보다 주도 뚜렷이 높음 (위협 아니라 위임 신호)
  if(ceoSlot){var _ceo=ceoSlot.p;filled.forEach(function(s){if(s.role.key==='CEO')return;var o=s.p,gap=o.r.fs.lead-_ceo.r.fs.lead;if(gap>=12&&o.r.fs.lead>=58)addRisk('권한·주도 균형','var(--drive)','⚑','<b>'+s.role.label+' '+esc(o.name||'')+'</b>의 주도('+o.r.fs.lead+')가 CEO '+esc(_ceo.name||'')+'('+_ceo.r.fs.lead+')보다 뚜렷이 높아요 — 위협이 아니라 <b>권한은 CEO, 추진 에너지는 '+esc(o.name||'')+'</b>라는 신호. 분명한 결정 영역을 위임하고 CEO는 최종 방향만 쥐면, 강한 주도가 조직의 엔진이 됩니다.');});}
  // 3) 직분-강점 미스매치
- filled.forEach(function(s){if(fitOf(s.p,s.role).lv===0)addRisk('직분 미스매치','var(--order)','◇','<b>'+s.role.label+' '+esc(s.p.name||'')+'</b> — 이 자리의 핵심 동력(<b style="color:'+DR[s.role.ideal].hex+'">'+DR[s.role.ideal].name+'</b>)이 가장 약한 결이에요. 그 결을 받칠 파트너를 옆에 두거나, 결정 절차에 그 관점을 규칙으로 넣어 보완하세요.');});
+ filled.forEach(function(s){if(fitInfo(s.p,s.role).score<64)addRisk('직분 미스매치','var(--order)','◇','<b>'+s.role.label+' '+esc(s.p.name||'')+'</b> — 이 자리의 핵심 동력(<b style="color:'+DR[s.role.ideal].hex+'">'+DR[s.role.ideal].name+'</b>)이 가장 약한 결이에요. 그 결을 받칠 파트너를 옆에 두거나, 결정 절차에 그 관점을 규칙으로 넣어 보완하세요.');});
  // 4) 1인 의존 — 특정 동력을 임원 1명만 강하게 커버 (bus factor)
  DK.forEach(function(d){var cov=filled.filter(function(s){return s.p.r.rk.slice(0,2).indexOf(d)>=0;});if(cov.length===1)addRisk('1인 의존','var(--explore)','▲','경영진에서 <b style="color:'+DR[d].hex+'">'+DR[d].name+'</b>을 강하게 가진 임원이 <b>'+esc(cov[0].p.name||'')+'</b> 한 명뿐이에요 — 이분이 빠지면 그 결이 리더십에서 사라집니다. 그 결이 다음으로 강한 사람을 <b>백업</b>으로 정해두세요.');});
  // 5) 경영진 동질성 — 같은 주 동력 쏠림
@@ -1950,6 +1951,39 @@ function renderOrg(){
  if(pending.length)addRisk('데이터 대기','var(--mute)','·','<b>'+pending.map(function(s){return s.role.label;}).join('·')+'</b> 직분은 아직 결과 미제출이라 빠졌어요 — 제출되면 조직 그림이 완성됩니다.');
  if(!risks.length)addRisk('양호','var(--connect)','✓','지금 데이터에선 직분 간 뚜렷한 충돌·미스매치 신호가 적어요. 좋은 배치입니다.');
  risks.forEach(function(rz){H+='<div style="border:1px solid var(--rule);border-left:3px solid '+rz.col+';border-radius:2px;background:var(--panel);padding:13px 15px;margin-bottom:9px"><div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px"><span style="font-size:13px">'+rz.ic+'</span><span class="mono" style="font-size:10px;letter-spacing:.04em;color:'+rz.col+';font-weight:700">'+rz.tag+'</span></div><p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--ink-soft)">'+rz.t+'</p></div>';});
+ // ⑥ 관계 지도 — 6각형, 선 클릭(+버튼 폴백)으로 두 사람 관계를 조직·관계심리 관점으로
+ H+=gh('⑥','관계 지도','서로 안의 관계 — 선/버튼을 누르면 자세히');
+ function orgRelData(sA,sB){var A=sA.p,B=sB.p,rA=sA.role,rB=sB.role,an=esc(A.name||''),bn=esc(B.name||'');
+  var la=A.r.fs.lead,lb=B.r.fs.lead,aff=Math.round((warmth(A)+warmth(B))/2),samePrime=A.r.p===B.r.p;
+  var vA=(A.r.vals||[])[0],vB=(B.r.vals||[])[0],vClash=vA&&vB&&vA!==vB;
+  var q,col,label;
+  if(Math.min(la,lb)>=58&&aff<55){q='조율';col='var(--drive)';label='조율 필요';}
+  else if(!samePrime&&aff>=52){q='시너지';col='var(--connect)';label='시너지';}
+  else if(samePrime&&Math.abs(la-lb)<14){q='동질';col='var(--explore)';label='닮은 결';}
+  else {q='보완';col='var(--order)';label='보완';}
+  var P=[];
+  if(Math.min(la,lb)>=58){if(aff>=55)P.push('<b>주도</b>가 둘 다 높지만(서로 '+la+'·'+lb+') 신뢰·지지가 두터워(친화 '+aff+') 주도권을 다투기보다 <b>함께 끄는 축</b>이 됩니다. 지배 성향은 대칭적이라, 영역만 나누면 경쟁이 협업이 돼요.');else P.push('<b>주도</b>가 둘 다 높은데(서로 '+la+'·'+lb+') 친화는 옅어요(친화 '+aff+'). 지배 성향은 양보가 아니라 경쟁으로 맞물리니(대인관계 상보성), 같은 사안을 동시에 쥐면 부딪힙니다 — 결정 영역을 미리 나누세요.');}
+  else {var hi=la>=lb?an:bn,lo=la>=lb?bn:an;P.push('주도는 <b>'+hi+'</b>가 앞서고 <b>'+lo+'</b>가 받치는 <b>상보적</b> 구조라, 방향–실행 분업이 자연스러워요(지배는 상보, 한쪽이 높을 때 안정).');}
+  if(aff>=58)P.push('정서적으로 <b>서로 따뜻한</b> 쌍(친화 '+aff+') — 따뜻함은 상응적이라 한쪽이 열면 다른 쪽도 열려, 신뢰가 빨리 쌓입니다.');
+  else if(aff<45)P.push('정서적 거리가 다소 있는 편(친화 '+aff+') — 일은 되더라도 신뢰는 천천히 쌓이니, 작은 인정·안부를 의식적으로 주고받으면 좋아요.');
+  if(vClash){var vat=VAL.filter(function(x){return x.k===vA;})[0],vbt=VAL.filter(function(x){return x.k===vB;})[0];P.push('결정 1순위가 <b>'+(vat?vat.t:'')+'</b> vs <b>'+(vbt?vbt.t:'')+'</b>로 달라요 — 부딪힐 땐 옳고 그름이 아니라 <b>우선순위 차이</b>로 보고 "이번엔 뭘 먼저"를 맞추면 풀립니다.');}
+  else if(vA&&vB)P.push('결정 기준(1순위 가치)이 같아 손발은 잘 맞지만, 둘 다 놓치는 관점이 없는지 한 번씩 점검하세요.');
+  P.push('직분으로 보면 <b>'+rA.label+'</b>('+rA.ko.split('·')[0]+')와 <b>'+rB.label+'</b>('+rB.ko.split('·')[0]+')의 접점이라 — '+(q==='조율'?'<b>역할 경계를 명문화</b>':q==='시너지'?'<b>서로의 강점을 공식 분업</b>으로':q==='동질'?'<b>다른 결의 제3자</b>를 끼워':'<b>서로 다른 결을 분담</b>으로')+' 두면 관계가 단단해집니다.');
+  var html='<div style="font-weight:800;font-size:15px;margin-bottom:9px"><span style="color:'+DR[A.r.p].hex+'">'+rA.label+' '+an+'</span> <span style="color:'+col+'">↔</span> <span style="color:'+DR[B.r.p].hex+'">'+rB.label+' '+bn+'</span> <span class="mono" style="font-size:11px;color:'+col+'">· '+label+'</span></div>'+P.map(function(t){return '<p style="margin:0 0 7px;font-size:13.5px;line-height:1.65;color:var(--ink-soft)">• '+t+'</p>';}).join('');
+  return {q:q,col:col,label:label,html:html};
+ }
+ var relPairs=[];for(var ri2=0;ri2<filled.length;ri2++)for(var rj2=ri2+1;rj2<filled.length;rj2++){relPairs.push({i:ri2,j:rj2,d:orgRelData(filled[ri2],filled[rj2])});}
+ (window.MEUS=window.MEUS||{});MEUS._orgRel=relPairs.map(function(pr){return pr.d.html;});
+ var nN=filled.length,cxv=185,cyv=158,Rv=104;
+ function npos(k){var a=(-90+k*360/nN)*Math.PI/180;return {x:cxv+Rv*Math.cos(a),y:cyv+Rv*Math.sin(a),a:a};}
+ var svg='<svg viewBox="0 0 370 330" width="100%" style="max-width:440px" fill="none">';
+ relPairs.forEach(function(pr,idx){var a=npos(pr.i),b=npos(pr.j);svg+='<line x1="'+a.x.toFixed(1)+'" y1="'+a.y.toFixed(1)+'" x2="'+b.x.toFixed(1)+'" y2="'+b.y.toFixed(1)+'" stroke="'+pr.d.col+'" stroke-width="'+(pr.d.q==='조율'?2.6:pr.d.q==='시너지'?2:1.4)+'" stroke-opacity="'+(pr.d.q==='보완'?0.28:0.72)+'"/><line id="oedge'+idx+'" x1="'+a.x.toFixed(1)+'" y1="'+a.y.toFixed(1)+'" x2="'+b.x.toFixed(1)+'" y2="'+b.y.toFixed(1)+'" stroke="transparent" stroke-width="15" style="cursor:pointer" onclick="MEUS.orgRel('+idx+')"/>';});
+ filled.forEach(function(s,k){var pos=npos(k),pcol=DR[s.p.r.p].hex,ini=esc((s.p.name||'?').slice(0,1));var lx=cxv+(Rv+30)*Math.cos(pos.a),ly=cyv+(Rv+30)*Math.sin(pos.a),anch=Math.abs(Math.cos(pos.a))<0.3?'middle':(Math.cos(pos.a)>0?'start':'end');svg+='<circle cx="'+pos.x.toFixed(1)+'" cy="'+pos.y.toFixed(1)+'" r="17" fill="'+pcol+'" stroke="var(--panel)" stroke-width="2.5"/><text x="'+pos.x.toFixed(1)+'" y="'+(pos.y+5).toFixed(1)+'" text-anchor="middle" font-size="14" font-weight="800" fill="#fff">'+ini+'</text><text x="'+lx.toFixed(1)+'" y="'+(ly-1).toFixed(1)+'" text-anchor="'+anch+'" font-size="11.5" font-weight="800" fill="var(--ink)">'+esc(s.p.name||'')+'</text><text x="'+lx.toFixed(1)+'" y="'+(ly+11).toFixed(1)+'" text-anchor="'+anch+'" font-size="9.5" fill="var(--mute)" font-family="JetBrains Mono,monospace">'+s.role.label+'</text>';});
+ svg+='</svg>';
+ H+='<div style="display:flex;justify-content:center;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--mute);margin-bottom:4px"><span><span style="color:var(--connect)">━</span> 시너지</span><span><span style="color:var(--order)">━</span> 보완</span><span><span style="color:var(--explore)">━</span> 닮은 결</span><span><span style="color:var(--drive)">━</span> 조율 필요</span></div>';
+ H+='<div style="text-align:center">'+svg+'</div>';
+ H+='<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 12px;justify-content:center">'+relPairs.map(function(pr,idx){return '<button class="btn" data-orgrel="'+idx+'" onclick="MEUS.orgRel('+idx+')" style="padding:5px 10px;font-size:11.5px;border-left:3px solid '+pr.d.col+'">'+esc(filled[pr.i].p.name||'')+'·'+esc(filled[pr.j].p.name||'')+'</button>';}).join('')+'</div>';
+ H+='<div id="orgRelDetail" style="border:1px solid var(--rule-strong);border-radius:2px;background:var(--fill);padding:15px 17px;min-height:64px"><p style="margin:0;font-size:13.5px;color:var(--mute)">위 지도에서 <b>관계선</b>을 누르거나 아래 <b>버튼</b>을 골라 보세요 — 두 사람의 관계를 조직·관계심리 관점으로 풀어드려요.</p></div>';
  H+='<p style="margin:18px 0 0;font-size:12px;color:var(--faint);line-height:1.6">※ 직분 매핑은 현재 고정값(CEO 김수민 · CSO 노필터 · CTO 최지민 · CBO 윤세빈 · 재무전략 임준서 · 해외총괄 김은우). 변경이 필요하면 알려주세요.</p>';
  H+='</div>';
  app.innerHTML=H;
