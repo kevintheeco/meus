@@ -1182,8 +1182,8 @@ function relDynamics(ra,rb,na,nb){
  H+='<p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:var(--ink-soft)">'+head+'</p>';
  H+='<div class="sec" style="margin:18px 0 6px;font-size:13.5px">종합 관계 해석 · 숲</div>';
  H+='<div style="border:1px solid var(--rule-strong);border-radius:2px;background:var(--fill);padding:16px 18px;margin-bottom:8px">'+synthHtml+'</div>';
- H+='<div class="sec" style="margin:22px 0 4px;font-size:13.5px">특성별 차이 · 나무 (Δ≥'+GAP_T+')</div>';
- H+='<p style="margin:0 0 6px;font-size:12.5px;color:var(--mute)">10점 이상 벌어진 특성을 빠짐없이 — 어느 동력이든. 위 종합 해석의 근거입니다.</p>';
+ H+='<div class="sec" style="margin:22px 0 4px;font-size:13.5px">특성 하나하나 들여다보기</div>';
+ H+='<p style="margin:0 0 6px;font-size:12.5px;color:var(--mute)">두 사람이 의미 있게 갈리는 특성들 — 위 해석이 어디서 나왔는지 보여줍니다.</p>';
  H+=micro;
  H+='<div class="mono" style="font-size:10px;color:var(--faint);margin-top:12px;line-height:1.6">근거 · 대인관계 원형이론(지배=대칭·친화=상응 상보) · 유사성–매력 가설 · 신뢰성향 모델(Mayer·Davis·Schoorman) · 성실성·개방성 적합. 자기보고 기반 경향이며 고정된 진단이 아닙니다.</div>';
  H+='</div>';
@@ -1216,16 +1216,16 @@ function renderYou(){
  // 12 특성 레이더 (두 사람 + 팀 평균 반투명)
  H+='<div style="margin-top:clamp(20px,3vw,28px)"><div class="sec" style="margin:0 0 4px">12 특성 지도 · '+esc(na)+' vs '+esc(nb)+'</div><p style="margin:0 0 8px;font-size:12.5px;color:var(--mute)">바깥으로 멀수록 강한 특성. 팀 평균(반투명)과 견주면 누가 어디서 높고 낮은지 한눈에 보입니다.</p><div id="youRadarBox" style="text-align:center">'+youRadarSVG(pa.r,pb.r,na,nb,(window.MEUS&&MEUS._teamAvg)||null)+'</div></div>';
  // 보완 지점 — 절대차이 큰 순서로, 차등 라벨
- function compCard(c){var d=c.d,col=DR[d].hex;
+ function compCard(c){var d=c.d,col=DR[d].hex,dn=DR[d].en;
   var f=FK.filter(function(x){return FC[x].d===d;}).sort(function(x,y){return Math.abs(c.hiP.r.fs[y]-c.loP.r.fs[y])-Math.abs(c.hiP.r.fs[x]-c.loP.r.fs[x]);})[0];
-  var tname=c.tier===3?'큰 격차':c.tier===2?'뚜렷한 차이':'가벼운 차이',sentence,cap;
-  if(c.blind&&c.tier>=2){sentence='<b>'+DR[d].name+'</b>'+eb(DR[d].name)+' '+esc(c.hiN)+'의 강점('+c.hi+'), '+esc(c.loN)+'에겐 '+(c.tier===3?'뚜렷한 <b>사각지대</b>':'<b>약한 영역</b>')+'('+c.lo+') — '+esc(c.hiN)+ig(c.hiN)+' 끌어줄 수 있어요.';cap='🤝 '+esc(c.hiN)+' → '+esc(c.loN)+' 보완';}
-  else{sentence='<b>'+DR[d].name+'</b>에서 '+esc(c.hiN)+'('+c.hi+')'+ig(c.hiN)+' '+esc(c.loN)+'('+c.lo+')보다 '+(c.tier===3?'크게':c.tier===2?'뚜렷이':'다소')+' 앞섭니다 — 둘 다 낮진 않으니 <b>사각지대라기보다</b> 그 영역은 '+esc(c.hiN)+'가 리드하면 효율적이에요.';cap='▲ '+esc(c.hiN)+' 리드';}
-  return '<div style="border:1px solid var(--rule);border-left:4px solid '+col+';border-radius:2px;background:var(--panel);padding:16px 18px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px"><span class="mono" style="font-size:11px;color:var(--mute)">'+DR[d].name+' · '+FC[f].name+'</span><span class="mono" style="font-size:10.5px;font-weight:700;color:'+(c.tier===3?col:'var(--mute)')+'">Δ'+c.diff+' · '+tname+'</span></div><div style="font-size:15px;line-height:1.5">'+sentence+'</div><div class="mono" style="font-size:11.5px;color:var(--mute);margin-top:8px">'+cap+'</div></div>';}
+  var sentence,cap;
+  if(c.blind&&c.tier>=2){sentence='<b>'+dn+'</b>'+eb(dn)+' <b>'+esc(c.hiN)+'</b>의 강점이에요. <b>'+esc(c.loN)+'</b>에겐 비어 있는 자리라, 이 영역은 '+esc(c.hiN)+ig(c.hiN)+' 끌어주면 서로 편합니다.';cap='🤝 '+esc(c.hiN)+ig(c.hiN)+' 채워줘요';}
+  else{sentence='<b>'+dn+'</b>'+eb(dn)+' <b>'+esc(c.hiN)+'</b>'+ig(c.hiN)+' 한 발 앞서요. 둘 다 약하진 않으니, 이 영역은 '+esc(c.hiN)+ig(c.hiN)+' 맡아 끌고 가면 매끄럽습니다.';cap='▲ '+esc(c.hiN)+' 리드';}
+  return '<div style="border:1px solid var(--rule);border-left:4px solid '+col+';border-radius:2px;background:var(--panel);padding:16px 18px"><div class="mono" style="font-size:11px;color:var(--mute);margin-bottom:9px">'+dn+' · '+FC[f].name+'</div><div style="font-size:15px;line-height:1.6">'+sentence+'</div><div class="mono" style="font-size:11.5px;color:'+col+';margin-top:9px">'+cap+'</div></div>';}
  var game=comps.map(compCard).join('');
- H+='<div class="sec" style="margin:clamp(28px,4vw,38px) 0 6px">보완 지점 · 동력 차이</div>';
- H+='<p style="margin:0 0 12px;font-size:12.5px;color:var(--mute)">절대점수 차이(Δ) 기준 — 10↑ 가벼운 차이, 20↑ 뚜렷, 30↑ 큰 격차. 낮은 쪽이 실제로 낮을 때(45 미만)만 <b>사각지대</b>로 봅니다.</p>';
- H+=game?'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(258px,1fr));gap:12px">'+game+'</div>':'<div class="card"><p style="color:var(--mute);font-size:15.5px;margin:0">네 동력 모두 두 사람의 차이가 10점 미만으로 <b>비슷</b>합니다 — 보완보다 같은 강·약을 <b style="color:var(--ink)">증폭</b>하는 관계예요. 미세한 차이는 아래 12특성 미시 분석에서 보세요.</p></div>';
+ H+='<div class="sec" style="margin:clamp(28px,4vw,38px) 0 6px">서로를 채우는 자리</div>';
+ H+='<p style="margin:0 0 12px;font-size:13px;color:var(--mute)">가장 다른 동력부터 — 누가 어디를 끌고, 누가 어디를 채워 주는지.</p>';
+ H+=game?'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(258px,1fr));gap:12px">'+game+'</div>':'<div class="card"><p style="color:var(--mute);font-size:15.5px;margin:0">네 동력이 서로 닮았어요 — 보완하기보다 같은 강점을 <b style="color:var(--ink)">함께 키우는</b> 관계입니다. 세밀한 결의 차이는 아래 12특성에서 보세요.</p></div>';
  // 과용조절
  function temperRows(over,helper,onm,hnm){var out='';overFacets(over.r).forEach(function(f){var od=FC[f].d;var anti=ANTI[od].filter(function(ad){return helper.r.rk.slice(0,2).indexOf(ad)>=0;});if(anti.length){var last=DR[anti[anti.length-1]].name;out+='<div style="border:1px solid var(--rule-strong);border-radius:2px;background:var(--fill);padding:15px 18px;margin-bottom:10px;font-size:15px;line-height:1.5">'+esc(onm)+'의 <b style="color:'+DR[od].hex+'">'+FC[f].name+'</b>이 과해질 때, '+esc(hnm)+'의 <b style="color:'+DR[anti[0]].hex+'">'+anti.map(function(ad){return DR[ad].name;}).join('·')+'</b>'+ig(last)+' 브레이크가 됩니다.</div>';}});return out;}
  var t1=temperRows(pa,pb,na,nb),t2=temperRows(pb,pa,nb,na);
