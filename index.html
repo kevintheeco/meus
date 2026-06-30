@@ -1592,11 +1592,14 @@ function renderUs(){
   return{solo:solo,uf:uf};
  }
  M.forEach(function(p,i){var r=p.r,nm=esc(p.name||('멤버'+(i+1))),col=DR[r.p].hex,u=uniqOf(p);
-  var uniqHtml;
-  if(u.solo.length)uniqHtml='이 팀에서 <b style="color:'+col+'">'+u.solo.map(function(d){return DR[d].name;}).join('·')+'</b> ●을 <b>혼자</b> 쥔 사람이에요. '+nm+ig(nm)+' 빠지면 그 결이 팀에서 옅어집니다.'+(u.uf.length?' 특히 <b>'+FC[u.uf[0]].name+'</b>(팀 1위 '+r.fs[u.uf[0]]+')가 도드라져요.':'');
-  else if(u.uf.length)uniqHtml='팀에서 <b style="color:'+DR[FC[u.uf[0]].d].hex+'">'+u.uf.slice(0,2).map(function(f){return FC[f].name+'('+r.fs[f]+')';}).join(' · ')+'</b>가 가장 도드라집니다 — 2위와 뚜렷이 벌어진, '+nm+'만의 결이에요.';
-  else if(sigMap[i]!==undefined){var _sf=sigMap[i];uniqHtml='동력 하나를 통째로 독점하진 않지만, '+n+'명을 나란히 놓고 팀 평균과 견주면 <b style="color:'+DR[FC[_sf].d].hex+'">'+FC[_sf].name+'</b>('+r.fs[_sf]+')'+ig(FC[_sf].name)+' '+nm+'에게서 가장 도드라져요 — 그게 이 팀에서 '+nm+'만의 색입니다.';}
-  else uniqHtml=(r.bal?'특정 결을 독점하진 않지만, 여러 결을 고루 받치는 <b>팀의 안정축</b>이에요 — 빠진 자리를 그때그때 메웁니다.':'다른 멤버와 강점이 겹치는 영역이 많아요 — 같은 결을 <b>함께 두껍게</b> 만드는 역할입니다.')+(n<=3?' (인원이 적어 상대 비교는 참고로 보세요.)':'');
+  // 대체 불가 = 각자 실제 최고점 facet(본인 베스트). 팀 1위면 표시, 동력을 혼자 쥐면 보너스로 명시.
+  var fRank=FK.slice().sort(function(a,b){return r.fs[b]-r.fs[a];}),bestF=fRank[0],scndF=fRank[1];
+  var bestSorted=M.slice().sort(function(a,b){return b.r.fs[bestF]-a.r.fs[bestF];}),bestRank=bestSorted.indexOf(p)+1,bestGap=bestSorted[1]?(r.fs[bestF]-bestSorted[1].r.fs[bestF]):r.fs[bestF];
+  var bestSig=(FACET_SIG[bestF]&&FACET_SIG[bestF].s)?FACET_SIG[bestF].s:'';
+  var uniqHtml='<b style="color:'+DR[FC[bestF].d].hex+'">'+FC[bestF].name+'</b>('+r.fs[bestF]+')'+ig(FC[bestF].name)+' '+nm+'의 가장 큰 무기'+(bestRank===1?' — <b>팀에서도 '+(bestGap>=12?'압도적으로 ':'')+'가장 높아요</b>':'')+'.';
+  if(u.solo.length)uniqHtml+=' 게다가 이 팀에서 <b style="color:'+col+'">'+u.solo.map(function(d){return DR[d].name;}).join('·')+'</b> 동력을 <b>혼자</b> 쥐고 있어, 그 결은 '+nm+ig(nm)+' 빠지면 옅어집니다.';
+  else if(r.fs[scndF]>=68)uniqHtml+=' <b>'+FC[scndF].name+'</b>('+r.fs[scndF]+')도 함께 받쳐 줍니다.';
+  if(bestSig)uniqHtml+=' '+bestSig+'.';
   // 개인 데이터 기반 (유형 일반 문구 대체)
   var topFac=FK.slice().sort(function(a,b){return r.fs[b]-r.fs[a];})[0];
   var cs={};COMP.forEach(function(c){cs[c.k]=Math.round(c.fac.reduce(function(x,f){return x+r.fs[f];},0)/c.fac.length);});
@@ -1615,9 +1618,9 @@ function renderUs(){
   // 이렇게 대해주세요: 주동력 1줄(같은 동력이면 동일) → 개인의 상위 facet 기반 COMM_FACET로 개인화
   var wRank=FK.slice().sort(function(a,b){return r.fs[b]-r.fs[a];}),w1=wRank[0],w2=wRank[1];
   var workP='<b>'+FC[w1].name+'</b>('+r.fs[w1]+')'+ig(FC[w1].name)+' 강한 사람이라 — '+(COMM_FACET[w1]||'')+(r.fs[w2]>=64&&COMM_FACET[w2]?' 또 <b>'+FC[w2].name+'</b>('+r.fs[w2]+')도 높아요: '+COMM_FACET[w2]:'');
-  // 과용주의: 최고 facet 1개(겹침) → 그 사람의 시그니처 facet(팀 유일 배정)로 사람마다 다르게
-  var sf=(sigMap[i]!==undefined&&r.fs[sigMap[i]]>=58)?sigMap[i]:w1;
-  var shadowP='가장 도드라지는 <b>'+FC[sf].name+'</b>('+r.fs[sf]+')도 과해지면 <b>'+FC[sf].ov+'</b>로 흐를 수 있어요 — '+(OV_FIX[sf]||'');
+  // 과용주의: 2순위 강점(있으면)으로 — 대체불가(최고점)와 겹치지 않게 + 사람마다 다르게
+  var sf=(r.fs[scndF]>=62)?scndF:bestF;
+  var shadowP='<b>'+FC[sf].name+'</b>('+r.fs[sf]+')도 강한데, 과해지면 <b>'+FC[sf].ov+'</b>로 흐를 수 있어요 — '+(OV_FIX[sf]||'');
   H+='<div style="border:1px solid var(--rule);border-top:3px solid '+col+';border-radius:2px;background:var(--panel);padding:16px 18px;margin-bottom:11px">'+
    '<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px"><span style="font-weight:900;font-size:17px">'+nm+'</span><span style="font-size:13px;color:'+col+';font-weight:700">'+r.arch+'</span><span style="font-size:12px;color:var(--faint)">'+(AD[r.arch]||'')+'</span></div>'+
    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(228px,1fr));gap:11px 18px">'+
@@ -1665,7 +1668,7 @@ function renderUs(){
  var topF=fSorted.slice(0,3),botF=fSorted.slice(-3);
  var pillar=FK.map(function(f){var vs=M.map(function(p){return{n:esc(p.name||'한 명'),v:p.r.fs[f]};}).sort(function(a,b){return b.v-a.v;});return{f:f,top:vs[0],sec:vs[1]?vs[1].v:0,avg:fAvg[f]};}).filter(function(o){return o.top.v>=60&&(o.top.v-o.sec)>=22&&o.avg<55;}).sort(function(a,b){return (b.top.v-b.sec)-(a.top.v-a.sec);})[0];
  var hmText='<p style="margin:0 0 8px;font-size:14.5px;line-height:1.7;color:var(--ink-soft)"><b>함께 강한 결</b> — '+topF.map(function(f){return '<b style="color:'+DR[FC[f].d].hex+'">'+FC[f].name+'</b>('+fAvg[f]+')';}).join(' · ')+'. 이 팀이 자연스럽게 잘 굴러가는 영역이에요.</p>';
- hmText+='<p style="margin:0 0 8px;font-size:14.5px;line-height:1.7;color:var(--ink-soft)"><b>함께 옅은 결</b> — '+botF.map(function(f){return '<b style="color:'+DR[FC[f].d].hex+'">'+FC[f].name+'</b>('+fAvg[f]+')';}).join(' · ')+'. 아무도 확실히 채우지 않는 칸이라, 중요한 일에선 의식적으로 챙기거나 보강해야 합니다.</p>';
+ hmText+='<p style="margin:0 0 8px;font-size:14.5px;line-height:1.7;color:var(--ink-soft)"><b>함께 옅은 결</b> — '+botF.map(function(f){var t=M.slice().sort(function(a,b){return b.r.fs[f]-a.r.fs[f];})[0];return '<b style="color:'+DR[FC[f].d].hex+'">'+FC[f].name+'</b>('+fAvg[f]+' · 그나마 '+esc(t.name||'한 명')+' '+t.r.fs[f]+')';}).join(' · ')+'. 팀 평균은 얇지만 <b>각 결을 상대적으로 받치는 사람</b>이 있어요 — 그 일은 이들에게 맡기되, 점수 자체가 낮은 만큼 팀 차원의 보강도 함께 챙기세요.</p>';
  if(pillar)hmText+='<p style="margin:0;font-size:14.5px;line-height:1.7;color:var(--ink-soft)"><b>혼자 떠받치는 기둥</b> — <b style="color:'+DR[FC[pillar.f].d].hex+'">'+FC[pillar.f].name+'</b>은 <b>'+pillar.top.n+'</b>('+pillar.top.v+') 한 사람에게 거의 의존해요(나머지는 '+pillar.sec+' 이하). '+pillar.top.n+'가 빠지면 이 결이 팀에서 사라지니, 그 역할을 알아주고 백업을 두세요.</p>';
  H+='<div style="margin-top:14px;border:1px solid var(--rule-strong);border-radius:2px;background:var(--fill);padding:15px 17px"><div class="sec" style="margin:0 0 10px;font-size:12.5px">히트맵이 말해주는 것</div>'+hmText+'</div></div>';
  // ===== ③ 마찰과 예방 =====
