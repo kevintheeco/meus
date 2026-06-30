@@ -1558,12 +1558,19 @@ function renderUs(){
  TN.push('한 문장으로|||'+oneLine[topD0]+olp+' 움직이'+(blindKeyClear?'고, <b>'+bAn+'</b>'+ig(bAn)+' '+keyRole[blind]+'을 받쳐 주는 팀입니다. 강점을 살리되 그 빈자리를 지키는 사람을 함께 알아주는 것':'는 팀입니다. '+keyRole[blind]+'은 한 사람에게 맡기기보다 팀이 함께 보강하는 것')+' — 그게 이 팀을 단단하게 만드는 열쇠예요.');
  H+='<div style="margin-top:clamp(22px,3vw,30px);border-top:2px solid var(--ink);padding-top:clamp(16px,2.5vw,22px)"><div class="sec" style="margin:0 0 16px">팀 종합 리딩</div>'+TN.map(function(t,ti){var pp=t.split('|||');var h=pp.length>1?pp[0]:'';var b=pp.length>1?pp[1]:pp[0];var last=ti===TN.length-1;return '<div style="margin:0 0 16px;padding:'+(last?'14px 16px':'0 0 0 14px')+';'+(last?'background:var(--panel);border:1px solid var(--ink);border-radius:2px':'border-left:2px solid var(--rule-strong)')+'">'+(h?'<div style="font-weight:800;font-size:12px;letter-spacing:.04em;color:'+(last?'var(--drive)':'var(--ink)')+';margin-bottom:5px">'+h+'</div>':'')+'<p style="margin:0;font-size:14px;line-height:1.75;color:var(--ink-soft)">'+b+'</p></div>';}).join('')+'</div>';
  // 01 분포 지도 (2축)
- var cx=160,cy=160,Rad=114;
- var maxAbs=1;M.forEach(function(p){maxAbs=Math.max(maxAbs,Math.abs(p.r.bl.drive-p.r.bl.connect),Math.abs(p.r.bl.order-p.r.bl.explore));});
- var dots='';M.forEach(function(p,i){var x=(p.r.bl.drive-p.r.bl.connect)/maxAbs,y=(p.r.bl.explore-p.r.bl.order)/maxAbs;var px=cx+x*Rad,py=cy-y*Rad;var ini=esc((p.name||('P'+(i+1))).slice(0,1));var nm=esc((p.name||('P'+(i+1))).slice(0,5));dots+='<g><circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="15" fill="'+DR[p.r.p].hex+'" stroke="var(--panel)" stroke-width="2.5"/><text x="'+px.toFixed(1)+'" y="'+(py+4).toFixed(1)+'" text-anchor="middle" font-size="12" font-weight="700" fill="#F6F1E6">'+ini+'</text><text x="'+px.toFixed(1)+'" y="'+(py+30).toFixed(1)+'" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="var(--mute)">'+nm+'</text></g>';});
+ var cx=160,cy=160,Rad=122;
+ // 좌표 = 백분위(ds) 차이 → 블렌드 점유율보다 훨씬 넓게 퍼짐. 축별 정규화로 양 축 모두 채움.
+ var pts=M.map(function(p,i){return {x0:(p.r.ds.drive-p.r.ds.connect),y0:(p.r.ds.explore-p.r.ds.order),p:p,i:i};});
+ var maxX=1,maxY=1;pts.forEach(function(o){maxX=Math.max(maxX,Math.abs(o.x0));maxY=Math.max(maxY,Math.abs(o.y0));});
+ pts.forEach(function(o){o.px=cx+(o.x0/maxX)*Rad*0.9;o.py=cy-(o.y0/maxY)*Rad*0.9;});
+ // 충돌 회피: 겹친 점 밀어내기
+ var MINd=34;for(var it=0;it<90;it++){var moved=false;for(var a=0;a<pts.length;a++){for(var b=a+1;b<pts.length;b++){var dx=pts[b].px-pts[a].px,dy=pts[b].py-pts[a].py,d=Math.sqrt(dx*dx+dy*dy)||0.01;if(d<MINd){var pu=(MINd-d)/2,ux=dx/d,uy=dy/d;pts[a].px-=ux*pu;pts[a].py-=uy*pu;pts[b].px+=ux*pu;pts[b].py+=uy*pu;moved=true;}}}if(!moved)break;}
+ pts.forEach(function(o){o.px=Math.max(26,Math.min(294,o.px));o.py=Math.max(26,Math.min(282,o.py));});
+ var dots='';pts.forEach(function(o){var p=o.p,i=o.i,px=o.px,py=o.py,ini=esc((p.name||('P'+(i+1))).slice(0,1)),nm=esc((p.name||('P'+(i+1))).slice(0,6));dots+='<g><circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="13" fill="'+DR[p.r.p].hex+'" stroke="var(--panel)" stroke-width="2.5"/><text x="'+px.toFixed(1)+'" y="'+(py+4).toFixed(1)+'" text-anchor="middle" font-size="11" font-weight="700" fill="#F6F1E6">'+ini+'</text><text x="'+px.toFixed(1)+'" y="'+(py+25).toFixed(1)+'" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="var(--ink-soft)">'+nm+'</text></g>';});
  var map='<svg viewBox="0 0 320 320" width="100%" style="max-width:360px;aspect-ratio:1">'+
   '<rect x="14" y="14" width="292" height="292" rx="2" fill="var(--panel)" stroke="var(--hairline)"/>'+
   '<line x1="160" y1="14" x2="160" y2="306" stroke="var(--hairline)"/><line x1="14" y1="160" x2="306" y2="160" stroke="var(--hairline)"/>'+
+  '<circle cx="160" cy="160" r="48" fill="none" stroke="var(--hairline)" stroke-dasharray="3 4"/><circle cx="160" cy="160" r="2.5" fill="var(--faint)"/>'+
   '<text x="160" y="28" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="var(--explore)">Explore</text>'+
   '<text x="160" y="300" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="var(--order)">Order</text>'+
   '<text x="34" y="164" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="var(--connect)">Connect</text>'+
