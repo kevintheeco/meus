@@ -308,6 +308,21 @@ var OV_FIX={
  flex:'바꾸지 않을 핵심 기준 한두 개를 고정해 팀 혼란을 줄이세요.',
  vision:'큰 그림 옆에 "다음 한 걸음"의 구체 실행을 항상 붙이세요.'
 };
+/* facet별 심리학적 의미 — s:시그니처 한마디, lead:그 동력 안에서 이 결이 앞설 때의 의미 */
+var FACET_SIG={
+ decision:{s:'빠르게 끊고 가는 결단',lead:'끌고 가기(주도)나 성과(성취)보다 빠른 판단·실행이 엔진이에요 — 멈춰 있는 걸 못 견디고 일단 정해 움직입니다.'},
+ lead:{s:'방향을 정하고 사람을 이끄는 주도',lead:'성과(성취)보다 영향력으로 움직이는 리더형이에요 — 결과 점수판보다 "내가 방향을 잡고 사람을 데려간다"에서 힘을 얻습니다.'},
+ achieve:{s:'성과·경쟁에서 오는 성취욕',lead:'사람을 이끄는 것(주도)보다 결과 그 자체에 꽂히는 성취형이에요 — 목표만 분명하면 누가 시키든 끝까지 밀어붙입니다.'},
+ support:{s:'행동으로 돕고 받쳐 주는 지지',lead:'공감·신뢰보다 직접 나서서 돕는 쪽이에요 — 말보다 "내가 대신 해줄게"로 표현되는 헌신형입니다.'},
+ trust:{s:'먼저 믿고 맡기는 신뢰',lead:'챙김(지지)·공감보다 믿고 위임하는 쪽이에요 — 통제하기보다 자율을 내어주는 신뢰형입니다.'},
+ empathy:{s:'감정을 읽고 맞추는 공감',lead:'돕기(지지)·위임(신뢰)보다 감정 조율이 핵심이에요 — 분위기와 마음의 흐름을 먼저 읽습니다.'},
+ precision:{s:'오차 없이 정밀하게 하는 완성도',lead:'계획·점검(신중)보다 결과물의 정확도에 꽂히는 완성형이에요 — 디테일의 빈틈을 못 견딥니다.'},
+ plan:{s:'절차와 구조를 세우는 계획',lead:'정밀·신중보다 큰 틀과 순서를 먼저 짜는 쪽이에요 — 일을 구조로 정리해야 마음이 놓입니다.'},
+ caution:{s:'리스크를 먼저 짚는 신중',lead:'정밀·계획보다 위험을 먼저 재는 쪽이에요 — 움직이기 전에 "잘못될 가능성"부터 살핍니다.'},
+ idea:{s:'새것을 떠올리는 발상',lead:'유연·비전보다 아이디어 생성이 핵심이에요 — 새 연결과 가능성을 끊임없이 만들어냅니다.'},
+ flex:{s:'상황에 맞춰 갈아타는 유연',lead:'발상·비전보다 적응력이 강점이에요 — 변수가 생겨도 빠르게 방식을 바꿉니다.'},
+ vision:{s:'큰 그림과 미래를 보는 비전',lead:'발상·유연보다 장기 방향에 꽂히는 쪽이에요 — 눈앞보다 "이게 결국 어디로 가는가"를 먼저 봅니다.'}
+};
 
 /* ---------- facet별 관계 역학 텍스트 (미시 분석) — #H#높은쪽 #L#낮은쪽 #Hn/#Ln 은·는 #Hg/#Lg 이·가 #hv/#lv 점수 ---------- */
 var FREL={
@@ -729,7 +744,7 @@ function renderResult(){
   if(trulylowF.length)NAR.push('동력 중 쏠림은 없지만, <b>'+FC[trulylowF[0]].name+'</b>('+r.fs[trulylowF[0]]+')'+eb(FC[trulylowF[0]].name)+' 상대적으로 낮아 — 이 결이 강한 동료와 짝이면 보완이 됩니다.');
  } else {
   (function(){var ff=fOf(r.p).slice().sort(function(a,b){return r.fs[b]-r.fs[a];});var hi=ff[0],loF=ff[ff.length-1];
-   if(r.fs[hi]-r.fs[loF]>=16)NAR.push('주 동력 <b style="color:var('+DR[r.p].v+')">'+DR[r.p].name+'</b> 안에서도 <b>'+FC[hi].name+'</b>('+r.fs[hi]+')'+eb(FC[hi].name)+' 두드러지지만 <b>'+FC[loF].name+'</b>('+r.fs[loF]+')'+eb(FC[loF].name)+' 낮습니다 — 같은 색이라도 결이 다릅니다.');
+   if(r.fs[hi]-r.fs[loF]>=16){var sig=FACET_SIG[hi]||{s:FC[hi].name,lead:''};NAR.push('주 동력 <b style="color:var('+DR[r.p].v+')">'+DR[r.p].name+'</b> 안에서도 결이 또렷이 갈려요 — <b>'+FC[hi].name+'</b>(백분위 '+r.fs[hi]+')는 높지만 <b>'+FC[loF].name+'</b>('+r.fs[loF]+')는 낮습니다. 이게 뭘 뜻하냐면 — '+sig.lead+' 같은 '+DR[r.p].name+'형이라도 당신의 엔진은 <b>'+sig.s+'</b>에 가깝습니다.');}
    else NAR.push('주 동력은 <b style="color:var('+DR[r.p].v+')">'+DR[r.p].name+'</b>, 그 안의 세 결('+ff.map(function(f){return FC[f].name;}).join('·')+')이 고르게 받쳐 줍니다.');})();
   if(r.secStr){NAR.push('두 번째로 강한 건 <b style="color:var('+DR[r.s].v+')">'+DR[r.s].name+'</b>(백분위 '+r.ds[r.s]+'). '+DR[r.p].name+'를 '+DR[r.s].name+'가 받치는 조합이라 '+AD[r.arch]+' 모습으로 드러납니다.');}
   else{NAR.push('<b style="color:var('+DR[r.p].v+')">'+DR[r.p].name+'</b>(백분위 '+r.ds[r.p]+')'+ig(DR[r.p].name)+' 뚜렷이 앞서고, 나머지 세 동력은 비슷합니다('+r.rk.slice(1).map(function(d){return DR[d].name+' '+r.ds[d];}).join(' / ')+'). 주 동력 중심으로 읽으세요.');}
@@ -1045,6 +1060,14 @@ function renderResult(){
  if(!S.shared){var code=packAnswers(S);
   var submitBtn=_user?'<button class="btn dark" id="teambtn" onclick="MEUS.teamSubmit()" style="width:100%;margin-top:10px;background:var(--connect)">팀에 제출하기 →</button>':'<button class="btn" style="width:100%;margin-top:10px;color:var(--mute);cursor:default" disabled>팀 제출은 구글 로그인 후 가능합니다</button>';
   H+='<div class="card noprint" style="margin-top:14px"><div class="sec" style="margin:0 0 7px">내 코드 · 너(You)·우리(Us) 입력</div><p style="margin:0 0 12px;color:var(--mute);font-size:14.5px">이 코드를 동료에게 주거나 다음 모듈에 넣으면 보완·팀 분석이 됩니다.</p><div class="mono" style="background:var(--fill);border:1px solid var(--rule);border-radius:2px;padding:11px 13px;font-size:13.5px;word-break:break-all;color:var(--mute);margin-bottom:11px">'+code+'</div><div style="display:flex;gap:9px;flex-wrap:wrap"><button class="btn dark" id="copybtn" onclick="MEUS.copy()">코드 복사</button><button class="btn" id="copyurlbtn" onclick="MEUS.copyurl()">결과 링크 복사</button></div>'+submitBtn+'</div>';}
+ H+='<div style="margin-top:clamp(28px,4vw,40px);border-top:1px solid var(--hairline);padding-top:18px"><div class="sec" style="margin:0 0 10px;font-size:12.5px;color:var(--mute)">이 진단의 학술적 기반</div><div class="mono" style="font-size:11px;line-height:1.9;color:var(--faint)">'+
+  '· <b>성격 5요인(Big Five·FFM)</b> — 4동력·12특성을 외향·추진(Extraversion)·우호(Agreeableness)·성실(Conscientiousness)·개방(Openness) 구조에 대응<br>'+
+  '· <b>대인관계 원형이론(Interpersonal Circumplex)</b> — Leary·Kiesler·Wiggins: 지배–순응 / 친화 축의 상보성<br>'+
+  '· <b>갈등 양식 TKI(Thomas–Kilmann) · SDI(Strength Deployment Inventory)</b> — 주장·수용·분석 3양식<br>'+
+  '· <b>규준참조 심리측정(normative scoring)</b> — 백분위·스테나인으로 모집단 대비 위치 산출(평균회귀 보정)<br>'+
+  '· <b>신뢰 형성 모델</b>(Mayer·Davis·Schoorman, 1995) · <b>유사성–매력 가설</b>(Byrne) ↔ 상보성 원리<br>'+
+  '· <b>팀 역할 이론</b>(Belbin) · <b>심층 다양성</b>(deep-level diversity) — 팀 궁합·집단 사각지대<br>'+
+  '<span style="color:var(--mute)">위 모델에서 설계 원리를 가져온 <b>자기보고형 성향 도구</b>입니다 — 임상·채용 선발 검사가 아니라, 팀의 상호 이해를 돕기 위한 것입니다.</span></div></div>';
  H+='<div class="noprint" style="display:flex;gap:11px;flex-wrap:wrap;margin-top:14px"><button class="btn dark" onclick="MEUS.print()">결과지 인쇄 / PDF 저장</button>'+(S.shared?'<a class="btn" href="#/me" style="text-decoration:none">내 진단 하러 가기</a>':'<button class="btn" onclick="MEUS.reset()">처음으로</button>')+'</div>';
  H+='<p style="margin-top:18px;text-align:center;font-size:13px;color:var(--faint)">사람을 한 글자로 가두지 마세요 — "넌 추진형이라 그래"(✕), "그 상황에선 추진이 세게 나왔네"(○)</p></div>';
  app.innerHTML=H;
