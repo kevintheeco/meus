@@ -1885,13 +1885,22 @@ function renderOrg(){
  var extra=M.filter(function(p){return !assigned[p.name];});
  function topFacOf(r){return FK.slice().sort(function(a,b){return r.fs[b]-r.fs[a];})[0];}
  function fitOf(p,role){var ri=p.r.rk.indexOf(role.ideal),ai=p.r.rk.indexOf(role.alt),best=Math.min(ri,ai);return best<=1?{t:'강함',c:'var(--connect)',lv:2}:best===2?{t:'보통',c:'var(--explore)',lv:1}:{t:'주의',c:'var(--drive)',lv:0};}
+ // 시그니처 = 팀 빈곳을 채우거나 압도적으로 높은 결 = 팀 평균 대비 도드라진 facet, 중복 없이 배정(모두 다름)
+ var orgPpl=filled.map(function(s){return s.p;});
+ var fAvgO={};FK.forEach(function(f){fAvgO[f]=orgPpl.length?orgPpl.reduce(function(a,q){return a+q.r.fs[f];},0)/orgPpl.length:50;});
+ var sigO={},takenO={},pairsO=[];
+ orgPpl.forEach(function(q,qi){FK.forEach(function(f){if(q.r.fs[f]>=50)pairsO.push({qi:qi,f:f,v:q.r.fs[f]-fAvgO[f]});});});
+ pairsO.sort(function(a,b){return b.v-a.v;});
+ pairsO.forEach(function(pr){if(sigO[pr.qi]===undefined&&!takenO[pr.f]){sigO[pr.qi]=pr.f;takenO[pr.f]=1;}});
+ orgPpl.forEach(function(q,qi){if(sigO[qi]===undefined)sigO[qi]=FK.slice().sort(function(a,b){return (q.r.fs[b]-fAvgO[b])-(q.r.fs[a]-fAvgO[a]);})[0];});
+ function sigOf(p){var k=orgPpl.indexOf(p);var prim=(k>=0&&sigO[k]!==undefined)?sigO[k]:FK.slice().sort(function(a,b){return p.r.fs[b]-p.r.fs[a];})[0];var sec=FK.slice().sort(function(a,b){return p.r.fs[b]-p.r.fs[a];}).filter(function(f){return f!==prim;})[0];return {prim:prim,sec:sec};}
  // ① 조직 한 장
  H+=gh('①','조직 한 장','직분 × 강점 한눈에');
  H+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:11px;margin-top:14px">';
  slots.forEach(function(s){var role=s.role;
   if(!s.p){H+='<div style="border:1px dashed var(--rule-strong);border-radius:2px;background:var(--fill);padding:14px 16px"><div style="font-weight:800;font-size:15px">'+role.label+'</div><div style="font-size:12px;color:var(--mute);margin:3px 0 8px">'+role.ko+'</div><div style="font-size:12.5px;color:var(--faint)">· '+role.m+' — 결과 대기 (제출되면 반영)</div></div>';return;}
-  var p=s.p,r=p.r,col=DR[r.p].hex,tf=topFacOf(r),fit=fitOf(p,role);
-  H+='<div style="border:1px solid var(--rule);border-top:3px solid '+col+';border-radius:2px;background:var(--panel);padding:14px 16px"><div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px"><span style="font-weight:800;font-size:15px">'+role.label+'</span><span class="mono" style="font-size:10px;color:'+fit.c+';font-weight:700">적합도 '+fit.t+'</span></div><div style="font-size:12px;color:var(--mute);margin:2px 0 9px">'+role.ko+'</div><div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap"><span style="font-weight:800;font-size:16px">'+esc(p.name||'')+'</span><span style="font-size:12px;color:'+col+';font-weight:700">'+r.arch+'</span></div><div style="font-size:12.5px;color:var(--ink-soft);margin-top:6px">주 동력 <b style="color:'+col+'">'+DR[r.p].name+'</b> · 시그니처 <b>'+FC[tf].name+'</b>('+r.fs[tf]+')</div></div>';
+  var p=s.p,r=p.r,col=DR[r.p].hex,sg=sigOf(p),fit=fitOf(p,role);
+  H+='<div style="border:1px solid var(--rule);border-top:3px solid '+col+';border-radius:2px;background:var(--panel);padding:14px 16px"><div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px"><span style="font-weight:800;font-size:15px">'+role.label+'</span><span class="mono" style="font-size:10px;color:'+fit.c+';font-weight:700">적합도 '+fit.t+'</span></div><div style="font-size:12px;color:var(--mute);margin:2px 0 9px">'+role.ko+'</div><div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap"><span style="font-weight:800;font-size:16px">'+esc(p.name||'')+'</span><span style="font-size:12px;color:'+col+';font-weight:700">'+r.arch+'</span></div><div style="font-size:12.5px;color:var(--ink-soft);margin-top:6px">시그니처 <b style="color:'+DR[FC[sg.prim].d].hex+'">'+FC[sg.prim].name+'</b>('+r.fs[sg.prim]+')'+(r.fs[sg.sec]>=60?' · '+FC[sg.sec].name+'('+r.fs[sg.sec]+')':'')+'</div></div>';
  });
  H+='</div>';
  if(extra.length)H+='<p style="margin:10px 0 0;font-size:12.5px;color:var(--mute)">직분 미지정 · '+extra.map(function(p){return esc(p.name||'');}).join(' · ')+'</p>';
