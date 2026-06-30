@@ -399,6 +399,7 @@ function eun(w){return w+(batchim(w)?'은':'는');}
 function eb(w){return batchim(w)?'은':'는';}
 function ig(w){return batchim(w)?'이':'가';}
 function el(w){return batchim(w)?'을':'를';}
+function gw(w){return batchim(w)?'과':'와';}
 
 function done(st){
  if(st.type==='likert')return st.items.every(function(q){return S.LK[q.id]!=null;});
@@ -1657,7 +1658,7 @@ function renderUs(){
   var weakHtml;
   if(weakDs<=44&&teamRankW>=2){
    var cW=M.slice().filter(function(q){return q!==p;}).sort(function(a,b){return b.r.ds[weakD]-a.r.ds[weakD];})[0];
-   weakHtml='가장 옅은 결은 <b style="color:var('+DR[weakD].v+')">'+DR[weakD].name+'</b>('+weakDs+')예요 — '+LOW_DRIVE[weakD].d+(lowF.length?' 특히 <b>'+lowF.slice(0,2).map(function(f){return FC[f].name+'('+r.fs[f]+')';}).join('·')+'</b>가 많이 낮아요.':'')+(cW&&cW.r.ds[weakD]>=weakDs+10?' 마침 이건 <b>'+esc(cW.name||'한 명')+'</b>('+cW.r.ds[weakD]+')의 강점이라, 그 일은 '+esc(cW.name||'')+'와 짝지으면 메워져요.':' 팀 전체가 옅은 편이라 규칙·외부 보강으로 받쳐야 해요.')+' '+LOW_DRIVE[weakD].t;
+   weakHtml='가장 옅은 결은 <b style="color:var('+DR[weakD].v+')">'+DR[weakD].name+'</b>('+weakDs+')'+(batchim(DR[weakD].name)?'이에요':'예요')+' — '+LOW_DRIVE[weakD].d+(lowF.length?' 특히 <b>'+lowF.slice(0,2).map(function(f){return FC[f].name+'('+r.fs[f]+')';}).join('·')+'</b>'+ig(FC[lowF[1]!==undefined?lowF[1]:lowF[0]].name)+' 많이 낮아요.':'')+(cW&&cW.r.ds[weakD]>=weakDs+10?' 마침 이건 <b>'+esc(cW.name||'한 명')+'</b>('+cW.r.ds[weakD]+')의 강점이라, 그 일은 '+esc(cW.name||'')+gw(cW.name||'')+' 짝지으면 메워져요.':' 팀 전체가 옅은 편이라 규칙·외부 보강으로 받쳐야 해요.')+' '+LOW_DRIVE[weakD].t;
   } else if(lowF.length){
    var lf=lowF[0],bA=bestAtF(lf);
    weakHtml='크게 비는 동력은 없어요 — 다만 특성으로 보면 <b style="color:'+DR[FC[lf].d].hex+'">'+FC[lf].name+'</b>('+r.fs[lf]+')'+(lowF[1]?' · <b>'+FC[lowF[1]].name+'</b>('+r.fs[lowF[1]]+')':'')+'가 낮은 편이에요. 이 결이 필요한 순간엔 '+(bA&&bA.r.fs[lf]>=r.fs[lf]+12?'<b>'+esc(bA.name||'')+'</b>('+bA.r.fs[lf]+')에게 맡기거나 ':'')+'의식적으로 한 번 챙기면 좋아요.';
@@ -1683,7 +1684,7 @@ function renderUs(){
  // 집단 사각지대
  var nobody=DK.filter(function(d){return M.every(function(p){return p.r.rk.slice(0,2).indexOf(d)<0;});});
  var bK=strongestIn(blind),bKn=esc(bK.name||'한 명'),bKs=bK.r.ds[blind];
- var blindT=blindKeyClear?('팀에서 가장 얇은 영역은 <b style="color:var('+DR[blind].v+')">'+DR[blind].name+'</b>('+avg[blind]+')예요 — 이 빈자리를 지키는 키는 <b>'+bKn+'</b>('+bKs+')입니다. '+bKn+'의 역할을 팀이 분명히 인정하고, 한 사람에게만 쏠리지 않게 곁에서 받칠 두 번째 사람을 정해두면 좋아요.'):(bKs>=50?('팀에서 가장 얇은 영역은 <b style="color:var('+DR[blind].v+')">'+DR[blind].name+'</b>('+avg[blind]+')이에요 — <b>'+bKn+'</b>('+bKs+')·<b>'+esc(blind2ndP.name||'또 한 명')+'</b>('+blind2ndP.r.ds[blind]+')처럼 여러 명이 비슷하게 받쳐, 특정 한 명의 키는 아니에요. 그때그때 이 관점을 누가 챙길지만 정하면 됩니다.'):('<b style="color:var('+DR[blind].v+')">'+DR[blind].name+'</b>('+avg[blind]+')'+eb(DR[blind].name)+' 아무도 확실히 책임지지 못하는 <b>팀의 진짜 공백</b>이에요 — 가장 높은 '+bKn+'도 '+bKs+'에 그칩니다. 이 역할을 누군가에게 공식으로 맡기거나, 이 힘이 강한 사람을 보강하세요.'));
+ var blindT=blindKeyClear?('팀에서 가장 얇은 영역은 <b style="color:var('+DR[blind].v+')">'+DR[blind].name+'</b>('+avg[blind]+')'+(batchim(DR[blind].name)?'이에요':'예요')+' — 이 빈자리를 지키는 키는 <b>'+bKn+'</b>('+bKs+')입니다. '+bKn+'의 역할을 팀이 분명히 인정하고, 한 사람에게만 쏠리지 않게 곁에서 받칠 두 번째 사람을 정해두면 좋아요.'):(bKs>=50?('팀에서 가장 얇은 영역은 <b style="color:var('+DR[blind].v+')">'+DR[blind].name+'</b>('+avg[blind]+')이에요 — <b>'+bKn+'</b>('+bKs+')·<b>'+esc(blind2ndP.name||'또 한 명')+'</b>('+blind2ndP.r.ds[blind]+')처럼 여러 명이 비슷하게 받쳐, 특정 한 명의 키는 아니에요. 그때그때 이 관점을 누가 챙길지만 정하면 됩니다.'):('<b style="color:var('+DR[blind].v+')">'+DR[blind].name+'</b>('+avg[blind]+')'+eb(DR[blind].name)+' 아무도 확실히 책임지지 못하는 <b>팀의 진짜 공백</b>이에요 — 가장 높은 '+bKn+'도 '+bKs+'에 그칩니다. 이 역할을 누군가에게 공식으로 맡기거나, 이 힘이 강한 사람을 보강하세요.'));
  H+='<div style="margin-top:clamp(26px,3vw,38px);border:1px solid var(--explore);border-radius:2px;background:color-mix(in srgb,var(--explore) 8%,transparent);padding:16px 18px"><div style="display:flex;align-items:center;gap:7px;margin-bottom:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--explore)"></span><span class="mono" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--explore)">집단 사각지대</span></div><p style="margin:0;font-size:15.5px;color:var(--ink-soft)">'+blindT+'</p></div>';
  // ===== 팀 심층 분석 =====
  // 1. 팀 유형
@@ -1996,9 +1997,9 @@ function renderOrg(){
   filled.forEach(function(s){if(s.role.key==='CEO')return;var o=s.p,on=esc(o.name||''),role=s.role,tfO=topFacOf(o.r),howto=COMM_FACET[tfO]||'';
    var oLead=o.r.fs.lead,ceoLead=ceo.r.fs.lead,push='';
    if(oLead>=58&&ceoLead>=58){var aff2=Math.round(((o.r.fs.support+o.r.fs.trust+o.r.fs.empathy)/3+(ceo.r.fs.support+ceo.r.fs.trust+ceo.r.fs.empathy)/3)/2);push=(aff2>=55)?' 둘 다 주도성이 높지만 서로 신뢰·지지가 두터워, '+on+'의 강한 의견은 위협이 아니라 <b>전략 자산</b>이에요 — 결정권은 '+cn+'이 쥐되 먼저 의견을 구하면 시너지가 큽니다.':' 둘 다 주도성이 높고 친화는 옅은 편이라, 같은 사안을 동시에 쥐면 부딪힐 수 있어요. <b>'+on+'의 결정 영역('+role.ko+')을 분명히 위임</b>하고 그 안에선 '+cn+'이 한발 물러나 존중하면, 경쟁이 협업이 됩니다.';}
-   else if(oLead>=58)push=' '+on+'은 주도성이 높아 의견을 강하게 냅니다 — '+cn+'이 결정 전에 "네 생각은?"으로 먼저 들으면 그 추진력이 CEO의 결정을 밀어주는 힘이 돼요.';
-   else push=' '+on+'은 먼저 강하게 밀기보다 받쳐주는 편이라, '+cn+'이 의견을 <b>적극적으로 끌어내</b> 줘야 좋은 판단이 묻히지 않아요.';
-   H+='<div style="border:1px solid var(--rule);border-left:3px solid '+DR[o.r.p].hex+';border-radius:2px;background:var(--panel);padding:14px 16px;margin-bottom:9px"><div style="font-weight:800;font-size:14.5px;margin-bottom:6px">'+cn+' <span style="color:var(--mute);font-weight:500">→</span> '+role.label+' '+on+'</div><p style="margin:0 0 6px;font-size:13.5px;line-height:1.6;color:var(--ink-soft)"><b>'+role.ko+'</b>를 맡은 '+on+'을 대할 땐 — '+howto+push+'</p><p style="margin:0;font-size:12.5px;color:var(--mute)">▸ 결정 구조 — 이 영역은 '+on+'이 1차 설계·조언(Consulted), 최종 결정은 '+cn+'.</p></div>';
+   else if(oLead>=58)push=' '+on+eb(on)+' 주도성이 높아 의견을 강하게 냅니다 — '+cn+ig(cn)+' 결정 전에 "네 생각은?"으로 먼저 들으면 그 추진력이 CEO의 결정을 밀어주는 힘이 돼요.';
+   else push=' '+on+eb(on)+' 먼저 강하게 밀기보다 받쳐주는 편이라, '+cn+ig(cn)+' 의견을 <b>적극적으로 끌어내</b> 줘야 좋은 판단이 묻히지 않아요.';
+   H+='<div style="border:1px solid var(--rule);border-left:3px solid '+DR[o.r.p].hex+';border-radius:2px;background:var(--panel);padding:14px 16px;margin-bottom:9px"><div style="font-weight:800;font-size:14.5px;margin-bottom:6px">'+cn+' <span style="color:var(--mute);font-weight:500">→</span> '+role.label+' '+on+'</div><p style="margin:0 0 6px;font-size:13.5px;line-height:1.6;color:var(--ink-soft)"><b>'+role.ko+'</b>'+el(role.ko)+' 맡은 '+on+el(on)+' 대할 땐 — '+howto+push+'</p><p style="margin:0;font-size:12.5px;color:var(--mute)">▸ 결정 구조 — 이 영역은 '+on+ig(on)+' 1차 설계·조언(Consulted), 최종 결정은 '+cn+'.</p></div>';
   });
  }
  // ④ 경영진 동력 커버리지
