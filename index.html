@@ -1500,6 +1500,11 @@ function renderUs(){
  var bA=strongestIn(blind),bAn=esc(bA.name||'한 명'),bScore=bA.r.ds[blind];
  if(bScore>=52)TN.push('팀 전체로는 <b style="color:var('+DR[blind].v+')">'+DR[blind].name+'</b>('+avg[blind]+')이 가장 얇습니다 — 그런데 이 빈자리를 지키는 <b>키</b>가 있어요. 바로 <b>'+bAn+'</b>('+bScore+')! 모두가 약한 '+keyRole[blind]+'을 '+bAn+ig(bAn)+' 떠받치고 있으니, 그 역할의 무게를 팀이 분명히 알아주고 힘을 실어 주세요. 한 사람에게만 쏠리지 않게, 곁에서 함께 받칠 두 번째 사람도 정해두면 더 단단해집니다.');
  else TN.push('<b style="color:var('+DR[blind].v+')">'+DR[blind].name+'</b>('+avg[blind]+')은 이 팀의 <b>진짜 공백</b>입니다 — 가장 높은 '+bAn+'조차 '+bScore+'라, '+keyRole[blind]+'을 확실히 책임질 사람이 아직 없어요. 이 역할을 누군가에게 공식으로 맡기거나, 이 힘이 강한 사람을 새로 들이면 팀이 단단해집니다.');
+ // 특성(facet) 단위 팀 강점/약점 — 평균 최고·최저
+ var facHi=FK.slice().sort(function(a,b){return fAvgT[b]-fAvgT[a];}).slice(0,3);
+ var facLo=FK.slice().sort(function(a,b){return fAvgT[a]-fAvgT[b];});
+ var lo1=facLo[0],lo2=facLo[1];
+ TN.push('특성 하나하나로 내려가 보면 — 팀이 <b>함께 두꺼운 결</b>은 <b>'+facHi.map(function(f){return '<span style="color:'+DR[FC[f].d].hex+'">'+FC[f].name+'</span>('+fAvgT[f]+')';}).join(' · ')+'</b>예요. 반대로 <b>전체 평균이 가장 얇은</b> 건 <b style="color:var('+DR[FC[lo1].d].v+')">'+FC[lo1].name+'</b>('+fAvgT[lo1]+')와 <b>'+FC[lo2].name+'</b>('+fAvgT[lo2]+')입니다 — 이 결이 필요한 순간엔 팀 전체가 함께 놓치기 쉬우니, 중요한 결정·회의에서 이 관점을 일부러 한 번 짚고 가세요.');
  var vc={};M.forEach(function(p){var v=(p.r.vals||[])[0];if(v)vc[v]=(vc[v]||0)+1;});var vk=Object.keys(vc).sort(function(a,b){return vc[b]-vc[a];});
  if(vk.length){var v0=VAL.filter(function(x){return x.k===vk[0];})[0];
   var minor=M.filter(function(p){return (p.r.vals||[])[0]&&p.r.vals[0]!==vk[0];}).map(function(p){var vv=VAL.filter(function(x){return x.k===p.r.vals[0];})[0];return esc(p.name||'')+'('+(vv?vv.t:'')+')';});
