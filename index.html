@@ -744,7 +744,7 @@ function renderResult(){
   var cp1=compOfFacR(ld1,null),st1=(cp1&&COMP_DESC[cp1.k])?COMP_DESC[cp1.k].s:'';
   var cp2=compOfFacR(ld2,cp1?cp1.k:null),st2=(cp2&&COMP_DESC[cp2.k])?COMP_DESC[cp2.k].s:'';
   var twoV=(r.fs[ld2]>=66&&st2&&st2!==st1);
-  var shineV=st1?('<b style="color:'+DR[FC[ld1].d].hex+'">'+FC[ld1].name+'</b>('+r.fs[ld1]+')'+(twoV?' · <b style="color:'+DR[FC[ld2].d].hex+'">'+FC[ld2].name+'</b>('+r.fs[ld2]+')':'')+'가 강해서 — '+st1+(twoV?' <b>그리고</b> '+st2:'')+' 빛나요.'):(ap.shine||'');
+  var shineV=st1?('<b style="color:'+DR[FC[ld1].d].hex+'">'+FC[ld1].name+'</b>('+r.fs[ld1]+')'+(twoV?' · <b style="color:'+DR[FC[ld2].d].hex+'">'+FC[ld2].name+'</b>('+r.fs[ld2]+')':'')+ig(twoV?FC[ld2].name:FC[ld1].name)+' 강해서 — '+st1+(twoV?' <b>그리고</b> '+st2:'')+' 빛나요.'):(ap.shine||'');
   var tfR=FK.slice().sort(function(x,y){return r.fs[y]-r.fs[x];}),tf1=tfR[0],tf2=tfR[1];
   var workV='<b>'+FC[tf1].name+'</b>('+r.fs[tf1]+')'+ig(FC[tf1].name)+' 강한 편이라 — '+(COMM_FACET[tf1]||'')+(r.fs[tf2]>=64&&COMM_FACET[tf2]?' 또 <b>'+FC[tf2].name+'</b>('+r.fs[tf2]+')도 높아요: '+COMM_FACET[tf2]:'');
   var shadowV='가장 강한 <b>'+FC[tf1].name+'</b>('+r.fs[tf1]+')도 지나치면 <b>'+FC[tf1].ov+'</b>로 흐를 수 있어요 — '+(OV_FIX[tf1]||'한 박자 쉬어가기')+'.';
@@ -765,7 +765,7 @@ function renderResult(){
   if(trulylowF.length)NAR.push('동력 중 쏠림은 없지만, <b>'+FC[trulylowF[0]].name+'</b>('+r.fs[trulylowF[0]]+')'+eb(FC[trulylowF[0]].name)+' 상대적으로 낮아 — 이 결이 강한 동료와 짝이면 보완이 됩니다.');
  } else {
   (function(){var ff=fOf(r.p).slice().sort(function(a,b){return r.fs[b]-r.fs[a];});var hi=ff[0],loF=ff[ff.length-1];
-   if(r.fs[hi]-r.fs[loF]>=16){var sig=FACET_SIG[hi]||{s:FC[hi].name,lead:''};NAR.push('주 동력 <b style="color:var('+DR[r.p].v+')">'+DR[r.p].name+'</b> 안에서도 결이 또렷이 갈려요 — <b>'+FC[hi].name+'</b>(점수 '+r.fs[hi]+')는 높지만 <b>'+FC[loF].name+'</b>('+r.fs[loF]+')는 낮습니다. 이게 뭘 뜻하냐면 — '+sig.lead+' 같은 '+DR[r.p].name+'형이라도 당신의 엔진은 <b>'+sig.s+'</b>에 가깝습니다.');}
+   if(r.fs[hi]-r.fs[loF]>=16){var sig=FACET_SIG[hi]||{s:FC[hi].name,lead:''};NAR.push('주 동력 <b style="color:var('+DR[r.p].v+')">'+DR[r.p].name+'</b> 안에서도 결이 또렷이 갈려요 — <b>'+FC[hi].name+'</b>(점수 '+r.fs[hi]+')'+eb(FC[hi].name)+' 높지만 <b>'+FC[loF].name+'</b>('+r.fs[loF]+')'+eb(FC[loF].name)+' 낮습니다. 이게 뭘 뜻하냐면 — '+sig.lead+' 같은 '+DR[r.p].name+'형이라도 당신의 엔진은 <b>'+sig.s+'</b>에 가깝습니다.');}
    else NAR.push('주 동력은 <b style="color:var('+DR[r.p].v+')">'+DR[r.p].name+'</b>, 그 안의 세 결('+ff.map(function(f){return FC[f].name;}).join('·')+')이 고르게 받쳐 줍니다.');})();
   if(r.secStr){NAR.push('두 번째로 강한 건 <b style="color:var('+DR[r.s].v+')">'+DR[r.s].name+'</b>(점수 '+r.ds[r.s]+'). '+DR[r.p].name+'를 '+DR[r.s].name+'가 받치는 조합이라 '+AD[r.arch]+' 모습으로 드러납니다.');}
   else{NAR.push('<b style="color:var('+DR[r.p].v+')">'+DR[r.p].name+'</b>(점수 '+r.ds[r.p]+')'+ig(DR[r.p].name)+' 뚜렷이 앞서고, 나머지 세 동력은 비슷합니다('+r.rk.slice(1).map(function(d){return DR[d].name+' '+r.ds[d];}).join(' / ')+'). 주 동력 중심으로 읽으세요.');}
@@ -1028,7 +1028,7 @@ function renderResult(){
   grow.push('가장 덜 쓰는 <b style="color:var('+DR[r.lo].v+')">'+DR[r.lo].name+'</b> — '+loTip[r.lo]);
   if(ovList.length){var f0=ovList[0];grow.push('<b>'+FC[f0].name+'</b>'+ig(FC[f0].name)+' 과용 구간 — 강점이지만, 지나치다 싶을 때 <b>'+ANTI[FC[f0].d].map(function(d){return DR[d].name;}).join('·')+'</b>의 시선을 한 번 빌려보세요.');}
   var wf=fOf(r.p).slice().sort(function(a,b){return r.fs[a]-r.fs[b];})[0];
-  if(r.fs[wf]<=45)grow.push('주 동력 '+DR[r.p].name+' 안에서도 <b>'+FC[wf].name+'</b>('+r.fs[wf]+')은 상대적으로 낮아 — 여기를 한 칸 키우면 강점이 더 입체적이 됩니다.');
+  if(r.fs[wf]<=45)grow.push('주 동력 '+DR[r.p].name+' 안에서도 <b>'+FC[wf].name+'</b>('+r.fs[wf]+')'+eb(FC[wf].name)+' 상대적으로 낮아 — 여기를 한 칸 키우면 강점이 더 입체적이 됩니다.');
  }
  grow.push('약점을 없애려 애쓰기보다, <b>나를 보완하는 동료와 짝</b>을 짓는 게 더 빠릅니다. (위 협업 궁합 참고)');
  H+='<div style="margin-top:clamp(28px,4vw,44px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,28px)"><div class="sec" style="margin:0 0 14px">성장 제언 · Growth edges</div>'+grow.map(function(t){return '<p style="margin:0 0 10px;font-size:14.5px;line-height:1.7;color:var(--ink-soft)">▸ '+t+'</p>';}).join('')+'</div>';
@@ -1561,7 +1561,7 @@ function renderUs(){
  var bA=strongestIn(blind),bAn=esc(bA.name||'한 명'),bScore=bA.r.ds[blind];
  if(blindKeyClear)TN.push('약한 영역|||팀에서 가장 얇은 건 <b style="color:var('+DR[blind].v+')">'+DR[blind].name+'</b>('+avg[blind]+')입니다. 그런데 이 빈자리를 지키는 <b>키</b>가 있어요 — 바로 <b>'+bAn+'</b>('+bScore+')!<br>모두가 약한 '+keyRole[blind]+'을 '+bAn+ig(bAn)+' 떠받치고 있으니, 그 무게를 팀이 알아주고 힘을 실어 주세요. 곁에서 함께 받칠 두 번째 사람도 정해두면 더 단단해집니다.');
  else if(bScore>=50)TN.push('약한 영역|||팀에서 가장 얇은 건 <b style="color:var('+DR[blind].v+')">'+DR[blind].name+'</b>('+avg[blind]+')이에요. 다만 <b>'+bAn+'</b>('+bScore+')·<b>'+esc(blind2ndP.name||'또 한 명')+'</b>('+blind2ndP.r.ds[blind]+')처럼 <b>여러 명이 비슷하게</b> 받치고 있어, 특정 한 명의 "키"라기보다 <b>함께 조금씩 메우는</b> 영역입니다.<br>중요한 순간에 이 관점을 누가 챙길지만 그때그때 정해두면 충분해요.');
- else TN.push('약한 영역|||<b style="color:var('+DR[blind].v+')">'+DR[blind].name+'</b>('+avg[blind]+')은 이 팀의 <b>진짜 공백</b>입니다. 가장 높은 '+bAn+'조차 '+bScore+'라, '+keyRole[blind]+'을 확실히 책임질 사람이 아직 없어요.<br>이 역할을 누군가에게 공식으로 맡기거나, 이 힘이 강한 사람을 새로 들이면 팀이 단단해집니다.');
+ else TN.push('약한 영역|||<b style="color:var('+DR[blind].v+')">'+DR[blind].name+'</b>('+avg[blind]+')'+eb(DR[blind].name)+' 이 팀의 <b>진짜 공백</b>입니다. 가장 높은 '+bAn+'조차 '+bScore+'라, '+keyRole[blind]+'을 확실히 책임질 사람이 아직 없어요.<br>이 역할을 누군가에게 공식으로 맡기거나, 이 힘이 강한 사람을 새로 들이면 팀이 단단해집니다.');
  // 특성(facet) 단위 팀 강점/약점 — 평균 최고·최저
  var facHi=FK.slice().sort(function(a,b){return fAvgT[b]-fAvgT[a];}).slice(0,3);
  var facLo=FK.slice().sort(function(a,b){return fAvgT[a]-fAvgT[b];});
@@ -1640,7 +1640,7 @@ function renderUs(){
   var cmp1=compOfFac(lead1,null),sit1=(cmp1&&COMP_DESC[cmp1.k])?COMP_DESC[cmp1.k].s:'';
   var cmp2=compOfFac(lead2,cmp1?cmp1.k:null),sit2=(cmp2&&COMP_DESC[cmp2.k])?COMP_DESC[cmp2.k].s:'';
   var twoSh=(r.fs[lead2]>=66&&sit2&&sit2!==sit1);
-  var shineP=sit1?('<b style="color:'+DR[FC[lead1].d].hex+'">'+FC[lead1].name+'</b>('+r.fs[lead1]+')'+(twoSh?' · <b style="color:'+DR[FC[lead2].d].hex+'">'+FC[lead2].name+'</b>('+r.fs[lead2]+')':'')+'가 강해서 — '+sit1+(twoSh?' <b>그리고</b> '+sit2:'')+' 빛나요.'):((AP[r.arch]&&AP[r.arch].shine)||'');
+  var shineP=sit1?('<b style="color:'+DR[FC[lead1].d].hex+'">'+FC[lead1].name+'</b>('+r.fs[lead1]+')'+(twoSh?' · <b style="color:'+DR[FC[lead2].d].hex+'">'+FC[lead2].name+'</b>('+r.fs[lead2]+')':'')+ig(twoSh?FC[lead2].name:FC[lead1].name)+' 강해서 — '+sit1+(twoSh?' <b>그리고</b> '+sit2:'')+' 빛나요.'):((AP[r.arch]&&AP[r.arch].shine)||'');
   // 이렇게 대해주세요: 주동력 1줄(같은 동력이면 동일) → 개인의 상위 facet 기반 COMM_FACET로 개인화
   var wRank=FK.slice().sort(function(a,b){return r.fs[b]-r.fs[a];}),w1=wRank[0],w2=wRank[1];
   var workP='<b>'+FC[w1].name+'</b>('+r.fs[w1]+')'+ig(FC[w1].name)+' 강한 사람이라 — '+(COMM_FACET[w1]||'')+(r.fs[w2]>=64&&COMM_FACET[w2]?' 또 <b>'+FC[w2].name+'</b>('+r.fs[w2]+')도 높아요: '+COMM_FACET[w2]:'');
@@ -1662,7 +1662,7 @@ function renderUs(){
    var lf=lowF[0],bA=bestAtF(lf);
    weakHtml='크게 비는 동력은 없어요 — 다만 특성으로 보면 <b style="color:'+DR[FC[lf].d].hex+'">'+FC[lf].name+'</b>('+r.fs[lf]+')'+(lowF[1]?' · <b>'+FC[lowF[1]].name+'</b>('+r.fs[lowF[1]]+')':'')+'가 낮은 편이에요. 이 결이 필요한 순간엔 '+(bA&&bA.r.fs[lf]>=r.fs[lf]+12?'<b>'+esc(bA.name||'')+'</b>('+bA.r.fs[lf]+')에게 맡기거나 ':'')+'의식적으로 한 번 챙기면 좋아요.';
   } else {
-   weakHtml='약한 결이 <b>뚜렷하지 않아요</b> — 어느 영역도 크게 비지 않은, 고루 갖춘 편이에요. 굳이 꼽자면 <b>'+FC[ownLow].name+'</b>('+r.fs[ownLow]+')가 상대적으로 낮지만, 절대적으론 무난합니다.';
+   weakHtml='약한 결이 <b>뚜렷하지 않아요</b> — 어느 영역도 크게 비지 않은, 고루 갖춘 편이에요. 굳이 꼽자면 <b>'+FC[ownLow].name+'</b>('+r.fs[ownLow]+')'+ig(FC[ownLow].name)+' 상대적으로 낮지만, 절대적으론 무난합니다.';
   }
   H+='<div style="border:1px solid var(--rule);border-top:3px solid '+col+';border-radius:2px;background:var(--panel);padding:16px 18px;margin-bottom:11px">'+
    '<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px"><span style="font-weight:900;font-size:17px">'+nm+'</span><span style="font-size:13px;color:'+col+';font-weight:700">'+r.arch+'</span><span style="font-size:12px;color:var(--faint)">'+(AD[r.arch]||'')+'</span></div>'+
@@ -1683,7 +1683,7 @@ function renderUs(){
  // 집단 사각지대
  var nobody=DK.filter(function(d){return M.every(function(p){return p.r.rk.slice(0,2).indexOf(d)<0;});});
  var bK=strongestIn(blind),bKn=esc(bK.name||'한 명'),bKs=bK.r.ds[blind];
- var blindT=blindKeyClear?('팀에서 가장 얇은 영역은 <b style="color:var('+DR[blind].v+')">'+DR[blind].name+'</b>('+avg[blind]+')예요 — 이 빈자리를 지키는 키는 <b>'+bKn+'</b>('+bKs+')입니다. '+bKn+'의 역할을 팀이 분명히 인정하고, 한 사람에게만 쏠리지 않게 곁에서 받칠 두 번째 사람을 정해두면 좋아요.'):(bKs>=50?('팀에서 가장 얇은 영역은 <b style="color:var('+DR[blind].v+')">'+DR[blind].name+'</b>('+avg[blind]+')이에요 — <b>'+bKn+'</b>('+bKs+')·<b>'+esc(blind2ndP.name||'또 한 명')+'</b>('+blind2ndP.r.ds[blind]+')처럼 여러 명이 비슷하게 받쳐, 특정 한 명의 키는 아니에요. 그때그때 이 관점을 누가 챙길지만 정하면 됩니다.'):('<b style="color:var('+DR[blind].v+')">'+DR[blind].name+'</b>('+avg[blind]+')은 아무도 확실히 책임지지 못하는 <b>팀의 진짜 공백</b>이에요 — 가장 높은 '+bKn+'도 '+bKs+'에 그칩니다. 이 역할을 누군가에게 공식으로 맡기거나, 이 힘이 강한 사람을 보강하세요.'));
+ var blindT=blindKeyClear?('팀에서 가장 얇은 영역은 <b style="color:var('+DR[blind].v+')">'+DR[blind].name+'</b>('+avg[blind]+')예요 — 이 빈자리를 지키는 키는 <b>'+bKn+'</b>('+bKs+')입니다. '+bKn+'의 역할을 팀이 분명히 인정하고, 한 사람에게만 쏠리지 않게 곁에서 받칠 두 번째 사람을 정해두면 좋아요.'):(bKs>=50?('팀에서 가장 얇은 영역은 <b style="color:var('+DR[blind].v+')">'+DR[blind].name+'</b>('+avg[blind]+')이에요 — <b>'+bKn+'</b>('+bKs+')·<b>'+esc(blind2ndP.name||'또 한 명')+'</b>('+blind2ndP.r.ds[blind]+')처럼 여러 명이 비슷하게 받쳐, 특정 한 명의 키는 아니에요. 그때그때 이 관점을 누가 챙길지만 정하면 됩니다.'):('<b style="color:var('+DR[blind].v+')">'+DR[blind].name+'</b>('+avg[blind]+')'+eb(DR[blind].name)+' 아무도 확실히 책임지지 못하는 <b>팀의 진짜 공백</b>이에요 — 가장 높은 '+bKn+'도 '+bKs+'에 그칩니다. 이 역할을 누군가에게 공식으로 맡기거나, 이 힘이 강한 사람을 보강하세요.'));
  H+='<div style="margin-top:clamp(26px,3vw,38px);border:1px solid var(--explore);border-radius:2px;background:color-mix(in srgb,var(--explore) 8%,transparent);padding:16px 18px"><div style="display:flex;align-items:center;gap:7px;margin-bottom:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--explore)"></span><span class="mono" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--explore)">집단 사각지대</span></div><p style="margin:0;font-size:15.5px;color:var(--ink-soft)">'+blindT+'</p></div>';
  // ===== 팀 심층 분석 =====
  // 1. 팀 유형
@@ -1960,7 +1960,7 @@ function renderOrg(){
   var fkS=fk.slice().sort(function(a,b){return p.r.fs[b]-p.r.fs[a];});
   var strong=fkS.filter(function(f){return p.r.fs[f]>=56;}).slice(0,2),weakF=fkS[fkS.length-1];
   var reason;
-  if(strong.length)reason='이 자리의 핵심인 '+strong.map(function(f){return '<b style="color:'+DR[FC[f].d].hex+'">'+FC[f].name+'</b>('+p.r.fs[f]+')';}).join(' · ')+'이 강점이에요'+(p.r.fs[weakF]<=46&&strong.indexOf(weakF)<0?' — 다만 <b>'+FC[weakF].name+'</b>('+p.r.fs[weakF]+')은 옅어 그 부분만 받쳐주면 완벽해요.':'.');
+  if(strong.length)reason='이 자리의 핵심인 '+strong.map(function(f){return '<b style="color:'+DR[FC[f].d].hex+'">'+FC[f].name+'</b>('+p.r.fs[f]+')';}).join(' · ')+ig(FC[strong[strong.length-1]].name)+' 강점이에요'+(p.r.fs[weakF]<=46&&strong.indexOf(weakF)<0?' — 다만 <b>'+FC[weakF].name+'</b>('+p.r.fs[weakF]+')'+eb(FC[weakF].name)+' 옅어 그 부분만 받쳐주면 완벽해요.':'.');
   else reason='이 자리가 요구하는 <b>'+fk.slice(0,2).map(function(f){return FC[f].name;}).join('·')+'</b> 결이 아직 옅은 편이에요 — 그 결을 받칠 파트너나 절차를 두면 좋아요.';
   return {score:score,label:label,col:col,reason:reason};}
  // 시그니처 = 팀 빈곳을 채우거나 압도적으로 높은 결 = 팀 평균 대비 도드라진 facet, 중복 없이 배정(모두 다름)
@@ -2044,9 +2044,9 @@ function renderOrg(){
   var tfA=FK.slice().sort(function(x,y){return A.r.fs[y]-A.r.fs[x];})[0],tfB=FK.slice().sort(function(x,y){return B.r.fs[y]-B.r.fs[x];})[0];
   var touch=roleTouch(rA.key,rB.key);
   if(touch)P.push('<b>업무 접점</b> — '+touch);
-  P.push('<b>각자의 무기</b> — '+an+'('+rA.label+')은 '+rA.ko.split('·')[0]+'에 <b style="color:'+DR[FC[tfA].d].hex+'">'+FC[tfA].name+'</b>('+A.r.fs[tfA]+')를, '+bn+'('+rB.label+')은 '+rB.ko.split('·')[0]+'에 <b style="color:'+DR[FC[tfB].d].hex+'">'+FC[tfB].name+'</b>('+B.r.fs[tfB]+')를 얹어요.');
+  P.push('<b>각자의 무기</b> — '+an+'('+rA.label+')'+eb(an)+' '+rA.ko.split('·')[0]+'에 <b style="color:'+DR[FC[tfA].d].hex+'">'+FC[tfA].name+'</b>('+A.r.fs[tfA]+')'+el(FC[tfA].name)+', '+bn+'('+rB.label+')'+eb(bn)+' '+rB.ko.split('·')[0]+'에 <b style="color:'+DR[FC[tfB].d].hex+'">'+FC[tfB].name+'</b>('+B.r.fs[tfB]+')'+el(FC[tfB].name)+' 얹어요.');
   if(Math.min(la,lb)>=58){if(aff>=55)P.push('<b>주도</b>가 둘 다 높지만(서로 '+la+'·'+lb+') 신뢰·지지가 두터워(친화 '+aff+') 주도권을 다투기보다 <b>함께 끄는 축</b>이 됩니다. 지배 성향은 대칭적이라, 영역만 나누면 경쟁이 협업이 돼요.');else P.push('<b>주도</b>가 둘 다 높은데(서로 '+la+'·'+lb+') 친화는 옅어요(친화 '+aff+'). 지배 성향은 양보가 아니라 경쟁으로 맞물리니(대인관계 상보성), 같은 사안을 동시에 쥐면 부딪힙니다 — 결정 영역을 미리 나누세요.');}
-  else {var hi=la>=lb?an:bn,lo=la>=lb?bn:an;P.push('주도는 <b>'+hi+'</b>가 앞서고 <b>'+lo+'</b>가 받치는 <b>상보적</b> 구조라, 방향–실행 분업이 자연스러워요(지배는 상보, 한쪽이 높을 때 안정).');}
+  else {var hi=la>=lb?an:bn,lo=la>=lb?bn:an;P.push('주도는 <b>'+hi+'</b>'+ig(hi)+' 앞서고 <b>'+lo+'</b>'+ig(lo)+' 받치는 <b>상보적</b> 구조라, 방향–실행 분업이 자연스러워요(지배는 상보, 한쪽이 높을 때 안정).');}
   if(aff>=58)P.push('정서적으로 <b>서로 따뜻한</b> 쌍(친화 '+aff+') — 따뜻함은 상응적이라 한쪽이 열면 다른 쪽도 열려, 신뢰가 빨리 쌓입니다.');
   else if(aff<45)P.push('정서적 거리가 다소 있는 편(친화 '+aff+') — 일은 되더라도 신뢰는 천천히 쌓이니, 작은 인정·안부를 의식적으로 주고받으면 좋아요.');
   if(vClash){var vat=VAL.filter(function(x){return x.k===vA;})[0],vbt=VAL.filter(function(x){return x.k===vB;})[0];P.push('결정 1순위가 <b>'+(vat?vat.t:'')+'</b> vs <b>'+(vbt?vbt.t:'')+'</b>로 달라요 — 부딪힐 땐 옳고 그름이 아니라 <b>우선순위 차이</b>로 보고 "이번엔 뭘 먼저"를 맞추면 풀립니다.');}
