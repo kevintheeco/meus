@@ -930,10 +930,15 @@ function renderResult(){
  var lowTypes=Object.keys(AR).filter(function(k){return k.split('_')[0]===r.lo;}).map(function(k){return AR[k];});
  var sameTypes=Object.keys(AR).filter(function(k){return k.split('_')[0]===r.p&&AR[k]!==r.arch;}).map(function(k){return AR[k];});
  var ovList=FK.filter(function(f){return r.dial[f]&&r.dial[f].ov!=null&&r.dial[f].ov>=4;}).sort(function(a,b){return r.dial[b].ov-r.dial[a].ov;});
- var fric=ovList.length?('당신이 <b>'+FC[ovList[0]].name+'</b>'+el(FC[ovList[0]].name)+' 과하게 쓸 때, <b>'+ANTI[FC[ovList[0]].d].map(function(d){return DR[d].name;}).join('·')+'</b>가 강한 사람이 균형을 잡아 줍니다.'):'특정 과용이 두드러지지 않아, 대부분의 유형과 무난하게 맞춰 갑니다.';
+ var loFacet=FK.slice().sort(function(a,b){return r.fs[a]-r.fs[b];})[0];
+ var driveHelp={drive:'바로 해보자며 결단과 속도를 더해 주고',connect:'사람과 분위기를 살펴 긴장을 풀어 주고',order:'기준과 절차로 빈틈을 메워 주고',explore:'다른 방법은 없냐며 굳은 틀을 깨 주고'};
+ var fric;
+ if(ovList.length){var ofac=ovList[0],od=FC[ofac].d,antis=ANTI[od];
+  fric='당신이 <b>'+FC[ofac].name+'</b>'+el(FC[ofac].name)+' 과하게 쓰면 <b>'+FC[ofac].ov+'</b>로 흐르기 쉬워요. 이럴 때 '+antis.map(function(ad){return '<b style="color:'+DR[ad].hex+'">'+DR[ad].en+'</b>'+ig(DR[ad].en)+' 강한 사람은 '+driveHelp[ad];}).join(', ')+' — 이런 동료가 옆에 있으면 당신의 <b>'+FC[ofac].name+'</b>'+ig(FC[ofac].name)+' 발목이 아니라 무기가 됩니다.';
+ }else fric='지금은 뚜렷하게 과하게 쓰는 특성이 없어요 — 대부분의 사람과 무리 없이 맞춰 갑니다.';
  function cg(t,c,b){return '<div style="border:1px solid var(--rule);border-left:4px solid '+c+';border-radius:2px;background:var(--panel);padding:15px 17px"><div style="font-weight:800;font-size:14px;margin-bottom:6px">'+t+'</div><div style="font-size:13.5px;line-height:1.6;color:var(--ink-soft)">'+b+'</div></div>';}
  H+='<div style="margin-top:clamp(28px,4vw,44px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,28px)"><div class="sec" style="margin:0 0 6px">협업 궁합 · 누구와 잘 맞나</div><p style="margin:0 0 14px;color:var(--mute);font-size:13.5px">관계를 고정하려는 게 아니라, 어떤 결의 사람과 시너지·보완·조율이 생기는지 봅니다.</p><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">'+
-  cg('🤝 보완 (빈자리를 채움)',r.bal?'var(--ink)':'var('+DR[r.lo].v+')',r.bal?('네 동력은 고르지만, 개별 특성 중 가장 낮은 <b>'+FC[r.topFacets[r.topFacets.length-1]].name+'</b>('+r.fs[r.topFacets[r.topFacets.length-1]]+'). 이 특성이 강한 사람과 짝이면 균형이 더 촘촘해집니다.'):('당신이 가장 덜 쓰는 <b style="color:var('+DR[r.lo].v+')">'+DR[r.lo].name+'</b>가 강한 '+(lowTypes.length?'<b>'+lowTypes.join(' · ')+'</b> 같은 유형':'사람')+'과 짝이면, 서로의 빈자리가 채워집니다.'))+
+  cg('🤝 보완 (빈자리를 채움)',r.bal?'var(--ink)':'var('+DR[r.lo].v+')',r.bal?('네 동력은 고르지만, 12특성 중에서는 <b>'+FC[loFacet].name+'</b>(백분위 '+r.fs[loFacet]+')이 가장 조용해요. 이 결이 강한 사람과 짝이면 균형이 더 촘촘해집니다.'):('당신이 가장 덜 쓰는 <b style="color:var('+DR[r.lo].v+')">'+DR[r.lo].name+'</b>가 강한 '+(lowTypes.length?'<b>'+lowTypes.join(' · ')+'</b> 같은 유형':'사람')+'과 짝이면, 서로의 빈자리가 채워집니다.'))+
   cg('⚡ 증폭 (잘 통함·주의)',r.bal?'var(--explore)':'var('+DR[r.p].v+')',r.bal?('균형형끼리 만나면 유연성이 증폭됩니다. 단, 두 사람 다 방향 설정이 약해질 수 있어 — 한 명은 의도적으로 결정자 역할을 가져가세요.'):((sameTypes.length?'<b>'+sameTypes.join(' · ')+'</b>처럼 ':'')+'같은 <b style="color:var('+DR[r.p].v+')">'+DR[r.p].name+'</b>가 강한 사람과는 빠르게 통합니다. 다만 같은 사각지대('+DR[r.lo].name+')를 공유하니 제3자가 필요해요.'))+
   cg('⚖️ 조율 (과용 브레이크)','var(--ink)',fric)+
   '</div></div>';
