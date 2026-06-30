@@ -1684,10 +1684,25 @@ function renderUs(){
   else if(md<=11&&rA.p===rB.p&&!vClash)echoPairs.push({a:an,b:bn,md:md});
  }}
  riskPairs2.sort(function(x,y){return y.score-x.score;});
+ // 비슷한 양상이 여러 쌍에 반복되면 공통 멤버 기준으로 합친다 (예: 노필터 ↔ 최지민·김은우)
+ function rpNorm(rp,piv,oth){return rp.rs.map(function(s){return s.split(piv).join('§P§').split(oth).join('§O§').replace(/\d+/g,'#');}).join('¶');}
+ var rpUsed={},rpDisplay=[];
+ for(var gi=0;gi<riskPairs2.length;gi++){
+  if(rpUsed[gi])continue;var base=riskPairs2[gi],bestG=null;
+  ['a','b'].forEach(function(sd){
+   var piv=base[sd],oth=base[sd==='a'?'b':'a'],bnorm=rpNorm(base,piv,oth),members=[oth],idxs=[gi];
+   for(var gj=gi+1;gj<riskPairs2.length;gj++){if(rpUsed[gj])continue;var q=riskPairs2[gj],qo=null;if(q.a===piv)qo=q.b;else if(q.b===piv)qo=q.a;else continue;if(rpNorm(q,piv,qo)===bnorm){members.push(qo);idxs.push(gj);}}
+   if(members.length>=2&&(!bestG||members.length>bestG.members.length))bestG={piv:piv,oth:oth,members:members,idxs:idxs};
+  });
+  if(bestG){bestG.idxs.forEach(function(k){rpUsed[k]=1;});rpDisplay.push({grp:true,piv:bestG.piv,oth:bestG.oth,members:bestG.members,rs:base.rs,score:base.score});}
+  else{rpUsed[gi]=1;rpDisplay.push({grp:false,a:base.a,b:base.b,rs:base.rs,score:base.score});}
+ }
  if(riskPairs2.length||echoPairs.length){
   H+='<div style="margin-top:clamp(26px,3vw,38px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,26px)"><div class="sec" style="margin:0 0 6px">함께 일할 때 · 미리 맞춰두면 좋은 조합</div><p style="margin:0 0 14px;font-size:12.5px;color:var(--mute)">충돌 예측이 아니에요 — 서로 다른 결을 미리 알면 <b>싸우지 않고 더 잘 맞출 수</b> 있어요. 합을 맞추는 가이드입니다.</p>';
-  riskPairs2.slice(0,4).forEach(function(rp){var col=rp.score>=4?'var(--order)':rp.score>=2?'var(--explore)':'var(--connect)',lab=rp.score>=4?'미리 합의 권장':rp.score>=2?'가볍게 조율':'잘 맞는 편';
-   H+='<div style="border:1px solid var(--rule);border-left:3px solid '+col+';border-radius:2px;background:var(--panel);padding:14px 16px;margin-bottom:9px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px"><span style="font-weight:800">'+rp.a+' × '+rp.b+'</span><span class="mono" style="font-size:10px;color:'+col+'">'+lab+'</span></div>'+rp.rs.slice(0,2).map(function(t){return '<p style="margin:0 0 6px;font-size:13.5px;line-height:1.6;color:var(--ink-soft)">• '+t+'</p>';}).join('')+'</div>';});
+  rpDisplay.slice(0,4).forEach(function(rp){var col=rp.score>=4?'var(--order)':rp.score>=2?'var(--explore)':'var(--connect)',lab=rp.score>=4?'미리 합의 권장':rp.score>=2?'가볍게 조율':'잘 맞는 편';
+   var title=rp.grp?(rp.piv+' ↔ '+rp.members.join(' · ')):(rp.a+' × '+rp.b);
+   var rsArr=rp.grp?rp.rs.map(function(t){return t.split(rp.oth).join(rp.members.join('·'));}):rp.rs;
+   H+='<div style="border:1px solid var(--rule);border-left:3px solid '+col+';border-radius:2px;background:var(--panel);padding:14px 16px;margin-bottom:9px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px"><span style="font-weight:800">'+title+'</span><span class="mono" style="font-size:10px;color:'+col+'">'+lab+(rp.grp?' · 같은 양상':'')+'</span></div>'+rsArr.slice(0,2).map(function(t){return '<p style="margin:0 0 6px;font-size:13.5px;line-height:1.6;color:var(--ink-soft)">• '+t+'</p>';}).join('')+'</div>';});
   if(echoPairs.length)H+='<div style="border:1px dashed var(--rule-strong);border-radius:2px;background:var(--fill);padding:13px 16px;margin-top:4px"><div style="font-size:12.5px;font-weight:700;color:var(--mute);margin-bottom:5px">닮음 주의 · 에코챔버 (갈등이 아니라 너무 비슷한 쌍)</div><p style="margin:0;font-size:13px;line-height:1.6;color:var(--ink-soft)">'+echoPairs.slice(0,3).map(function(ep){return '<b>'+ep.a+' × '+ep.b+'</b>(차이 '+ep.md+')';}).join(', ')+' — 잘 통하지만 <b>같은 사각지대를 공유</b>해요. 둘만 두면 빠진 관점을 함께 놓치니, 다른 결의 사람을 한 명 끼우면 균형이 잡힙니다.</p></div>';
   H+='</div>';
  }
@@ -1695,7 +1710,16 @@ function renderUs(){
  var stressMap2={drive:'마감·압박이 오면 더 밀어붙이고 결정을 급하게 처리합니다. 속도가 빨라지며 품질 체크와 관계 배려가 줄어드는 패턴이에요.',connect:'압박이 오면 갈등을 피하고 내부 긴장을 봉합합니다. "어떻게든 되겠지"로 중요한 이슈가 수면 아래로 내려가는 위험이 있어요.',order:'압박이 오면 더 완벽하게 하려 하거나 분석 루프에 빠집니다. 오히려 속도가 느려지는 역설이 생길 수 있어요.',explore:'압박이 오면 새 아이디어를 쏟아내거나 방향을 바꿉니다. 집중력을 잃고 여러 방향으로 흩어지는 분산이 주요 위험이에요.'};
  var stressFix={drive:'"한 번만 확인" 체크포인트와 관계 배려 시간을 강제로 넣으세요.',connect:'어려운 결정을 공식 프로세스로 구조화하고, 의견 불일치를 안전하게 표현할 채널을 만드세요.',order:'"지금 이 정도면 됐어"를 외쳐줄 결정권자가 있어야 합니다.',explore:'아이디어 수집과 실행 전환 사이에 명확한 게이트(결정 회의)를 두세요.'};
  var blindFix={drive:'빠른 결단을 내릴 수 있는 의사결정권자를 1인 지정하거나, 결정 마감 시한을 팀 약속으로 정하세요.',connect:'심리적 안전감을 높이는 1:1 체크인이나 회고 루틴을 도입하세요.',order:'체크리스트·공유 캘린더·단계별 품질 게이트를 구조적으로 설계하세요.',explore:'분기별 "새 시도" 시간을 배정하거나, 외부 자극(게스트·리서치)을 정기적으로 들이세요.'};
- H+='<div style="margin-top:clamp(26px,3vw,38px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,26px)"><div class="sec" style="margin:0 0 14px">스트레스 반응 · Under Pressure</div><p style="margin:0 0 14px;font-size:13.5px;color:var(--mute)">마감·압박 상황에서 이 팀의 지배적 동력이 어떻게 작동하는지 예측합니다.</p><div style="border:1px solid var(--rule-strong);border-left:4px solid var('+DR[topD].v+');border-radius:2px;background:var(--panel);padding:16px 18px;margin-bottom:10px"><div style="font-weight:700;font-size:14px;margin-bottom:6px">주 동력('+DR[topD].name+') 과부하 시</div><p style="margin:0 0 10px;font-size:14px;color:var(--ink-soft)">'+stressMap2[topD]+'</p><div style="font-size:13px;color:var(--mute)">대응 ▸ '+stressFix[topD]+'</div></div>';
+ var stHi2=teamRk[1];
+ var stressSign={drive:'결정이 거칠어지고 "일단 가"가 늘면',connect:'갈등이 수면 아래로 가라앉고 "괜찮아요"가 늘면',order:'재검토·확인 요청이 쌓이고 일정이 밀리면',explore:'주제가 자꾸 바뀌고 회의가 발산만 하면'};
+ var escal=M.filter(function(p){return p.r.p===topD;}).map(function(p){return esc(p.name||'');}).filter(Boolean);
+ var brkP=strongestIn(OPP[topD]),brkN=esc(brkP.name||'한 명'),brkOK=brkP.r.ds[OPP[topD]]>=50;
+ H+='<div style="margin-top:clamp(26px,3vw,38px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,26px)"><div class="sec" style="margin:0 0 6px">스트레스 반응 · 압박이 오면</div><p style="margin:0 0 14px;font-size:12.5px;color:var(--mute)">평소엔 강점인 동력도 과부하가 오면 한쪽으로 쏠려요. 미리 알면 신호를 빨리 잡습니다.</p>';
+ H+='<div style="border:1px solid var(--rule-strong);border-left:4px solid var('+DR[topD].v+');border-radius:2px;background:var(--panel);padding:16px 18px;margin-bottom:10px">';
+ H+='<p style="margin:0 0 11px;font-size:14.5px;line-height:1.7;color:var(--ink-soft)">마감·압박이 닥치면 이 팀은 지배 동력 <b style="color:var('+DR[topD].v+')">'+DR[topD].name+'</b>이 더 세져요 — '+stressMap2[topD]+(avg[stHi2]>=avg[topD]-12?' 여기에 2순위 <b style="color:var('+DR[stHi2].v+')">'+DR[stHi2].name+'</b>까지 겹쳐 그 쏠림이 더 짙어집니다.':'')+'</p>';
+ H+='<p style="margin:0 0 9px;font-size:13.5px;line-height:1.65;color:var(--ink-soft)"><b style="color:var(--drive)">⚑ 이게 신호예요</b> — '+stressSign[topD]+' 팀이 과부하에 들어선 거예요'+(escal.length?'. 특히 <b>'+escal.slice(0,3).join('·')+'</b>'+ig(escal[escal.length-1])+' 이 방향으로 가장 먼저 빨라집니다':'')+'.</p>';
+ H+='<p style="margin:0 0 11px;font-size:13.5px;line-height:1.65;color:var(--ink-soft)"><b style="color:var('+DR[OPP[topD]].v+')">⛑ 누가 제동을 거나</b> — '+(brkOK?'<b>'+brkN+'</b>처럼 <b>'+DR[OPP[topD]].name+'</b>이 강한 사람이 "잠깐, 이건?" 한마디로 균형을 잡아줄 수 있어요. 압박이 올 때 그 역할을 '+brkN+'에게 미리 부탁해두세요.':'이 팀엔 <b>'+DR[OPP[topD]].name+'</b>으로 제동을 걸 사람이 약한 편이에요 — 사람에 기대기보다 "결정 전 한 박자" 같은 <b>규칙</b>을 구조로 정해두는 게 안전합니다.')+'</p>';
+ H+='<div style="font-size:13px;color:var(--mute);border-top:1px dashed var(--rule);padding-top:9px">대응 ▸ '+stressFix[topD]+'</div></div>';
  if(blind!==topD)H+='<div style="border:1px solid var(--hairline);border-radius:2px;background:var(--fill);padding:14px 16px"><div style="font-size:13px;font-weight:700;margin-bottom:4px">빈자리('+DR[blind].name+') 보강 방법</div><p style="margin:0;font-size:13.5px;color:var(--ink-soft)">'+blindFix[blind]+'</p></div>';
  H+='</div>';
  // 팀 약속 · 다음 주에 바로 (신호 → 실행 약속 자동 도출)
