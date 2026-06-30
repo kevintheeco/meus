@@ -1617,6 +1617,12 @@ function renderUs(){
   var uf=FK.filter(function(f){var sorted=M.slice().sort(function(a,b){return b.r.fs[f]-a.r.fs[f];});return sorted[0]===p&&p.r.fs[f]>=58&&(p.r.fs[f]-(sorted[1]?sorted[1].r.fs[f]:0))>=UNIQ_GAP;}).sort(function(a,b){return p.r.fs[b]-p.r.fs[a];});
   return{solo:solo,uf:uf};
  }
+ var LOW_DRIVE={
+  connect:{d:'사람·감정·분위기를 덜 챙겨, 본의 아니게 차갑거나 일만 보는 사람으로 비칠 수 있어요.',t:'결정 전에 "사람들 마음은?"을 한 번 짚어주고, 관계를 챙기는 동료를 곁에 두면 메워져요.'},
+  drive:{d:'먼저 밀어붙이고 끊어가는 힘이 약해, 추진이 필요한 순간 머뭇거리거나 결정을 미룰 수 있어요.',t:'방향을 정해 밀어줄 동료가 옆에 있으면 자기 강점에 집중해 빛나요.'},
+  order:{d:'꼼꼼함·계획·리스크 점검이 옅어, 마감·디테일·완성도가 샐 수 있어요.',t:'체크리스트나 정밀한 동료가 받쳐주면 안정돼요.'},
+  explore:{d:'새 시도·큰 그림·변화 적응이 약해, 익숙한 방식에 머물기 쉬워요.',t:'아이디어를 던지는 동료와 섞이면 시야가 트여요.'}
+ };
  M.forEach(function(p,i){var r=p.r,nm=esc(p.name||('멤버'+(i+1))),col=DR[r.p].hex,u=uniqOf(p);
   // 대체 불가 = 각자 실제 최고점 facet(본인 베스트). 팀 1위면 표시, 동력을 혼자 쥐면 보너스로 명시.
   var fRank=FK.slice().sort(function(a,b){return r.fs[b]-r.fs[a];}),bestF=fRank[0],scndF=fRank[1];
@@ -1642,6 +1648,13 @@ function renderUs(){
   var sf=(r.fs[scndF]>=62)?scndF:bestF;
   var shadowP='<b>'+FC[sf].name+'</b>('+r.fs[sf]+')도 강한데, 과해지면 <b>'+FC[sf].ov+'</b>로 흐를 수 있어요 — '+(OV_FIX[sf]||'');
   var combos=facetCombos(r.fs);
+  // 약한 결 & 보완 — 가장 약한 동력 + 그게 강점인 팀원(궁합) + 유독 낮은 facet(43↓)
+  var weakD=r.rk[3];
+  var compW=M.slice().filter(function(q){return q!==p;}).sort(function(a,b){return b.r.ds[weakD]-a.r.ds[weakD];})[0];
+  var lowF=FK.filter(function(f){return r.fs[f]<=43;}).sort(function(a,b){return r.fs[a]-r.fs[b];}).slice(0,2);
+  var weakHtml='가장 옅은 결은 <b style="color:var('+DR[weakD].v+')">'+DR[weakD].name+'</b>('+r.ds[weakD]+')예요 — '+LOW_DRIVE[weakD].d+(lowF.length?' 특히 <b>'+lowF.map(function(f){return FC[f].name+'('+r.fs[f]+')';}).join('·')+'</b>가 많이 낮아요.':'');
+  weakHtml+=(compW&&compW.r.ds[weakD]>=r.ds[weakD]+10)?(' 마침 이건 <b>'+esc(compW.name||'한 명')+'</b>('+compW.r.ds[weakD]+')의 강점이라 — 그 일은 '+esc(compW.name||'')+'와 짝지으면 자연스럽게 메워져요.'):(' 팀 전체가 이 결이 옅은 편이라, 규칙이나 외부 보강으로 받쳐야 해요.');
+  weakHtml+=' '+LOW_DRIVE[weakD].t;
   H+='<div style="border:1px solid var(--rule);border-top:3px solid '+col+';border-radius:2px;background:var(--panel);padding:16px 18px;margin-bottom:11px">'+
    '<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px"><span style="font-weight:900;font-size:17px">'+nm+'</span><span style="font-size:13px;color:'+col+';font-weight:700">'+r.arch+'</span><span style="font-size:12px;color:var(--faint)">'+(AD[r.arch]||'')+'</span></div>'+
    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(228px,1fr));gap:11px 18px">'+
@@ -1649,7 +1662,7 @@ function renderUs(){
     (shineP?'<div><div class="mono" style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--connect);margin-bottom:3px">빛나는 순간</div><p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--ink-soft)">'+shineP+'</p></div>':'')+
     (workP?'<div><div class="mono" style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--order);margin-bottom:3px">이렇게 대해주세요</div><p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--ink-soft)">'+workP+'</p></div>':'')+
     '<div><div class="mono" style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);margin-bottom:3px">⚠ 과용주의</div><p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--ink-soft)">'+shadowP+'</p></div>'+
-   '</div>'+(combos.length?'<div style="margin-top:11px;border-top:1px dashed var(--rule);padding-top:9px"><div class="mono" style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--explore);margin-bottom:3px">결의 조합 · 왜 이런 사람인지</div><p style="margin:0;font-size:13px;line-height:1.6;color:var(--ink-soft)">'+combos[0].t+(combos[1]?'<br>'+combos[1].t:'')+'</p></div>':'')+'</div>';
+   '</div>'+(combos.length?'<div style="margin-top:11px;border-top:1px dashed var(--rule);padding-top:9px"><div class="mono" style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--explore);margin-bottom:3px">결의 조합 · 왜 이런 사람인지</div><p style="margin:0;font-size:13px;line-height:1.6;color:var(--ink-soft)">'+combos[0].t+(combos[1]?'<br>'+combos[1].t:'')+'</p></div>':'')+'<div style="margin-top:10px;border-top:1px dashed var(--rule);padding-top:9px"><div class="mono" style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--drive);margin-bottom:3px">약한 결 &amp; 누가 메워주나</div><p style="margin:0;font-size:13px;line-height:1.6;color:var(--ink-soft)">'+weakHtml+'</p></div></div>';
  });
  // 보완 매트릭스 (●○·)
  var grid='<div style="display:grid;grid-template-columns:92px repeat(4,1fr);gap:1px;background:var(--hairline);border:1px solid var(--hairline);border-radius:2px;overflow:hidden;font-family:var(--font-mono);font-size:13px">';
