@@ -1572,11 +1572,16 @@ function renderUs(){
   var cs={};COMP.forEach(function(c){cs[c.k]=Math.round(c.fac.reduce(function(x,f){return x+r.fs[f];},0)/c.fac.length);});
   // 팀 대비 가장 "도드라지는" 역량(절대 최고가 아니라 상대 standout) — 모두가 설득력으로 겹치는 문제 해결
   var compTA={};COMP.forEach(function(c){compTA[c.k]=M.reduce(function(a,q){return a+Math.round(c.fac.reduce(function(x,f){return x+q.r.fs[f];},0)/c.fac.length);},0)/n;});
-  var topComp=COMP.slice().sort(function(a,b){return (cs[b.k]-compTA[b.k])-(cs[a.k]-compTA[a.k]);})[0];
-  // 그 역량을 떠받치는 본인의 핵심 facet (예: 설득력 ← 공감)
-  var drvF=topComp.fac.slice().sort(function(a,b){return r.fs[b]-r.fs[a];})[0];
-  var drvAdj=r.fs[drvF]>=72?'압도적인 ':r.fs[drvF]>=60?'강한 ':'';
-  var shineP=(COMP_DESC[topComp.k]&&COMP_DESC[topComp.k].s)?'가장 도드라지는 강점은 <b style="color:'+col+'">'+topComp.label+'</b>('+cs[topComp.k]+')이에요 — 그 바탕엔 '+drvAdj+'<b>'+FC[drvF].name+'</b>('+r.fs[drvF]+')가 있어요. '+COMP_DESC[topComp.k].s+'.':((AP[r.arch]&&AP[r.arch].shine)||'');
+  var compRank=COMP.slice().sort(function(a,b){return (cs[b.k]-compTA[b.k])-(cs[a.k]-compTA[a.k]);});
+  function shineClause(c){var df=c.fac.slice().sort(function(x,y){return r.fs[y]-r.fs[x];})[0];return {label:c.label,sc:cs[c.k],df:df,adj:(r.fs[df]>=72?'압도적인 ':r.fs[df]>=60?'강한 ':''),desc:(COMP_DESC[c.k]&&COMP_DESC[c.k].s)||''};}
+  var c1=compRank[0],s1=shineClause(c1);
+  // 강점이 둘이면(서로 다른 facet이 바탕인 두 번째 강한 역량) 둘 다 보여준다 (예: 정밀+공감)
+  var s2=null;for(var ci=1;ci<compRank.length;ci++){var cand=shineClause(compRank[ci]);if(cand.df!==s1.df&&cs[compRank[ci].k]>=62&&(cs[compRank[ci].k]-compTA[compRank[ci].k])>=4){s2=cand;break;}}
+  var shineP;
+  if(s1.desc){
+   if(s2)shineP='도드라지는 강점이 둘이에요 — <b style="color:'+col+'">'+s1.label+'</b>('+s1.sc+')와 <b style="color:'+col+'">'+s2.label+'</b>('+s2.sc+'). 각각 '+s1.adj+'<b>'+FC[s1.df].name+'</b>('+r.fs[s1.df]+')와 '+s2.adj+'<b>'+FC[s2.df].name+'</b>('+r.fs[s2.df]+')가 바탕이죠. '+s1.desc+'.';
+   else shineP='가장 도드라지는 강점은 <b style="color:'+col+'">'+s1.label+'</b>('+s1.sc+')이에요 — 그 바탕엔 '+s1.adj+'<b>'+FC[s1.df].name+'</b>('+r.fs[s1.df]+')가 있어요. '+s1.desc+'.';
+  } else shineP=(AP[r.arch]&&AP[r.arch].shine)||'';
   var workP=(PF_MANUAL[r.p]&&PF_MANUAL[r.p][0])||'';
   var shadowP='강점이 과해지면 <b>'+FC[topFac].name+'</b>('+r.fs[topFac]+')'+ig(FC[topFac].name)+' <b>'+FC[topFac].ov+'</b>로 흐를 수 있어요 — '+(OV_FIX[topFac]||'');
   H+='<div style="border:1px solid var(--rule);border-top:3px solid '+col+';border-radius:2px;background:var(--panel);padding:16px 18px;margin-bottom:11px">'+
