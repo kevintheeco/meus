@@ -490,7 +490,7 @@ function compute(s){
  // 순위·아키타입: 모집단 z(zd) 기반 — 진짜 평탄할 때만 통역자
  var rk=DK.slice().sort(function(a,b){return zd[b]-zd[a]||DK.indexOf(a)-DK.indexOf(b);});
  var p=rk[0],sd=rk[1],lo=rk[3];
- var bal=(zd[rk[0]]<0.5)&&((zd[rk[0]]-zd[rk[3]])<0.8);
+ var bal=(zd[rk[0]]-zd[rk[3]])<0.75; // 수준이 높든 낮든 4동력이 고르면(격차<0.75σ) 균형형(허브)
  var secStr=(zd[rk[1]]-zd[rk[2]])>=0.4;
  var arch=bal?'통역자':AR[p+'_'+sd];
  // 다이얼: facet 점수 위치 + 과용(OV) 가산
@@ -708,8 +708,8 @@ function renderResult(){
  var archKicker=r.bal?'균형형(허브) · 시그니처: '+(r.sigFacets.length?r.sigFacets.slice(0,2).map(function(f){return FC[f].name;}).join('·'):FC[r.topFacets[0]].name+'·'+FC[r.topFacets[1]].name):r.secStr?'주 '+DR[r.p].name+' + 부 '+DR[r.s].name+' · Archetype':'주 '+DR[r.p].name+' 단독형 · Archetype';
  var archColor=r.bal?'var(--ink)':'var('+DR[r.p].v+')';
  H+='<div style="margin-top:clamp(22px,3vw,34px)"><div class="kicker" style="color:'+archColor+';letter-spacing:.18em;margin-bottom:10px">'+archKicker+'</div><h3 class="display" style="font-weight:900;font-size:clamp(40px,8vw,80px);line-height:.9;letter-spacing:-.03em;margin:0">'+r.arch+'</h3><p style="font-weight:500;font-size:clamp(16px,2.4vw,20px);color:var(--ink-soft);margin:10px 0 0">'+AD[r.arch]+'.'+(r.bal?' 네 동력이 고른 균형형(허브)입니다.':'')+'</p>';
- var seg='',lab='';r.rk.forEach(function(k){seg+='<div style="width:'+r.bl[k]+'%;background:'+DR[k].hex+'"></div>';lab+='<span style="width:'+r.bl[k]+'%">'+DR[k].name+' '+r.bl[k]+'</span>';});
- H+='<div style="margin-top:26px"><div style="display:flex;height:14px;border-radius:2px;overflow:hidden">'+seg+'</div><div class="mono" style="display:flex;font-size:12px;color:var(--mute);margin-top:8px">'+lab+'</div></div></div>';
+ var dsBars=r.rk.map(function(k){return '<div style="display:flex;align-items:center;gap:11px;margin-bottom:8px"><span style="flex:none;width:58px;font-size:13.5px;color:'+DR[k].hex+';font-weight:700">'+DR[k].name+'</span><div style="flex:1;height:10px;background:var(--paint);border-radius:5px;overflow:hidden"><div style="height:100%;width:'+r.ds[k]+'%;background:'+DR[k].hex+'"></div></div><span class="mono" style="flex:none;width:30px;text-align:right;font-size:13px;color:var(--ink-soft);font-weight:700">'+r.ds[k]+'</span></div>';}).join('');
+ H+='<div style="margin-top:24px">'+dsBars+'<p class="mono" style="font-size:11px;color:var(--faint);margin:8px 0 0">동력 점수 = 모집단 대비 백분위(50=평균). 높을수록 그 힘이 강합니다.</p></div>';
  // ===== 당신은 어떤 사람 (유형 프로필) =====
  var ap=AP[r.arch];
  if(ap){function apb(l,v){return '<div style="margin-bottom:12px"><div class="mono" style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:4px">'+l+'</div><div style="font-size:14.5px;line-height:1.65;color:var(--ink-soft)">'+v+'</div></div>';}
@@ -720,7 +720,7 @@ function renderResult(){
  if(r.bal){
   // 균형형: 드라이브 블렌드보다 개별 facet 시그니처가 실제 신호
   var sigStr=r.sigFacets.length?r.sigFacets.map(function(f){return '<b style="color:var('+DR[FC[f].d].v+')">'+FC[f].name+'</b>('+r.fs[f]+')';}).join(' · '):'';
-  NAR.push('네 동력이 '+r.bl[r.rk[0]]+'~'+r.bl[r.rk[3]]+' 안에 고르게 분포해 있어 — 어느 한 쪽으로 쏠리지 않는 <b>균형형</b>입니다. 이 프로필에선 드라이브 비율보다 <b>개별 특성 점수</b>가 실제 성향을 더 정확히 보여줍니다.');
+  NAR.push('네 동력 점수가 '+r.ds[r.rk[3]]+'~'+r.ds[r.rk[0]]+'(백분위) 안에 고르게 모여 있어 — 어느 한 쪽으로 쏠리지 않는 <b>균형형</b>입니다. 이 프로필에선 동력보다 <b>개별 특성 점수</b>가 실제 성향을 더 정확히 보여줍니다.');
   if(sigStr)NAR.push('실제로 높게 나온 특성: '+sigStr+'. 이것이 당신의 <b>진짜 시그니처</b>입니다.');
   var top=r.topFacets[0];var top2=r.topFacets[1];
   NAR.push('<b>'+FC[top].name+'</b>('+r.fs[top]+')과 <b>'+FC[top2].name+'</b>('+r.fs[top2]+') — 이 두 특성이 가장 자연스럽게 나옵니다. 상황에 따라 어떤 동력이든 꺼낼 수 있는 유연성이 강점입니다.');
@@ -731,9 +731,9 @@ function renderResult(){
   (function(){var ff=fOf(r.p).slice().sort(function(a,b){return r.fs[b]-r.fs[a];});var hi=ff[0],loF=ff[ff.length-1];
    if(r.fs[hi]-r.fs[loF]>=16)NAR.push('주 동력 <b style="color:var('+DR[r.p].v+')">'+DR[r.p].name+'</b> 안에서도 <b>'+FC[hi].name+'</b>('+r.fs[hi]+')'+eb(FC[hi].name)+' 두드러지지만 <b>'+FC[loF].name+'</b>('+r.fs[loF]+')'+eb(FC[loF].name)+' 낮습니다 — 같은 색이라도 결이 다릅니다.');
    else NAR.push('주 동력은 <b style="color:var('+DR[r.p].v+')">'+DR[r.p].name+'</b>, 그 안의 세 결('+ff.map(function(f){return FC[f].name;}).join('·')+')이 고르게 받쳐 줍니다.');})();
-  if(r.secStr){NAR.push('두 번째로 강한 건 <b style="color:var('+DR[r.s].v+')">'+DR[r.s].name+'</b>('+r.bl[r.s]+'). '+DR[r.p].name+'를 '+DR[r.s].name+'가 받치는 조합이라 '+AD[r.arch]+' 모습으로 드러납니다.');}
-  else{NAR.push('<b style="color:var('+DR[r.p].v+')">'+DR[r.p].name+'</b>('+r.bl[r.p]+')이 뚜렷이 앞서고, 나머지 세 동력은 비슷하게 분포됩니다('+r.rk.slice(1).map(function(d){return DR[d].name+' '+r.bl[d];}).join(' / ')+'). 주 동력 중심으로 읽으세요.');}
-  (function(){var loBlend=r.bl[r.lo];var loLabel=loBlend<18?'사각지대 — 의식하지 않으면 놓치기 쉬운 영역':loBlend<24?'상대적으로 덜 앞세우는 힘 — 약점이라기보다 우선순위가 뒤에 있는 것':'네 힘 중 가장 조용한 편이지만 완전히 비어 있지는 않습니다';NAR.push('가장 덜 쓰는 힘은 <b style="color:var('+DR[r.lo].v+')">'+DR[r.lo].name+'</b>('+loBlend+'%) — '+loLabel+'. 이 힘이 강한 동료가 당신을 보완합니다.');})();
+  if(r.secStr){NAR.push('두 번째로 강한 건 <b style="color:var('+DR[r.s].v+')">'+DR[r.s].name+'</b>(백분위 '+r.ds[r.s]+'). '+DR[r.p].name+'를 '+DR[r.s].name+'가 받치는 조합이라 '+AD[r.arch]+' 모습으로 드러납니다.');}
+  else{NAR.push('<b style="color:var('+DR[r.p].v+')">'+DR[r.p].name+'</b>(백분위 '+r.ds[r.p]+')'+ig(DR[r.p].name)+' 뚜렷이 앞서고, 나머지 세 동력은 비슷합니다('+r.rk.slice(1).map(function(d){return DR[d].name+' '+r.ds[d];}).join(' / ')+'). 주 동력 중심으로 읽으세요.');}
+  (function(){var loS=r.ds[r.lo];var loLabel=loS<33?'사각지대 — 의식하지 않으면 놓치기 쉬운 영역':loS<45?'상대적으로 덜 앞세우는 힘 — 약점이라기보다 우선순위가 뒤에 있는 것':'네 힘 중 가장 조용한 편이지만 완전히 비어 있지는 않습니다';NAR.push('가장 덜 쓰는 힘은 <b style="color:var('+DR[r.lo].v+')">'+DR[r.lo].name+'</b>(백분위 '+loS+') — '+loLabel+'. 이 힘이 강한 동료가 당신을 보완합니다.');})();
  }
  var T=[];
  if(r.fs.achieve>=62&&r.fs.empathy>=62)T.push('성과 욕심과 사람 배려가 둘 다 높아, 둘이 부딪히는 순간 내적 갈등이 큽니다.');
@@ -751,7 +751,7 @@ function renderResult(){
  // ===== 동력 심층 해설 (주·부 동력) =====
  var deep='';[r.p,r.s].forEach(function(d,di){var pf=PF[d];var ff=fOf(d).slice().sort(function(a,b){return r.fs[b]-r.fs[a];});
   var facLine=ff.map(function(f){var mk=r.fs[f]>=62?' <span style="color:var('+DR[d].v+')">↑</span>':(r.fs[f]<=42?' <span style="color:var(--faint)">↓</span>':'');return '<span style="display:inline-block;margin-right:12px;font-size:13.5px">'+FC[f].name+' <span class="mono" style="color:var(--mute)">'+r.fs[f]+'</span>'+mk+'</span>';}).join('');
-  deep+='<div style="'+(di?'border-top:1px solid var(--hairline);margin-top:16px;padding-top:16px':'')+'"><div style="display:flex;align-items:baseline;gap:9px;margin-bottom:8px"><span class="pill" style="background:var('+DR[d].v+');color:#fff">'+(di?'부 동력':'주 동력')+' · '+DR[d].name+'</span><span class="mono" style="font-size:12px;color:var(--mute)">'+r.bl[d]+'</span></div><p style="margin:0 0 10px;font-size:14.5px;line-height:1.65;color:var(--ink-soft)">'+pf.m+'</p><div style="margin:0 0 10px">'+facLine+'</div><div class="kv"><div><div class="mono" style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:3px">필요한 것</div><div style="font-size:13.5px;line-height:1.55;color:var(--ink-soft)">'+pf.nd+'</div></div><div><div class="mono" style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:3px">스트레스 트리거</div><div style="font-size:13.5px;line-height:1.55;color:var(--ink-soft)">'+pf.tr+'</div></div></div></div>';});
+  deep+='<div style="'+(di?'border-top:1px solid var(--hairline);margin-top:16px;padding-top:16px':'')+'"><div style="display:flex;align-items:baseline;gap:9px;margin-bottom:8px"><span class="pill" style="background:var('+DR[d].v+');color:#fff">'+(di?'부 동력':'주 동력')+' · '+DR[d].name+'</span><span class="mono" style="font-size:12px;color:var(--mute)">백분위 '+r.ds[d]+'</span></div><p style="margin:0 0 10px;font-size:14.5px;line-height:1.65;color:var(--ink-soft)">'+pf.m+'</p><div style="margin:0 0 10px">'+facLine+'</div><div class="kv"><div><div class="mono" style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:3px">필요한 것</div><div style="font-size:13.5px;line-height:1.55;color:var(--ink-soft)">'+pf.nd+'</div></div><div><div class="mono" style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:3px">스트레스 트리거</div><div style="font-size:13.5px;line-height:1.55;color:var(--ink-soft)">'+pf.tr+'</div></div></div></div>';});
  H+='<div style="margin-top:clamp(26px,3vw,36px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,26px)"><div class="sec" style="margin:0 0 14px">동력 심층 해설</div>'+deep+'</div>';
  // 컴퍼스 — 12-facet 레이더 + 팀 평균
  var compass=compassSVG(r,(window.MEUS&&MEUS._teamAvg)||null);
@@ -918,8 +918,8 @@ function renderResult(){
  var ovBody=ovPick.length?bullets(ovPick.map(function(o){return '<b style="color:'+DR[FC[o.f].d].hex+'">'+FC[o.f].name+'</b> <span style="color:var(--mute)">'+FC[o.f].ov+'</span> → '+(OV_FIX[o.f]||'');}))+'<div style="margin-top:8px;font-size:12.5px;color:var(--mute)">구조적으로는 옆에 '+anti+' 동력이 강한 동료를 두면 자연스러운 브레이크가 됩니다.</div>':'지금 응답에선 뚜렷한 과용 구간이 적습니다 — 좋은 신호예요. 다만 강점도 지나치면 약점이 되니, '+anti+'가 강한 동료와 짝이면 균형이 잡힙니다.';
  var man='<div class="kv">'+blk('이렇게 대해 주세요',bullets(PF_MANUAL[r.p]||[]))+blk('제가 빛나는 순간',ap.shine)+blk('주의 신호 — 그림자',shadowBody)+blk('과용 조절',ovBody)+'</div>';
  var extra='';if(S.reflection)extra+='<div style="border:1px solid var(--hairline);border-radius:2px;background:var(--fill);padding:14px 16px;margin-top:12px;font-size:14.5px;color:var(--ink-soft)"><b style="color:var(--ink)">내가 남긴 메모 ·</b> '+esc(S.reflection)+'</div>';
- var loBlend2=r.bl[r.lo];var loLabel2=loBlend2<18?'사각지대':loBlend2<24?'상대적으로 덜 쓰는 힘':'가장 조용한 힘';
- extra+='<p style="margin:12px 0 0;font-size:14px;color:var(--mute)">가장 덜 쓰는 근육은 <b style="color:var('+DR[r.lo].v+')">'+DR[r.lo].name+'</b>('+loBlend2+'%) — '+loLabel2+'. 이 힘이 강한 동료가 당신을 보완해 줍니다.</p>';
+ var loBlend2=r.ds[r.lo];var loLabel2=loBlend2<33?'사각지대':loBlend2<45?'상대적으로 덜 쓰는 힘':'가장 조용한 힘';
+ extra+='<p style="margin:12px 0 0;font-size:14px;color:var(--mute)">가장 덜 쓰는 근육은 <b style="color:var('+DR[r.lo].v+')">'+DR[r.lo].name+'</b>(백분위 '+loBlend2+') — '+loLabel2+'. 이 힘이 강한 동료가 당신을 보완해 줍니다.</p>';
  H+='<div style="margin-top:clamp(28px,4vw,44px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,28px)"><div class="sec" style="margin:0 0 16px">User manual · '+(nm?esc(nm)+'님 ':'')+'사용설명서</div>'+man+extra+'</div>';
  // ===== 협업 궁합 =====
  var lowTypes=Object.keys(AR).filter(function(k){return k.split('_')[0]===r.lo;}).map(function(k){return AR[k];});
@@ -1023,7 +1023,7 @@ function renderResult(){
  // SDI 크로스맵
  H+='<div style="margin-top:clamp(26px,3vw,36px);border-top:1px solid var(--hairline);padding-top:clamp(18px,2.5vw,24px)"><div class="sec" style="margin:0 0 10px">SDI crossmap</div><p style="margin:0;color:var(--mute);font-size:14px;line-height:1.6"><b style="color:var(--connect)">Connect</b>≈사람(Blue) · <b style="color:var(--drive)">Drive</b>≈성과(Red) · <b style="color:var(--order)">Order</b>≈절차(Green) · <b style="color:var(--explore)">Explore</b>는 SDI에 없는 확장축. 갈등 3모드는 SDI의 Assert·Accommodate·Analyze와 같은 결.</p></div>';
  // 푸터
- var ccode='CODE: '+DR[r.p].en.slice(0,3).toUpperCase()+'-'+r.bl[r.p];
+ var ccode='CODE: '+DR[r.p].en.slice(0,3).toUpperCase()+'-'+r.ds[r.p];
  H+='<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-top:clamp(24px,3vw,34px);border-top:1px solid var(--hairline);padding-top:14px"><span class="mono" style="font-size:11px;color:var(--faint)">MEUS // '+ccode+'</span><span class="mono" style="font-size:11px;color:var(--faint)">한 글자로 가두지 않기 · 자기보고식 이해 도구</span></div>';
  H+='</div>'; // /paper
  // 원본 facet 점수 (접기/펼치기)
@@ -1066,7 +1066,7 @@ function renderLanding(){
 var ANTI={drive:['connect','order'],connect:['order','drive'],order:['drive','explore'],explore:['order']};
 function personFromCode(code,name){var st=unpackAnswers((code||'').trim());if(!st)return null;return{name:(name||'').trim(),code:code,st:st,r:compute(st)};}
 function overFacets(r){return FK.filter(function(f){return r.dial[f]&&dialZone(r.dial[f].over||0,r.dial[f].under||0)==='over';});}
-function pillsMini(r){return r.rk.map(function(k){return '<span style="font-size:13.5px;color:var(--muted);margin-right:9px;white-space:nowrap"><span style="color:var('+DR[k].v+')">●</span> '+DR[k].name+' <span class="mono">'+r.bl[k]+'</span></span>';}).join('');}
+function pillsMini(r){return r.rk.map(function(k){return '<span style="font-size:13.5px;color:var(--muted);margin-right:9px;white-space:nowrap"><span style="color:var('+DR[k].v+')">●</span> '+DR[k].name+' <span class="mono">'+r.ds[k]+'</span></span>';}).join('');}
 function nameOf(p,fb){return p.name||fb;}
 
 /* ===== YOU ===== */
@@ -1367,7 +1367,7 @@ function renderUs(){
  }
  // ----- 팀 계산 -----
  var M=US.members,n=M.length;
- var avg={};DK.forEach(function(d){avg[d]=Math.round(M.reduce(function(a,p){return a+p.r.bl[d];},0)/n);});
+ var avg={};DK.forEach(function(d){avg[d]=Math.round(M.reduce(function(a,p){return a+p.r.ds[d];},0)/n);});
  var teamRk=DK.slice().sort(function(a,b){return avg[b]-avg[a];});
  var topD=teamRk[0],blind=teamRk[3];
  var H='<div class="wrap result fade">';
