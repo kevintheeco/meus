@@ -738,12 +738,13 @@ function renderResult(){
  // ===== 당신은 어떤 사람 (유형 프로필) =====
  var ap=AP[r.arch];
  if(ap){function apb(l,v){return '<div style="margin-bottom:12px"><div class="mono" style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:4px">'+l+'</div><div style="font-size:14.5px;line-height:1.65;color:var(--ink-soft)">'+v+'</div></div>';}
-  // 개인화: 유형 복붙 대신 본인 facet/역량 데이터 (팀·1:1과 동일 기준)
-  var csAP={};COMP.forEach(function(c){csAP[c.k]=Math.round(c.fac.reduce(function(x,f){return x+r.fs[f];},0)/c.fac.length);});
-  var compRkAP=COMP.slice().sort(function(a,b){return csAP[b.k]-csAP[a.k];});
-  function clauseAP(c){var df=c.fac.slice().sort(function(x,y){return r.fs[y]-r.fs[x];})[0];return {label:c.label,sc:csAP[c.k],df:df,adj:(r.fs[df]>=72?'압도적인 ':r.fs[df]>=60?'강한 ':''),desc:(COMP_DESC[c.k]&&COMP_DESC[c.k].s)||''};}
-  var a1=clauseAP(compRkAP[0]),a2=null;for(var ciA=1;ciA<compRkAP.length;ciA++){var ccA=clauseAP(compRkAP[ciA]);if(ccA.df!==a1.df&&csAP[compRkAP[ciA].k]>=62){a2=ccA;break;}}
-  var shineV=a2?('<b>'+a1.label+'</b>('+a1.sc+')와 <b>'+a2.label+'</b>('+a2.sc+') 둘 다 강해요 — 각각 '+a1.adj+'<b>'+FC[a1.df].name+'</b>('+r.fs[a1.df]+')와 '+a2.adj+'<b>'+FC[a2.df].name+'</b>('+r.fs[a2.df]+')가 바탕이죠. '+a1.desc+'.'):('<b>'+a1.label+'</b>('+a1.sc+')이 가장 강해요 — 그 바탕엔 '+a1.adj+'<b>'+FC[a1.df].name+'</b>('+r.fs[a1.df]+')가 있어요. '+a1.desc+'.');
+  // 개인화: 빛나는 순간 = 강한 facet이 만드는 상황(합성 역량점수로 희석 X, facet 점수 직접 노출)
+  var shFa=FK.slice().sort(function(a,b){return r.fs[b]-r.fs[a];}),ld1=shFa[0],ld2=shFa[1];
+  function compOfFacR(f,exK){var cc=COMP.filter(function(c){return c.fac.indexOf(f)>=0&&c.k!==exK;});if(!cc.length)return null;return cc.sort(function(a,b){return (b.fac.reduce(function(x,g){return x+r.fs[g];},0)/b.fac.length)-(a.fac.reduce(function(x,g){return x+r.fs[g];},0)/a.fac.length);})[0];}
+  var cp1=compOfFacR(ld1,null),st1=(cp1&&COMP_DESC[cp1.k])?COMP_DESC[cp1.k].s:'';
+  var cp2=compOfFacR(ld2,cp1?cp1.k:null),st2=(cp2&&COMP_DESC[cp2.k])?COMP_DESC[cp2.k].s:'';
+  var twoV=(r.fs[ld2]>=66&&st2&&st2!==st1);
+  var shineV=st1?('<b style="color:'+DR[FC[ld1].d].hex+'">'+FC[ld1].name+'</b>('+r.fs[ld1]+')'+(twoV?' · <b style="color:'+DR[FC[ld2].d].hex+'">'+FC[ld2].name+'</b>('+r.fs[ld2]+')':'')+'가 강해서 — '+st1+(twoV?' <b>그리고</b> '+st2:'')+' 빛나요.'):(ap.shine||'');
   var tfR=FK.slice().sort(function(x,y){return r.fs[y]-r.fs[x];}),tf1=tfR[0],tf2=tfR[1];
   var workV='<b>'+FC[tf1].name+'</b>('+r.fs[tf1]+')'+ig(FC[tf1].name)+' 강한 편이라 — '+(COMM_FACET[tf1]||'')+(r.fs[tf2]>=64&&COMM_FACET[tf2]?' 또 <b>'+FC[tf2].name+'</b>('+r.fs[tf2]+')도 높아요: '+COMM_FACET[tf2]:'');
   var shadowV='가장 강한 <b>'+FC[tf1].name+'</b>('+r.fs[tf1]+')도 지나치면 <b>'+FC[tf1].ov+'</b>로 흐를 수 있어요 — '+(OV_FIX[tf1]||'한 박자 쉬어가기')+'.';
@@ -1602,19 +1603,13 @@ function renderUs(){
   if(bestSig)uniqHtml+=' '+bestSig+'.';
   // 개인 데이터 기반 (유형 일반 문구 대체)
   var topFac=FK.slice().sort(function(a,b){return r.fs[b]-r.fs[a];})[0];
-  var cs={};COMP.forEach(function(c){cs[c.k]=Math.round(c.fac.reduce(function(x,f){return x+r.fs[f];},0)/c.fac.length);});
-  // 팀 대비 가장 "도드라지는" 역량(절대 최고가 아니라 상대 standout) — 모두가 설득력으로 겹치는 문제 해결
-  var compTA={};COMP.forEach(function(c){compTA[c.k]=M.reduce(function(a,q){return a+Math.round(c.fac.reduce(function(x,f){return x+q.r.fs[f];},0)/c.fac.length);},0)/n;});
-  var compRank=COMP.slice().sort(function(a,b){return (cs[b.k]-compTA[b.k])-(cs[a.k]-compTA[a.k]);});
-  function shineClause(c){var df=c.fac.slice().sort(function(x,y){return r.fs[y]-r.fs[x];})[0];return {label:c.label,sc:cs[c.k],df:df,adj:(r.fs[df]>=72?'압도적인 ':r.fs[df]>=60?'강한 ':''),desc:(COMP_DESC[c.k]&&COMP_DESC[c.k].s)||''};}
-  var c1=compRank[0],s1=shineClause(c1);
-  // 강점이 둘이면(서로 다른 facet이 바탕인 두 번째 강한 역량) 둘 다 보여준다 (예: 정밀+공감)
-  var s2=null;for(var ci=1;ci<compRank.length;ci++){var cand=shineClause(compRank[ci]);if(cand.df!==s1.df&&cs[compRank[ci].k]>=62&&(cs[compRank[ci].k]-compTA[compRank[ci].k])>=4){s2=cand;break;}}
-  var shineP;
-  if(s1.desc){
-   if(s2)shineP='도드라지는 강점이 둘이에요 — <b style="color:'+col+'">'+s1.label+'</b>('+s1.sc+')와 <b style="color:'+col+'">'+s2.label+'</b>('+s2.sc+'). 각각 '+s1.adj+'<b>'+FC[s1.df].name+'</b>('+r.fs[s1.df]+')와 '+s2.adj+'<b>'+FC[s2.df].name+'</b>('+r.fs[s2.df]+')가 바탕이죠. '+s1.desc+'.';
-   else shineP='가장 도드라지는 강점은 <b style="color:'+col+'">'+s1.label+'</b>('+s1.sc+')이에요 — 그 바탕엔 '+s1.adj+'<b>'+FC[s1.df].name+'</b>('+r.fs[s1.df]+')가 있어요. '+s1.desc+'.';
-  } else shineP=(AP[r.arch]&&AP[r.arch].shine)||'';
+  // 빛나는 순간 = 강한 facet이 만드는 "상황". 합성 역량점수(친화력 68 등)로 희석하지 말고 facet 점수를 직접 노출.
+  var shF=FK.slice().sort(function(a,b){return r.fs[b]-r.fs[a];}),lead1=shF[0],lead2=shF[1];
+  function compOfFac(f,exK){var cc=COMP.filter(function(c){return c.fac.indexOf(f)>=0&&c.k!==exK;});if(!cc.length)return null;return cc.sort(function(a,b){return (b.fac.reduce(function(x,g){return x+r.fs[g];},0)/b.fac.length)-(a.fac.reduce(function(x,g){return x+r.fs[g];},0)/a.fac.length);})[0];}
+  var cmp1=compOfFac(lead1,null),sit1=(cmp1&&COMP_DESC[cmp1.k])?COMP_DESC[cmp1.k].s:'';
+  var cmp2=compOfFac(lead2,cmp1?cmp1.k:null),sit2=(cmp2&&COMP_DESC[cmp2.k])?COMP_DESC[cmp2.k].s:'';
+  var twoSh=(r.fs[lead2]>=66&&sit2&&sit2!==sit1);
+  var shineP=sit1?('<b style="color:'+DR[FC[lead1].d].hex+'">'+FC[lead1].name+'</b>('+r.fs[lead1]+')'+(twoSh?' · <b style="color:'+DR[FC[lead2].d].hex+'">'+FC[lead2].name+'</b>('+r.fs[lead2]+')':'')+'가 강해서 — '+sit1+(twoSh?' <b>그리고</b> '+sit2:'')+' 빛나요.'):((AP[r.arch]&&AP[r.arch].shine)||'');
   // 이렇게 대해주세요: 주동력 1줄(같은 동력이면 동일) → 개인의 상위 facet 기반 COMM_FACET로 개인화
   var wRank=FK.slice().sort(function(a,b){return r.fs[b]-r.fs[a];}),w1=wRank[0],w2=wRank[1];
   var workP='<b>'+FC[w1].name+'</b>('+r.fs[w1]+')'+ig(FC[w1].name)+' 강한 사람이라 — '+(COMM_FACET[w1]||'')+(r.fs[w2]>=64&&COMM_FACET[w2]?' 또 <b>'+FC[w2].name+'</b>('+r.fs[w2]+')도 높아요: '+COMM_FACET[w2]:'');
