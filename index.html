@@ -1595,6 +1595,7 @@ function renderUs(){
   var uniqHtml;
   if(u.solo.length)uniqHtml='이 팀에서 <b style="color:'+col+'">'+u.solo.map(function(d){return DR[d].name;}).join('·')+'</b> ●을 <b>혼자</b> 쥔 사람이에요. '+nm+ig(nm)+' 빠지면 그 결이 팀에서 옅어집니다.'+(u.uf.length?' 특히 <b>'+FC[u.uf[0]].name+'</b>(팀 1위 '+r.fs[u.uf[0]]+')가 도드라져요.':'');
   else if(u.uf.length)uniqHtml='팀에서 <b style="color:'+DR[FC[u.uf[0]].d].hex+'">'+u.uf.slice(0,2).map(function(f){return FC[f].name+'('+r.fs[f]+')';}).join(' · ')+'</b>가 가장 도드라집니다 — 2위와 뚜렷이 벌어진, '+nm+'만의 결이에요.';
+  else if(sigMap[i]!==undefined){var _sf=sigMap[i];uniqHtml='동력 하나를 통째로 독점하진 않지만, '+n+'명을 나란히 놓고 팀 평균과 견주면 <b style="color:'+DR[FC[_sf].d].hex+'">'+FC[_sf].name+'</b>('+r.fs[_sf]+')'+ig(FC[_sf].name)+' '+nm+'에게서 가장 도드라져요 — 그게 이 팀에서 '+nm+'만의 색입니다.';}
   else uniqHtml=(r.bal?'특정 결을 독점하진 않지만, 여러 결을 고루 받치는 <b>팀의 안정축</b>이에요 — 빠진 자리를 그때그때 메웁니다.':'다른 멤버와 강점이 겹치는 영역이 많아요 — 같은 결을 <b>함께 두껍게</b> 만드는 역할입니다.')+(n<=3?' (인원이 적어 상대 비교는 참고로 보세요.)':'');
   // 개인 데이터 기반 (유형 일반 문구 대체)
   var topFac=FK.slice().sort(function(a,b){return r.fs[b]-r.fs[a];})[0];
