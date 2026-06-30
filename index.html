@@ -1177,6 +1177,22 @@ MEUS.youTeamSelect=function(slot,i){
 
 /* ---------- 관계 역학 (대인관계 이론 기반 상대적 분석) ---------- */
 var COMM_FACET={decision:'결정을 재촉하기보다 선택지를 깔끔히 정리해 주면 빠르게 끊어줘요.',lead:'방법까지 지시하지 말고 목표·권한을 주고 맡기세요 — 마이크로매니징이 가장 큰 지뢰입니다.',achieve:'"이게 어떤 성과·임팩트로 이어지나"를 보여주면 엔진에 불이 붙어요.',support:'도움을 먼저 청하면 기꺼이 나섭니다 — 대신 그 기여를 자주 알아봐 주세요.',trust:'맥락을 충분히 공유하세요. 의심받는 느낌만 안 주면 위임이 빠릅니다.',empathy:'본론 전 짧은 안부·감정 확인 한마디 — 용건만 차갑게 던지면 마음을 닫아요.',precision:'근거·디테일을 갖춰 말하세요. 두루뭉술·졸속으로 보이면 신뢰를 잃습니다.',plan:'미리, 구조적으로 알려주세요. 급작스런 변경·"지금 당장"이 가장 큰 스트레스예요.',caution:'"왜·리스크는?"에 답할 준비를 하고 결정할 시간을 주세요. 몰아붙이면 멈춥니다.',idea:'아이디어엔 "안 돼"보다 "그중 뭐부터 해볼까"로 받아 살려주세요.',flex:'세부 절차를 못 박기보다 큰 방향만 주고 융통성을 허용하세요.',vision:'"이게 왜 중요한지" 큰 그림·의미를 먼저 연결해 주세요.'};
+/* facet 조합 해석 — "왜 이 조합인지"(강한 결 + 옅은 결의 의미). 자기보고 패턴 기준. */
+var FCOMBO=[
+ {hi:'support',lo:'trust',t:'<b>잘 돕지만 잘 맡기진</b> 않아요 — 따뜻함을 "내가 직접 내주는" 쪽으로 써요. 위임보다 본인이 챙겨야 안심하는 편이라, 도움은 넘치는데 손 떼는 건 어렵습니다.'},
+ {hi:'vision',lo:'caution',t:'<b>가능성에 베팅하느라 리스크 점검은 옅어요</b> — "일단 가보자"가 강하고 "잠깐, 위험은?"이 약한, 빠르게 움직이는 사람의 그림자예요.'},
+ {hi:'idea',lo:'precision',t:'<b>아이디어는 풍부한데 마무리·정밀은 옅어요</b> — 벌이는 건 빠르되 끝마감이 샐 수 있어, 디테일을 받쳐줄 짝이 있으면 빛나요.'},
+ {hi:'decision',lo:'caution',t:'<b>빠르게 결정하지만 위험 점검이 약해</b> 가끔 성급할 수 있어요 — 되돌리기 힘든 결정 앞에선 한 박자.'},
+ {hi:'lead',lo:'empathy',t:'<b>끌고 가는 힘은 센데 감정 읽기는 옅어</b> 본의 아니게 독주로 비칠 수 있어요 — "네 생각은?"을 먼저 물으면 균형이 잡혀요.'},
+ {hi:'achieve',lo:'empathy',t:'<b>성과를 향해 달리느라 사람 배려가 뒤로</b> 밀릴 수 있어요 — 결과만큼 과정의 사람도 한 번씩 챙기면 좋아요.'},
+ {hi:'plan',lo:'flex',t:'<b>계획은 탄탄하나 변화 적응은 약해</b> 갑작스런 변수에 경직될 수 있어요.'},
+ {hi:'caution',lo:'decision',t:'<b>신중히 따지는 만큼 결정이 늦어져</b> 타이밍을 놓칠 수 있어요 — "정보 수집 마감"을 정해두면 좋아요.'},
+ {hi:'precision',lo:'flex',t:'<b>정확하지만 융통성은 옅어</b> "이 방법이 맞다"에 갇힐 수 있어요.'},
+ {hi:'empathy',lo:'decision',t:'<b>사람은 깊이 헤아리지만 결단은 미뤄</b> 어려운 결정을 끌어안고 혼자 힘들어할 수 있어요.'},
+ {hi:'achieve',lo:'caution',t:'<b>성과를 향해 빠르게 미는데 점검은 약해</b> 속도가 붙을수록 한 번씩 멈춰 확인이 필요해요.'},
+ {hi:'trust',lo:'precision',t:'<b>사람은 잘 믿고 맡기지만 디테일 점검은 옅어</b> 맡긴 일의 품질을 가끔 들여다보면 좋아요.'}
+];
+function facetCombos(fs,HI,LO){HI=HI||60;LO=LO||48;return FCOMBO.filter(function(c){return fs[c.hi]>=HI&&fs[c.lo]<=LO;}).sort(function(a,b){return (fs[b.hi]-fs[b.lo])-(fs[a.hi]-fs[a.lo]);});}
 function relDynamics(ra,rb,na,nb){
  function rd(x){return Math.round(x);}
  function band(a,b){var hi=Math.max(a,b),lo=Math.min(a,b),gap=Math.abs(a-b);
@@ -1624,6 +1640,7 @@ function renderUs(){
   // 과용주의: 2순위 강점(있으면)으로 — 대체불가(최고점)와 겹치지 않게 + 사람마다 다르게
   var sf=(r.fs[scndF]>=62)?scndF:bestF;
   var shadowP='<b>'+FC[sf].name+'</b>('+r.fs[sf]+')도 강한데, 과해지면 <b>'+FC[sf].ov+'</b>로 흐를 수 있어요 — '+(OV_FIX[sf]||'');
+  var combos=facetCombos(r.fs);
   H+='<div style="border:1px solid var(--rule);border-top:3px solid '+col+';border-radius:2px;background:var(--panel);padding:16px 18px;margin-bottom:11px">'+
    '<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px"><span style="font-weight:900;font-size:17px">'+nm+'</span><span style="font-size:13px;color:'+col+';font-weight:700">'+r.arch+'</span><span style="font-size:12px;color:var(--faint)">'+(AD[r.arch]||'')+'</span></div>'+
    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(228px,1fr));gap:11px 18px">'+
@@ -1631,7 +1648,7 @@ function renderUs(){
     (shineP?'<div><div class="mono" style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--connect);margin-bottom:3px">빛나는 순간</div><p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--ink-soft)">'+shineP+'</p></div>':'')+
     (workP?'<div><div class="mono" style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--order);margin-bottom:3px">이렇게 대해주세요</div><p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--ink-soft)">'+workP+'</p></div>':'')+
     '<div><div class="mono" style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);margin-bottom:3px">⚠ 과용주의</div><p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--ink-soft)">'+shadowP+'</p></div>'+
-   '</div></div>';
+   '</div>'+(combos.length?'<div style="margin-top:11px;border-top:1px dashed var(--rule);padding-top:9px"><div class="mono" style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--explore);margin-bottom:3px">결의 조합 · 왜 이런 사람인지</div><p style="margin:0;font-size:13px;line-height:1.6;color:var(--ink-soft)">'+combos[0].t+(combos[1]?'<br>'+combos[1].t:'')+'</p></div>':'')+'</div>';
  });
  // 보완 매트릭스 (●○·)
  var grid='<div style="display:grid;grid-template-columns:92px repeat(4,1fr);gap:1px;background:var(--hairline);border:1px solid var(--hairline);border-radius:2px;overflow:hidden;font-family:var(--font-mono);font-size:13px">';
