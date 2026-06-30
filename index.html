@@ -276,6 +276,16 @@ var COMP=[
  {k:'persuade',label:'설득력',fac:['lead','empathy','vision']},
  {k:'detail',label:'꼼꼼함',fac:['precision','caution']}
 ];
+/* 역량별 서술 + 빛나는 상황 */
+var COMP_DESC={
+ persuade:{t:'사람의 마음을 움직여 끌고 가는 힘',s:'새 방향에 사람들을 설득해 동참시키거나, 회의에서 합의를 끌어낼 때'},
+ social:{t:'관계를 잇고 신뢰를 쌓는 힘',s:'팀 분위기를 살리고, 갈등을 풀거나 사람을 모아야 할 때'},
+ exec:{t:'정하고 끝까지 밀어붙이는 힘',s:'멈춰 있는 일을 굴리거나, 빠른 결정과 실행이 필요할 때'},
+ finish:{t:'끝까지 정확하게 마무리하는 힘',s:'완성도가 결과를 좌우하는 일, 디테일까지 챙겨 마감할 때'},
+ detail:{t:'빈틈과 오류를 잡아내는 힘',s:'리스크를 미리 거르거나 꼼꼼한 검수·점검이 필요할 때'},
+ time:{t:'계획을 세워 시간을 지키는 힘',s:'여러 일이 얽혀 우선순위와 일정 관리가 중요할 때'},
+ crisis:{t:'예상 밖 상황에 침착하게 대응하는 힘',s:'갑작스런 변수·위기에서 빠르게 판단하고 움직여야 할 때'}
+};
 
 /* ---------- facet별 관계 역학 텍스트 (미시 분석) — #H#높은쪽 #L#낮은쪽 #Hn/#Ln 은·는 #Hg/#Lg 이·가 #hv/#lv 점수 ---------- */
 var FREL={
@@ -868,11 +878,17 @@ function renderResult(){
   var v0=VAL.filter(function(v){return v.k===r.vals[0];})[0];
   var vT=v0?'결정의 1순위는 <b style="color:var('+DR[v0.drv].v+')">'+v0.t+'</b>입니다. 회의에서 이걸 먼저 챙기고, 충돌은 대개 상대의 1순위가 달라서 생깁니다 — "누가 옳냐"가 아니라 "무엇을 먼저 두냐"의 차이.':'';
   H+='<div style="margin-top:clamp(28px,4vw,44px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,28px)"><div class="sec" style="margin:0 0 14px">Decision lens · 결정의 렌즈 (가치 우선순위)</div><div style="margin-bottom:8px">'+vh+'</div><p style="margin:6px 0 0;color:var(--ink-soft);font-size:15px">'+vT+'</p></div>';}
- // 강점 포트레이트 (역량)
- var compRows=COMP.slice().filter(function(c){return r.comp[c.k]!=null;}).sort(function(a,b){return r.comp[b.k]-r.comp[a.k];});
- if(compRows.length){var crh='';compRows.forEach(function(c){var lv=r.comp[c.k];var pct=Math.round(lv/3*100);var word=lv>=2.5?'아주 자주':lv>=1.5?'자주':lv>=0.7?'가끔':'드묾';crh+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><span style="flex:none;width:60px;font-size:14px">'+c.label+'</span><div style="flex:1">'+fillbar(pct,'var(--ink)')+'</div><span class="mono" style="flex:none;width:54px;text-align:right;font-size:12px;color:var(--mute)">'+word+'</span></div>';});
-  var top2=compRows.slice(0,2).map(function(c){return c.label;}).join(' · ');
-  H+='<div style="margin-top:clamp(28px,4vw,44px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,28px)"><div class="sec" style="margin:0 0 6px">Strength portrait · 강점 포트레이트 (최근 행동)</div><p style="margin:0 0 16px;color:var(--mute);font-size:14.5px">동력이 "왜 움직이나"라면, 이건 최근 행동에서 실제로 자주 나온 강점입니다.</p>'+crh+'<p style="margin:12px 0 0;color:var(--ink-soft);font-size:15px">요즘 가장 자주 발휘되는 강점은 <b>'+top2+'</b>입니다.</p></div>';}
+ // 강점 포트레이트 — 점수 순위 + 서술 + 빛나는 상황
+ var compScore={};COMP.forEach(function(c){compScore[c.k]=Math.round(c.fac.reduce(function(x,f){return x+r.fs[f];},0)/c.fac.length);});
+ var compRanked=COMP.slice().sort(function(a,b){return compScore[b.k]-compScore[a.k];});
+ var top5=compRanked.slice(0,5),restC=compRanked.slice(5);
+ var cTierN=function(i){return i<2?'대표 강점':i<4?'확실한 강점':'받쳐주는 강점';};
+ var cTierC=function(i){return i<2?DR[r.p].hex:i<4?'var(--ink)':'var(--mute)';};
+ var crh='';
+ top5.forEach(function(c,i){var sc=compScore[c.k],dd=COMP_DESC[c.k]||{t:'',s:''};crh+='<div style="display:flex;gap:13px;padding:13px 0;border-top:1px solid var(--hairline)"><div class="display" style="flex:none;width:26px;text-align:center;font-size:23px;font-weight:900;color:'+cTierC(i)+';line-height:1.1">'+(i+1)+'</div><div style="flex:1;min-width:0"><div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:4px"><span style="font-weight:800;font-size:16px">'+c.label+'</span><span class="mono" style="font-size:10.5px;font-weight:700;color:'+cTierC(i)+'">'+cTierN(i)+'</span><span class="mono" style="font-size:11px;color:var(--mute);margin-left:auto">'+sc+'</span></div><div style="height:5px;background:var(--paint);border-radius:3px;overflow:hidden;margin-bottom:7px"><div style="height:100%;width:'+sc+'%;background:'+cTierC(i)+'"></div></div><div style="font-size:14px;line-height:1.55;color:var(--ink-soft)">'+dd.t+'</div><div style="font-size:13px;line-height:1.5;color:var(--mute);margin-top:3px">💡 <b style="color:var(--ink-soft)">이럴 때 빛나요</b> — '+dd.s+'</div></div></div>';});
+ var restHtml=restC.length?'<div style="margin-top:14px;padding-top:12px;border-top:1px dashed var(--hairline);font-size:13px;color:var(--mute)">상대적으로 덜 두드러지는 편 — '+restC.map(function(c){return c.label+' <span class="mono">'+compScore[c.k]+'</span>';}).join(' · ')+'</div>':'';
+ var top2lbl=top5.slice(0,2).map(function(c){return c.label;}).join('·');var euro=(top5[1]?batchim(top5[1].label):batchim(top5[0].label))?'으로':'로';
+ H+='<div style="margin-top:clamp(28px,4vw,44px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,28px)"><div class="sec" style="margin:0 0 6px">Strength portrait · 강점 포트레이트</div><p style="margin:0 0 4px;color:var(--mute);font-size:14.5px">최근 행동에서 실제로 강하게 나온 역량을 순서대로 — 무엇을 잘하고, <b>어떤 상황에서 빛나는</b> 사람인지.</p>'+crh+restHtml+'<p style="margin:16px 0 0;color:var(--ink-soft);font-size:15px">한마디로 지금 당신은 <b style="color:var('+DR[r.p].v+')">'+top2lbl+'</b>'+euro+' 일을 풀어가는 사람입니다.</p></div>';
  // 나 사용설명서 (4블록)
  var pf=PF[r.p];var anti=ANTI[r.p].map(function(d){return '<b style="color:var('+DR[d].v+')">'+DR[d].name+'</b>';}).join('·');
  var shadF=FK.filter(function(f){return r.dial[f]&&r.dial[f].ov!=null&&r.dial[f].ov>=4;});
