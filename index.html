@@ -1497,7 +1497,9 @@ function renderUs(){
   var pA=M[ri],pB=M[rj],rA=pA.r,rB=pB.r,an=esc(pA.name||('멤버'+(ri+1))),bn=esc(pB.name||('멤버'+(rj+1)));
   var rs=[],score=0;
   var la=rA.fs.lead,lb=rB.fs.lead;
-  if(Math.min(la,lb)>=58&&Math.abs(la-lb)<16){rs.push('둘 다 주도성이 높아(주도 '+la+'·'+lb+') <b>방향이 같아도 "누가 끌지"에서 부딪히기 쉬워요</b> — 지배 성향은 서로 양보가 아니라 경쟁으로 맞물립니다(대인관계 상보성). 영역별 결정권을 미리 나눠두세요.');score+=3;}
+  if(Math.min(la,lb)>=58){var hN=la>=lb?an:bn,lN=la>=lb?bn:an,hV=Math.max(la,lb),lV=Math.min(la,lb);
+   if(hV-lV<12){rs.push('둘 다 주도성이 높고 <b>비등</b>해요(주도 '+la+'·'+lb+') — 방향이 같아도 "누가 끌지"에서 <b>정면으로 부딪히기</b> 쉽습니다. 지배 성향은 양보가 아니라 경쟁으로 맞물려요(대인관계 상보성). 영역별 결정권을 미리 나눠두세요.');score+=3;}
+   else{rs.push('둘 다 주도성이 높은데 <b>'+hN+'</b>('+hV+')가 <b>'+lN+'</b>('+lV+')보다 더 셉니다 — '+hN+'가 주도권을 쥐기 쉽지만, '+lN+'도 주도성이 높아 쉽게 물러서지 않아요. <b>'+lN+'이 그 아래에서 부딪히거나 눌리는</b> 긴장이 생길 수 있으니, '+lN+'에게 분명한 자기 결정 영역을 보장해 주세요.');score+=3;}}
   var aA=sqc(rA.seq,'assert'),bA=sqc(rB.seq,'assert'),aZ=sqc(rA.seq,'analyze'),bZ=sqc(rB.seq,'analyze');
   if(aA>=2&&bA>=2){rs.push('갈등이 깊어지면 둘 다 정면으로 밀어붙이는 <b>주장형</b>이라 한번 부딪히면 빠르게 격해져요 — "한 박자 식히고 다시"를 규칙으로 정해두세요.');score+=2;}
   else if((aA>=2&&bZ>=2)||(bA>=2&&aZ>=2)){var pushN=aA>=2?an:bn,pullN=aA>=2?bn:an;rs.push('한 명('+pushN+')은 밀어붙이고 한 명('+pullN+')은 물러나 따지는 <b>추궁–회피</b> 패턴 — 관계를 가장 갉아먹는 구조예요. '+pushN+'는 몰아세우지 말고, '+pullN+'은 "생각할 시간을 달라"고 신호를 주세요.');score+=2;}
