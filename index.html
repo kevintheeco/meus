@@ -1420,17 +1420,21 @@ function renderUs(){
  H+='<div style="display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 0">'+teamRk.map(function(k){return '<span class="pill" style="border:1px solid var(--rule);background:var(--panel)"><span style="color:'+DR[k].hex+'">●</span> '+DR[k].name+' <span class="mono">'+avg[k]+'</span></span>';}).join('')+'</div>';
  // ===== 팀 종합 리딩 (내러티브) =====
  var TN=[];var topD0=teamRk[0],topD1=teamRk[1];
- var leadByD=function(d){return M.filter(function(p){return p.r.p===d;}).map(function(p){return p.name||'멤버';});};
- var lp=leadByD(topD0);
- TN.push('이 팀의 무게중심은 <b style="color:var('+DR[topD0].v+')">'+DR[topD0].name+'</b>('+avg[topD0]+')과 <b style="color:var('+DR[topD1].v+')">'+DR[topD1].name+'</b>('+avg[topD1]+')입니다'+(lp.length?' — '+lp.map(esc).join('·')+ig(lp[lp.length-1])+' '+DR[topD0].name+el(DR[topD0].name)+' 끌어갑니다.':'.'));
+ var keyRole={drive:'추진과 결단',connect:'관계와 화합',order:'질서와 기준',explore:'새 시도와 탐색'};
+ var strongestIn=function(d){return M.slice().sort(function(a,b){return b.r.ds[d]-a.r.ds[d];})[0];};
+ var anchor0=strongestIn(topD0),a0n=esc(anchor0.name||'한 명');
+ TN.push('이 팀의 무게중심은 <b style="color:var('+DR[topD0].v+')">'+DR[topD0].name+'</b>('+avg[topD0]+')과 <b style="color:var('+DR[topD1].v+')">'+DR[topD1].name+'</b>('+avg[topD1]+')에 있습니다. 그중 <b>'+a0n+'</b>('+anchor0.r.ds[topD0]+')'+ig(a0n)+' '+keyRole[topD0]+'의 엔진으로 팀을 끌어가는 중심이에요.');
  var spread=avg[topD0]-avg[blind];
- TN.push(spread>=22?'동력이 <b>'+DR[topD0].name+'</b> 쪽으로 뚜렷이 쏠려 있어 — 그 방향은 강하지만, 반대편(<b style="color:var('+DR[blind].v+')">'+DR[blind].name+'</b>)이 팀의 빈자리입니다.':'네 동력이 비교적 고르게 퍼져 있어, 역할이 자연스럽게 나뉘는 균형 팀입니다.');
- var nobodyD=DK.filter(function(d){return M.every(function(p){return p.r.rk.slice(0,2).indexOf(d)<0;});});
- if(nobodyD.length)TN.push('특히 <b style="color:var('+DR[nobodyD[0]].v+')">'+nobodyD.map(function(d){return DR[d].name;}).join('·')+'</b>는 강한 사람이 한 명도 없는 <b>집단 사각지대</b> — 의사결정 때 이 관점을 의도적으로 챙기거나 보강이 필요합니다.');
+ TN.push(spread>=22?'힘이 <b>'+DR[topD0].name+'</b> 쪽으로 뚜렷이 쏠려 있어요 — 그 방향은 누구보다 강하지만, 반대편 <b style="color:var('+DR[blind].v+')">'+DR[blind].name+'</b>이 팀의 빈자리로 남습니다.':'네 동력이 비교적 고르게 퍼져 역할이 자연스럽게 나뉘는 균형 팀이에요 — 대신 "우리 팀은 무엇에 강한가"가 흐릿할 수 있습니다.');
+ var bA=strongestIn(blind),bAn=esc(bA.name||'한 명'),bScore=bA.r.ds[blind];
+ if(bScore>=52)TN.push('팀 전체로는 <b style="color:var('+DR[blind].v+')">'+DR[blind].name+'</b>('+avg[blind]+')이 가장 얇습니다 — 그런데 이 빈자리를 지키는 <b>키</b>가 있어요. 바로 <b>'+bAn+'</b>('+bScore+')! 모두가 약한 '+keyRole[blind]+'을 '+bAn+ig(bAn)+' 떠받치고 있으니, 그 역할의 무게를 팀이 분명히 알아주고 힘을 실어 주세요. 한 사람에게만 쏠리지 않게, 곁에서 함께 받칠 두 번째 사람도 정해두면 더 단단해집니다.');
+ else TN.push('<b style="color:var('+DR[blind].v+')">'+DR[blind].name+'</b>('+avg[blind]+')은 이 팀의 <b>진짜 공백</b>입니다 — 가장 높은 '+bAn+'조차 '+bScore+'라, '+keyRole[blind]+'을 확실히 책임질 사람이 아직 없어요. 이 역할을 누군가에게 공식으로 맡기거나, 이 힘이 강한 사람을 새로 들이면 팀이 단단해집니다.');
  var vc={};M.forEach(function(p){var v=(p.r.vals||[])[0];if(v)vc[v]=(vc[v]||0)+1;});var vk=Object.keys(vc).sort(function(a,b){return vc[b]-vc[a];});
- if(vk.length){var v0=VAL.filter(function(x){return x.k===vk[0];})[0];TN.push('가장 많은 1순위 가치는 <b>'+v0.t+'</b>('+vc[vk[0]]+'명)'+(vk.length>=4?' — 다만 1순위가 '+vk.length+'갈래로 흩어져, 결정 기준을 명시하지 않으면 충돌이 잦을 수 있어요.':'. 결정이 엇갈릴 땐 1순위 가치 차이를 먼저 보세요.'));}
- var oneLine={drive:'결정과 추진',connect:'사람과 화합',order:'정확과 체계',explore:'새 시도와 변화'};
- TN.push('한 줄로 — <b>'+oneLine[topD0]+'</b>엔 강하고 <b>'+oneLine[blind]+'</b>이 상대적으로 약한 팀. 강사는 이 강점을 살리되 빈자리를 의식적으로 채우게 이끄세요.');
+ if(vk.length){var v0=VAL.filter(function(x){return x.k===vk[0];})[0];
+  var minor=M.filter(function(p){return (p.r.vals||[])[0]&&p.r.vals[0]!==vk[0];}).map(function(p){var vv=VAL.filter(function(x){return x.k===p.r.vals[0];})[0];return esc(p.name||'')+'('+(vv?vv.t:'')+')';});
+  TN.push('결정의 무게추는 <b style="color:var('+DR[v0.drv].v+')">'+v0.t+'</b>('+vc[vk[0]]+'명)예요 — 갈림길에서 이 팀은 "'+v0.t+'"를 먼저 지키는 쪽으로 기웁니다.'+(minor.length?' 다만 '+minor.slice(0,3).join(', ')+'처럼 다른 렌즈를 가진 사람도 있어, 그 기준이 필요한 순간엔 이들의 목소리를 의도적으로 키워야 균형이 잡혀요.':' 전원이 같은 기준이라 결정은 빠르지만, 빠진 관점이 없는지 한 번씩 점검하세요.'));}
+ var oneLine={drive:'결정과 추진',connect:'사람과 화합',order:'정확과 체계',explore:'새 시도와 변화'};var olp=batchim(oneLine[topD0])?'으로':'로';
+ TN.push('<b>한 문장으로</b> — '+oneLine[topD0]+olp+' 움직이고, '+bAn+ig(bAn)+' '+keyRole[blind]+'을 받쳐 주는 팀입니다. 강점을 살리되 그 빈자리를 지키는 사람을 함께 알아주는 것 — 그게 이 팀을 단단하게 만드는 열쇠예요.');
  H+='<div style="margin-top:clamp(22px,3vw,30px);border-top:2px solid var(--ink);padding-top:clamp(16px,2.5vw,22px)"><div class="sec" style="margin:0 0 12px">팀 종합 리딩</div>'+TN.map(function(t){return '<p style="margin:0 0 10px;font-size:14.5px;line-height:1.7;color:var(--ink-soft)">▸ '+t+'</p>';}).join('')+'</div>';
  // 01 분포 지도 (2축)
  var cx=160,cy=160,Rad=114;
@@ -1468,7 +1472,8 @@ function renderUs(){
  H+='<div style="margin-top:clamp(28px,4vw,40px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,26px)"><div class="sec" style="margin:0 0 14px">보완 매트릭스 · ● 강점 ○ 보통 · 사각</div><div style="overflow-x:auto"><div style="min-width:380px">'+grid+'</div></div><p style="margin:12px 0 0;color:var(--mute);font-size:13.5px;line-height:1.6">각 동력 열에서 ●(강점)인 사람이 그 자리를 떠받칩니다. ●이 한 명뿐인 열은 그 사람에게 쏠린 팀 리스크 — 채용·과제 배분에서 보강하세요.</p></div>';
  // 집단 사각지대
  var nobody=DK.filter(function(d){return M.every(function(p){return p.r.rk.slice(0,2).indexOf(d)<0;});});
- var blindT='팀 평균이 가장 낮은 동력은 <b>'+DR[blind].name+'</b>('+avg[blind]+')입니다. '+(nobody.length?'특히 <b>'+nobody.map(function(d){return DR[d].name;}).join(' · ')+'</b>'+(batchim(DR[nobody[nobody.length-1]].name)?'은':'는')+' 강한 사람이 한 명도 없어요 — 의도적으로 분산하거나, 이 동력이 강한 사람을 합류시키면 팀이 단단해집니다.':DR[blind].name+' 관점을 회의 체크리스트에 넣어두세요.');
+ var bK=strongestIn(blind),bKn=esc(bK.name||'한 명'),bKs=bK.r.ds[blind];
+ var blindT=(bKs>=52)?('팀에서 가장 얇은 영역은 <b style="color:var('+DR[blind].v+')">'+DR[blind].name+'</b>('+avg[blind]+')예요 — 이 빈자리를 지키는 키는 <b>'+bKn+'</b>('+bKs+')입니다. '+bKn+'의 역할을 팀이 분명히 인정하고, 한 사람에게만 쏠리지 않게 곁에서 받칠 두 번째 사람을 정해두면 좋아요.'):('<b style="color:var('+DR[blind].v+')">'+DR[blind].name+'</b>('+avg[blind]+')은 아무도 확실히 책임지지 못하는 <b>팀의 진짜 공백</b>이에요 — 가장 높은 '+bKn+'도 '+bKs+'에 그칩니다. 이 역할을 누군가에게 공식으로 맡기거나, 이 힘이 강한 사람을 보강하세요.');
  H+='<div style="margin-top:clamp(26px,3vw,38px);border:1px solid var(--explore);border-radius:2px;background:color-mix(in srgb,var(--explore) 8%,transparent);padding:16px 18px"><div style="display:flex;align-items:center;gap:7px;margin-bottom:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--explore)"></span><span class="mono" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--explore)">집단 사각지대</span></div><p style="margin:0;font-size:15.5px;color:var(--ink-soft)">'+blindT+'</p></div>';
  // ===== 팀 심층 분석 =====
  // 1. 팀 유형
