@@ -1875,6 +1875,25 @@ var ORG_ROLES=[
  {key:'GLOBAL',m:'은우',label:'해외총괄',ko:'해외·확장·외부 네트워크',ideal:'explore',alt:'connect'}
 ];
 function orgMember(M,role){for(var i=0;i<M.length;i++){var nm=M[i].name||'';if(nm&&(nm.indexOf(role.m)>=0||role.m.indexOf(nm)>=0))return M[i];}return null;}
+// 직분쌍별 실제 업무 접점 (두 역할이 실무에서 어디서 만나는가)
+var ROLE_TOUCH={
+ 'CEO|CSO':'회사의 <b>전략 방향과 우선순위</b>에서 가장 자주 머리를 맞대요 — CSO가 전략을 설계하면 CEO가 최종 결정을 내립니다.',
+ 'CEO|CTO':'<b>제품·기술 로드맵과 리소스 배분</b>에서 만나요 — CTO가 실현 가능성을, CEO가 사업 방향을 가져옵니다.',
+ 'CEO|CBO':'<b>브랜드·메시지가 회사 방향과 맞는지</b>에서 만나요 — CBO가 "시장에 어떻게 보일지", CEO가 "우리가 누구인지"를.',
+ 'CEO|CFO':'<b>예산·투자·리스크</b>에서 만나요 — 재무전략이 숫자와 한계를, CEO가 베팅의 크기를 가져옵니다.',
+ 'CEO|GLOBAL':'<b>해외 확장의 속도와 우선순위</b>에서 만나요 — 해외총괄이 기회를, CEO가 자원 배분을.',
+ 'CSO|CTO':'<b>전략을 기술로 어떻게 구현할지</b> — 전략의 실현 가능성을 함께 검증하는 핵심 축이에요.',
+ 'CBO|CSO':'<b>전략 방향과 브랜드 포지셔닝</b>을 맞춥니다 — 무엇을 팔지와 어떻게 보일지.',
+ 'CFO|CSO':'<b>전략의 재무적 타당성</b> — 어디에 베팅하고 어디서 절제할지를 함께 정합니다.',
+ 'CSO|GLOBAL':'<b>어느 시장에 어떤 전략으로</b> 들어갈지를 함께 그립니다.',
+ 'CBO|CTO':'<b>제품 경험이 브랜드 약속을 지키는지</b> — 기술과 브랜드가 만나는 지점이에요.',
+ 'CFO|CTO':'<b>기술 투자·인프라 비용 대비 효과</b>를 따집니다.',
+ 'CTO|GLOBAL':'<b>해외 시장에 맞는 기술·현지화</b>에서 협업합니다.',
+ 'CBO|CFO':'<b>브랜드·마케팅 투자 대비 성과</b>를 함께 봅니다.',
+ 'CBO|GLOBAL':'<b>브랜드의 해외 현지화와 일관성</b>을 맞춥니다.',
+ 'CFO|GLOBAL':'<b>해외 사업의 재무 구조와 리스크</b>를 설계합니다.'
+};
+function roleTouch(k1,k2){return ROLE_TOUCH[k1+'|'+k2]||ROLE_TOUCH[k2+'|'+k1]||'';}
 function renderOrg(){
  var M=(typeof US!=='undefined'&&US.members)?US.members:[];
  var OPP_D={drive:'connect',connect:'drive',order:'explore',explore:'order'};
@@ -1969,6 +1988,10 @@ function renderOrg(){
   else if(samePrime&&Math.abs(la-lb)<14){q='동질';col='var(--explore)';label='닮은 결';}
   else {q='보완';col='var(--order)';label='보완';}
   var P=[];
+  var tfA=FK.slice().sort(function(x,y){return A.r.fs[y]-A.r.fs[x];})[0],tfB=FK.slice().sort(function(x,y){return B.r.fs[y]-B.r.fs[x];})[0];
+  var touch=roleTouch(rA.key,rB.key);
+  if(touch)P.push('<b>업무 접점</b> — '+touch);
+  P.push('<b>각자의 무기</b> — '+an+'('+rA.label+')은 '+rA.ko.split('·')[0]+'에 <b style="color:'+DR[FC[tfA].d].hex+'">'+FC[tfA].name+'</b>('+A.r.fs[tfA]+')를, '+bn+'('+rB.label+')은 '+rB.ko.split('·')[0]+'에 <b style="color:'+DR[FC[tfB].d].hex+'">'+FC[tfB].name+'</b>('+B.r.fs[tfB]+')를 얹어요.');
   if(Math.min(la,lb)>=58){if(aff>=55)P.push('<b>주도</b>가 둘 다 높지만(서로 '+la+'·'+lb+') 신뢰·지지가 두터워(친화 '+aff+') 주도권을 다투기보다 <b>함께 끄는 축</b>이 됩니다. 지배 성향은 대칭적이라, 영역만 나누면 경쟁이 협업이 돼요.');else P.push('<b>주도</b>가 둘 다 높은데(서로 '+la+'·'+lb+') 친화는 옅어요(친화 '+aff+'). 지배 성향은 양보가 아니라 경쟁으로 맞물리니(대인관계 상보성), 같은 사안을 동시에 쥐면 부딪힙니다 — 결정 영역을 미리 나누세요.');}
   else {var hi=la>=lb?an:bn,lo=la>=lb?bn:an;P.push('주도는 <b>'+hi+'</b>가 앞서고 <b>'+lo+'</b>가 받치는 <b>상보적</b> 구조라, 방향–실행 분업이 자연스러워요(지배는 상보, 한쪽이 높을 때 안정).');}
   if(aff>=58)P.push('정서적으로 <b>서로 따뜻한</b> 쌍(친화 '+aff+') — 따뜻함은 상응적이라 한쪽이 열면 다른 쪽도 열려, 신뢰가 빨리 쌓입니다.');
