@@ -1418,6 +1418,62 @@ function renderUs(){
  var H='<div class="wrap result fade">';
  H+='<div class="head"><span class="ix">US</span><div><div class="kicker" style="margin-bottom:3px">팀 리포트 · '+n+'명</div><h2>우리 팀의 지도</h2></div></div>';
  H+='<div style="display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 0">'+teamRk.map(function(k){return '<span class="pill" style="border:1px solid var(--rule);background:var(--panel)"><span style="color:'+DR[k].hex+'">●</span> '+DR[k].name+' <span class="mono">'+avg[k]+'</span></span>';}).join('')+'</div>';
+ // ===== 선계산: 요약·약속·멤버 유일성 (아래 상세 섹션과 값을 공유) =====
+ var strongestIn=function(d){return M.slice().sort(function(a,b){return b.r.ds[d]-a.r.ds[d];})[0];};
+ var keyRole={drive:'추진과 결단',connect:'관계와 화합',order:'질서와 기준',explore:'새 시도와 탐색'};
+ var spread0=avg[topD]-avg[blind];
+ var tType0; if(spread0<10)tType0='균형 통역팀'; else if(topD==='drive')tType0='실행 드라이브팀'; else if(topD==='connect')tType0='관계 중심팀'; else if(topD==='order')tType0='체계 분석팀'; else tType0='탐구 창의팀';
+ var fAvg0={};FK.forEach(function(f){fAvg0[f]=Math.round(M.reduce(function(a,p){return a+p.r.fs[f];},0)/n);});
+ var fSorted0=FK.slice().sort(function(a,b){return fAvg0[b]-fAvg0[a];});
+ var topF0=fSorted0.slice(0,3),botF0=fSorted0.slice(-3);
+ var pillar0=FK.map(function(f){var vs=M.map(function(p){return{n:esc(p.name||'한 명'),v:p.r.fs[f]};}).sort(function(a,b){return b.v-a.v;});return{f:f,top:vs[0],sec:vs[1]?vs[1].v:0,avg:fAvg0[f]};}).filter(function(o){return o.top.v>=60&&(o.top.v-o.sec)>=22&&o.avg<55;}).sort(function(a,b){return (b.top.v-b.sec)-(a.top.v-a.sec);})[0];
+ var vc0={};M.forEach(function(p){var v=(p.r.vals||[])[0];if(v)vc0[v]=(vc0[v]||0)+1;});
+ var vk0=Object.keys(vc0).sort(function(a,b){return vc0[b]-vc0[a];});
+ var topV0=vk0.length?VAL.filter(function(x){return x.k===vk0[0];})[0]:null;
+ // 마찰 신호 선검출 (아래 '마찰 쌍'과 동일 임계값)
+ var sig={lead:[],pushpull:[],pace:[],echo:[]};
+ (function(){function sq(seq,m){return (seq||[]).filter(function(x){return x===m;}).length;}
+  for(var i=0;i<M.length;i++)for(var j=i+1;j<M.length;j++){
+   var A=M[i],B=M[j],an=esc(A.name||('멤버'+(i+1))),bn=esc(B.name||('멤버'+(j+1)));
+   if(Math.min(A.r.fs.lead,B.r.fs.lead)>=58)sig.lead.push({a:an,b:bn});
+   var aA=sq(A.r.seq,'assert'),bA=sq(B.r.seq,'assert'),aZ=sq(A.r.seq,'analyze'),bZ=sq(B.r.seq,'analyze');
+   if((aA>=2&&bZ>=2)||(bA>=2&&aZ>=2)){var push=aA>=2?an:bn,pull=aA>=2?bn:an;sig.pushpull.push({push:push,pull:pull});}
+   var pace=Math.max(Math.abs(A.r.fs.decision-B.r.fs.decision),Math.abs(A.r.fs.caution-B.r.fs.caution),Math.abs(A.r.fs.precision-B.r.fs.precision));
+   if(pace>=30)sig.pace.push({a:an,b:bn});
+   var md=Math.round(FK.reduce(function(a,f){return a+Math.abs(A.r.fs[f]-B.r.fs[f]);},0)/FK.length);
+   if(md<=11&&A.r.p===B.r.p&&!(A.r.vals[0]&&B.r.vals[0]&&A.r.vals[0]!==B.r.vals[0]))sig.echo.push({a:an,b:bn});
+  }})();
+ // 팀 약속 자동 도출 (신호 → 실행 약속)
+ var blindFix0={drive:'빠른 결단을 내릴 의사결정권자를 한 명 정하거나, 결정 마감 시한을 팀 약속으로 둔다.',connect:'1:1 체크인·회고 루틴으로 심리적 안전감을 높인다.',order:'체크리스트·공유 캘린더·품질 게이트를 구조로 만든다.',explore:'분기별 "새 시도" 시간을 배정하거나 외부 자극(게스트·리서치)을 정기적으로 들인다.'};
+ var promises=[];
+ if(sig.lead.length){var lp=sig.lead[0];promises.push({tag:'주도권 겹침',who:lp.a+' · '+lp.b,act:'두 사람의 <b>결정 영역을 미리 나눈다</b> — "무엇은 누가 최종 결정"을 한 줄로 정해 두면 같은 사안에서 부딪히지 않아요.'});}
+ if(sig.pushpull.length){var pp=sig.pushpull[0];promises.push({tag:'추궁–회피',who:pp.push+' · '+pp.pull,act:'갈등 초기에 <b>'+pp.pull+'</b>은 "생각할 시간을 달라"고 신호하고 <b>'+pp.push+'</b>는 한 박자 식힌 뒤 다시 — 몰아세우기 전에 멈추는 규칙을 정한다.'});}
+ promises.push({tag:'집단 사각지대',who:DR[blind].name,act:blindFix0[blind]+' 그리고 중요한 회의 체크리스트에 <b>'+keyRole[blind]+'</b> 관점 한 줄을 넣는다.'});
+ if(vk0.length>=3)promises.push({tag:'결정 기준 분산',who:vk0.length+'갈래',act:'결정 전에 <b>"이번엔 무엇을 먼저 둘지"</b>를 한 줄로 명시한다 — 1순위 가치가 흩어져 있어, 안 정하면 충돌이 잦아요.'});
+ if(spread0>=22||sig.echo.length)promises.push({tag:spread0>=22?'한쪽 쏠림':'에코챔버',who:'',act:'중요한 결정에선 <b>빠진 결('+DR[blind].name+')</b> 관점을 의도적으로 한 번 듣는다 — 비슷한 사람끼리 같은 사각지대를 공유하지 않게.'});
+ if(pillar0)promises.push({tag:'1인 의존',who:pillar0.top.n,act:'<b>'+FC[pillar0.f].name+'</b>를 혼자 떠받치는 <b>'+pillar0.top.n+'</b>에게 <b>백업 한 명</b>을 정해 둔다 — 그 사람이 빠지면 이 결이 팀에서 사라져요.'});
+ if(sig.pace.length){var pc=sig.pace[0];promises.push({tag:'속도·기준 차',who:pc.a+' · '+pc.b,act:'일마다 <b>필요한 정확도·속도</b>를 착수 전에 맞춘다 — 마감·완성도에서 마찰이 줄어요.'});}
+ if(!promises.length)promises.push({tag:'정체성',who:'',act:'<b>"우리 팀은 ___다"</b>를 한 줄로 합의한다 — 동력이 고른 균형 팀이라 정체성을 또렷이 해두면 강해져요.'});
+ // 공통 그룹 헤더
+ function ghd(no,t,s){return '<div style="margin-top:clamp(34px,5vw,52px);margin-bottom:2px;display:flex;align-items:baseline;gap:11px;flex-wrap:wrap;border-bottom:2px solid var(--ink);padding-bottom:9px"><span class="mono" style="font-size:13px;color:var(--faint)">'+no+'</span><span style="font-weight:900;font-size:clamp(18px,3vw,22px)">'+t+'</span><span style="font-size:12.5px;color:var(--mute)">'+s+'</span></div>';}
+ // ===== ① 우리 팀 한 장 요약 =====
+ var olp0=batchim({drive:'결정과 추진',connect:'사람과 화합',order:'정확과 체계',explore:'새 시도와 변화'}[topD])?'으로':'로';
+ var oneLine0={drive:'결정과 추진',connect:'사람과 화합',order:'정확과 체계',explore:'새 시도와 변화'};
+ var bA0=strongestIn(blind),bAn0=esc(bA0.name||'한 명');
+ var summaryLine='<b>'+oneLine0[topD]+olp0+'</b> 움직이고, <b>'+bAn0+'</b>'+ig(bAn0)+' '+keyRole[blind]+'을 받쳐 주는 팀.';
+ H+='<div style="margin-top:clamp(18px,3vw,26px);border:2px solid var(--ink);border-radius:2px;background:var(--panel);padding:clamp(18px,3vw,24px)">'+
+  '<div class="mono" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);margin-bottom:10px">우리 팀 한 장 요약</div>'+
+  '<div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:10px"><h3 style="font-size:clamp(24px,5vw,34px);font-weight:900;margin:0">'+tType0+'</h3><span class="mono" style="font-size:12px;color:var(--mute)">'+DR[topD].name+' '+avg[topD]+' · '+n+'명</span></div>'+
+  '<p style="margin:0 0 9px;font-size:15.5px;line-height:1.65;color:var(--ink-soft)">'+summaryLine+'</p>'+
+  '<div style="display:flex;flex-wrap:wrap;gap:6px 18px;margin:0 0 14px;font-size:14px;color:var(--ink-soft)">'+
+   '<span><b>함께 강한 결</b> '+topF0.map(function(f){return '<span style="color:'+DR[FC[f].d].hex+'">'+FC[f].name+'</span>';}).join('·')+'</span>'+
+   '<span><b>빈 결</b> <span style="color:'+DR[blind].hex+'">'+DR[blind].name+'</span></span>'+
+   (topV0?'<span><b>결정 기준</b> '+topV0.t+'</span>':'')+'</div>'+
+  '<div style="border-top:1px dashed var(--rule-strong);padding-top:12px"><div class="mono" style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--drive);margin-bottom:7px">다음 주에 바로 · 팀 약속 미리보기</div>'+
+   promises.slice(0,2).map(function(pm){return '<p style="margin:0 0 5px;font-size:14px;line-height:1.55;color:var(--ink-soft)">✓ '+pm.act+'</p>';}).join('')+
+   '<p style="margin:6px 0 0;font-size:12.5px;color:var(--mute)">↓ 맨 아래 <b>팀 약속</b>에서 신호별 전체 목록과 근거를 봅니다.</p></div>'+
+ '</div>';
+ H+=ghd('①','우리 팀은','정체성 · 무게중심');
  // ===== 팀 종합 리딩 (내러티브) =====
  var TN=[];var topD0=teamRk[0],topD1=teamRk[1];
  var keyRole={drive:'추진과 결단',connect:'관계와 화합',order:'질서와 기준',explore:'새 시도와 탐색'};
@@ -1463,6 +1519,29 @@ function renderUs(){
  if(vKeys.length){vKeys.sort(function(a,b){return vcount[b]-vcount[a];});var topV=VAL.filter(function(v){return v.k===vKeys[0];})[0];var spread=vKeys.length;
   valLine='<p style="margin:9px 0 0;font-size:15.5px;color:var(--ink-soft)"><b style="color:var(--ink)">결정 기준 ·</b> 팀에서 가장 많은 1순위 가치는 <b style="color:var('+DR[topV.drv].v+')">'+topV.t+'</b>('+vcount[vKeys[0]]+'명)'+(spread>=4?' — 다만 1순위가 '+spread+'갈래로 흩어져, 의사결정 때 "이번엔 뭘 먼저"를 명시하지 않으면 충돌이 잦을 수 있어요.':spread===1?' — 전원이 같은 기준이라 결정은 빠르지만, 다른 관점이 빠질 위험.':'. 결정이 엇갈리면 "누가 옳냐"보다 1순위 차이를 먼저 보세요.')+'</p>';}
  H+='<div style="margin-top:clamp(28px,4vw,40px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,26px)"><div class="sec" style="margin:0 0 14px">시너지 · 주의점</div>'+syn+caution+valLine+'</div>';
+ // ===== ② 각자의 자리 — 멤버 스포트라이트 =====
+ H+=ghd('②','각자의 자리','한 명 한 명, 이 팀에서의 특별함');
+ H+='<p style="margin:0 0 16px;font-size:13.5px;color:var(--mute)">각자 자기 카드를 소리 내어 읽어 보세요. <b>대체 불가 지점</b>은 이 팀 안에서 그 사람만 또렷이 가진 결입니다.</p>';
+ var UNIQ_GAP=n<=3?14:18;
+ function uniqOf(p){
+  var solo=DK.filter(function(d){var owners=M.filter(function(q){return q.r.rk.slice(0,2).indexOf(d)>=0;});return owners.length===1&&owners[0]===p;});
+  var uf=FK.filter(function(f){var sorted=M.slice().sort(function(a,b){return b.r.fs[f]-a.r.fs[f];});return sorted[0]===p&&p.r.fs[f]>=58&&(p.r.fs[f]-(sorted[1]?sorted[1].r.fs[f]:0))>=UNIQ_GAP;}).sort(function(a,b){return p.r.fs[b]-p.r.fs[a];});
+  return{solo:solo,uf:uf};
+ }
+ M.forEach(function(p,i){var r=p.r,nm=esc(p.name||('멤버'+(i+1))),ap=AP[r.arch]||{},col=DR[r.p].hex,u=uniqOf(p);
+  var uniqHtml;
+  if(u.solo.length)uniqHtml='이 팀에서 <b style="color:'+col+'">'+u.solo.map(function(d){return DR[d].name;}).join('·')+'</b> ●을 <b>혼자</b> 쥔 사람이에요. '+nm+ig(nm)+' 빠지면 그 결이 팀에서 옅어집니다.'+(u.uf.length?' 특히 <b>'+FC[u.uf[0]].name+'</b>(팀 1위 '+r.fs[u.uf[0]]+')가 도드라져요.':'');
+  else if(u.uf.length)uniqHtml='팀에서 <b style="color:'+DR[FC[u.uf[0]].d].hex+'">'+u.uf.slice(0,2).map(function(f){return FC[f].name+'('+r.fs[f]+')';}).join(' · ')+'</b>가 가장 도드라집니다 — 2위와 뚜렷이 벌어진, '+nm+'만의 결이에요.';
+  else uniqHtml=(r.bal?'특정 결을 독점하진 않지만, 여러 결을 고루 받치는 <b>팀의 안정축</b>이에요 — 빠진 자리를 그때그때 메웁니다.':'다른 멤버와 강점이 겹치는 영역이 많아요 — 같은 결을 <b>함께 두껍게</b> 만드는 역할입니다.')+(n<=3?' (인원이 적어 상대 비교는 참고로 보세요.)':'');
+  H+='<div style="border:1px solid var(--rule);border-top:3px solid '+col+';border-radius:2px;background:var(--panel);padding:16px 18px;margin-bottom:11px">'+
+   '<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px"><span style="font-weight:900;font-size:17px">'+nm+'</span><span style="font-size:13px;color:'+col+';font-weight:700">'+r.arch+'</span><span style="font-size:12px;color:var(--faint)">'+(AD[r.arch]||'')+'</span></div>'+
+   '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(228px,1fr));gap:11px 18px">'+
+    '<div><div class="mono" style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--drive);margin-bottom:3px">대체 불가 지점</div><p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--ink-soft)">'+uniqHtml+'</p></div>'+
+    (ap.shine?'<div><div class="mono" style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--connect);margin-bottom:3px">빛나는 순간</div><p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--ink-soft)">'+ap.shine+'</p></div>':'')+
+    (ap.work?'<div><div class="mono" style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--order);margin-bottom:3px">이렇게 대해주세요</div><p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--ink-soft)">'+ap.work+'</p></div>':'')+
+    (ap.shadow?'<div><div class="mono" style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);margin-bottom:3px">⚠ 과용주의</div><p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--ink-soft)">'+ap.shadow+'</p></div>':'')+
+   '</div></div>';
+ });
  // 보완 매트릭스 (●○·)
  var grid='<div style="display:grid;grid-template-columns:92px repeat(4,1fr);gap:1px;background:var(--hairline);border:1px solid var(--hairline);border-radius:2px;overflow:hidden;font-family:var(--font-mono);font-size:13px">';
  grid+='<div style="background:var(--fill);padding:9px 12px"></div>';
@@ -1490,6 +1569,22 @@ function renderUs(){
  H+='<div style="margin-top:clamp(26px,3vw,38px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,26px)"><div class="sec" style="margin:0 0 14px">역할 커버리지 · Role Coverage</div><p style="margin:0 0 14px;font-size:13.5px;color:var(--mute)">각 조직 기능을 누가 담당하는지. ● 강점 · ○ 보통 · · 취약 — 빈 역할에 보강이나 발탁을 고려하세요.</p><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(172px,1fr));gap:8px">';
  roles2.forEach(function(role){var scores=M.map(function(p){return{name:p.name||'?',avg:Math.round(role.facs.reduce(function(a,f){return a+(p.r.fs[f]||0);},0)/role.facs.length)};}).sort(function(a,b){return b.avg-a.avg;});var col=DR[role.d].hex;H+='<div style="border:1px solid var(--rule);border-top:3px solid '+col+';border-radius:2px;background:var(--panel);padding:11px 13px"><div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px"><span style="font-weight:800;font-size:14px">'+role.k+'</span><span class="mono" style="font-size:9px;color:var(--mute)">'+role.desc+'</span></div><div style="font-size:12.5px;color:var(--ink-soft)">'+scores.slice(0,2).map(function(s){var sym=s.avg>=65?'●':s.avg>=45?'○':'·';return '<span style="color:'+(sym==='●'?col:sym==='○'?'var(--mute)':'var(--rule-strong)')+'">'+sym+'</span> '+esc(s.name)+'<span class="mono" style="font-size:10px;color:var(--faint)"> '+s.avg+'</span>';}).join(' · ')+'</div></div>';});
  H+='</div></div>';
+ // 5. 12 Facet 팀 히트맵 (각자의 자리 — 특성 분포)
+ H+='<div style="margin-top:clamp(26px,3vw,38px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,26px)"><div class="sec" style="margin:0 0 14px">팀 Facet 히트맵 · 12 특성 분포</div><p style="margin:0 0 12px;font-size:13.5px;color:var(--mute)">색이 진할수록 높은 점수. 열 전체가 옅으면 팀의 공백 특성입니다.</p><div style="overflow-x:auto"><div style="min-width:'+(80+n*56)+'px;display:grid;grid-template-columns:78px repeat('+n+',1fr);gap:1px;background:var(--hairline);border:1px solid var(--hairline);border-radius:2px;overflow:hidden;font-size:12px"><div style="background:var(--fill);padding:6px 8px;font-family:var(--font-mono);font-size:9px;letter-spacing:.04em;text-transform:uppercase;color:var(--mute)">특성</div>';
+ M.forEach(function(p,i){H+='<div style="background:var(--fill);padding:5px 4px;text-align:center;font-weight:700;font-size:11px">'+esc((p.name||('P'+(i+1))).slice(0,3))+'</div>';});
+ DK.forEach(function(d){H+='<div style="background:'+DR[d].hex+';color:#fff;padding:4px 8px;grid-column:span '+(n+1)+';font-family:var(--font-mono);font-size:9px;letter-spacing:.04em;text-transform:uppercase">'+DR[d].name+'</div>';FK.filter(function(f){return FC[f].d===d;}).forEach(function(f){H+='<div style="background:var(--paper-pure);padding:5px 8px;color:var(--mute);font-size:11px">'+FC[f].name+'</div>';M.forEach(function(p){var v=p.r.fs[f];var pct=Math.round(v*0.55+5);var bg='color-mix(in srgb,'+DR[d].hex+' '+pct+'%,var(--paper-pure))';var tc=v>=55?'color:#fff':'color:var(--ink)';H+='<div style="background:'+bg+';padding:5px 4px;text-align:center;font-family:var(--font-mono);font-size:10px;font-weight:600;'+tc+'">'+v+'</div>';});});});
+ H+='</div></div>';
+ // 히트맵 인사이트 — 색에서 의미 도출
+ var fAvg={};FK.forEach(function(f){fAvg[f]=Math.round(M.reduce(function(a,p){return a+p.r.fs[f];},0)/n);});
+ var fSorted=FK.slice().sort(function(a,b){return fAvg[b]-fAvg[a];});
+ var topF=fSorted.slice(0,3),botF=fSorted.slice(-3);
+ var pillar=FK.map(function(f){var vs=M.map(function(p){return{n:esc(p.name||'한 명'),v:p.r.fs[f]};}).sort(function(a,b){return b.v-a.v;});return{f:f,top:vs[0],sec:vs[1]?vs[1].v:0,avg:fAvg[f]};}).filter(function(o){return o.top.v>=60&&(o.top.v-o.sec)>=22&&o.avg<55;}).sort(function(a,b){return (b.top.v-b.sec)-(a.top.v-a.sec);})[0];
+ var hmText='<p style="margin:0 0 8px;font-size:14.5px;line-height:1.7;color:var(--ink-soft)"><b>함께 강한 결</b> — '+topF.map(function(f){return '<b style="color:'+DR[FC[f].d].hex+'">'+FC[f].name+'</b>('+fAvg[f]+')';}).join(' · ')+'. 이 팀이 자연스럽게 잘 굴러가는 영역이에요.</p>';
+ hmText+='<p style="margin:0 0 8px;font-size:14.5px;line-height:1.7;color:var(--ink-soft)"><b>함께 옅은 결</b> — '+botF.map(function(f){return '<b style="color:'+DR[FC[f].d].hex+'">'+FC[f].name+'</b>('+fAvg[f]+')';}).join(' · ')+'. 아무도 확실히 채우지 않는 칸이라, 중요한 일에선 의식적으로 챙기거나 보강해야 합니다.</p>';
+ if(pillar)hmText+='<p style="margin:0;font-size:14.5px;line-height:1.7;color:var(--ink-soft)"><b>혼자 떠받치는 기둥</b> — <b style="color:'+DR[FC[pillar.f].d].hex+'">'+FC[pillar.f].name+'</b>은 <b>'+pillar.top.n+'</b>('+pillar.top.v+') 한 사람에게 거의 의존해요(나머지는 '+pillar.sec+' 이하). '+pillar.top.n+'가 빠지면 이 결이 팀에서 사라지니, 그 역할을 알아주고 백업을 두세요.</p>';
+ H+='<div style="margin-top:14px;border:1px solid var(--rule-strong);border-radius:2px;background:var(--fill);padding:15px 17px"><div class="sec" style="margin:0 0 10px;font-size:12.5px">히트맵이 말해주는 것</div>'+hmText+'</div></div>';
+ // ===== ③ 마찰과 예방 =====
+ H+=ghd('③','마찰과 예방','미리 합의하면 덜 부딪힌다');
  // 3. 갈등 위험 쌍
  var riskPairs2=[],echoPairs=[];var OPP={drive:'connect',connect:'drive',order:'explore',explore:'order'};
  function sqc(seq,m){return (seq||[]).filter(function(x){return x===m;}).length;}
@@ -1526,20 +1621,12 @@ function renderUs(){
  H+='<div style="margin-top:clamp(26px,3vw,38px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,26px)"><div class="sec" style="margin:0 0 14px">스트레스 반응 · Under Pressure</div><p style="margin:0 0 14px;font-size:13.5px;color:var(--mute)">마감·압박 상황에서 이 팀의 지배적 동력이 어떻게 작동하는지 예측합니다.</p><div style="border:1px solid var(--rule-strong);border-left:4px solid var('+DR[topD].v+');border-radius:2px;background:var(--panel);padding:16px 18px;margin-bottom:10px"><div style="font-weight:700;font-size:14px;margin-bottom:6px">주 동력('+DR[topD].name+') 과부하 시</div><p style="margin:0 0 10px;font-size:14px;color:var(--ink-soft)">'+stressMap2[topD]+'</p><div style="font-size:13px;color:var(--mute)">대응 ▸ '+stressFix[topD]+'</div></div>';
  if(blind!==topD)H+='<div style="border:1px solid var(--hairline);border-radius:2px;background:var(--fill);padding:14px 16px"><div style="font-size:13px;font-weight:700;margin-bottom:4px">빈자리('+DR[blind].name+') 보강 방법</div><p style="margin:0;font-size:13.5px;color:var(--ink-soft)">'+blindFix[blind]+'</p></div>';
  H+='</div>';
- // 5. 12 Facet 팀 히트맵
- H+='<div style="margin-top:clamp(26px,3vw,38px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,26px)"><div class="sec" style="margin:0 0 14px">팀 Facet 히트맵 · 12 특성 분포</div><p style="margin:0 0 12px;font-size:13.5px;color:var(--mute)">색이 진할수록 높은 점수. 열 전체가 옅으면 팀의 공백 특성입니다.</p><div style="overflow-x:auto"><div style="min-width:'+(80+n*56)+'px;display:grid;grid-template-columns:78px repeat('+n+',1fr);gap:1px;background:var(--hairline);border:1px solid var(--hairline);border-radius:2px;overflow:hidden;font-size:12px"><div style="background:var(--fill);padding:6px 8px;font-family:var(--font-mono);font-size:9px;letter-spacing:.04em;text-transform:uppercase;color:var(--mute)">특성</div>';
- M.forEach(function(p,i){H+='<div style="background:var(--fill);padding:5px 4px;text-align:center;font-weight:700;font-size:11px">'+esc((p.name||('P'+(i+1))).slice(0,3))+'</div>';});
- DK.forEach(function(d){H+='<div style="background:'+DR[d].hex+';color:#fff;padding:4px 8px;grid-column:span '+(n+1)+';font-family:var(--font-mono);font-size:9px;letter-spacing:.04em;text-transform:uppercase">'+DR[d].name+'</div>';FK.filter(function(f){return FC[f].d===d;}).forEach(function(f){H+='<div style="background:var(--paper-pure);padding:5px 8px;color:var(--mute);font-size:11px">'+FC[f].name+'</div>';M.forEach(function(p){var v=p.r.fs[f];var pct=Math.round(v*0.55+5);var bg='color-mix(in srgb,'+DR[d].hex+' '+pct+'%,var(--paper-pure))';var tc=v>=55?'color:#fff':'color:var(--ink)';H+='<div style="background:'+bg+';padding:5px 4px;text-align:center;font-family:var(--font-mono);font-size:10px;font-weight:600;'+tc+'">'+v+'</div>';});});});
- H+='</div></div>';
- // 히트맵 인사이트 — 색에서 의미 도출
- var fAvg={};FK.forEach(function(f){fAvg[f]=Math.round(M.reduce(function(a,p){return a+p.r.fs[f];},0)/n);});
- var fSorted=FK.slice().sort(function(a,b){return fAvg[b]-fAvg[a];});
- var topF=fSorted.slice(0,3),botF=fSorted.slice(-3);
- var pillar=FK.map(function(f){var vs=M.map(function(p){return{n:esc(p.name||'한 명'),v:p.r.fs[f]};}).sort(function(a,b){return b.v-a.v;});return{f:f,top:vs[0],sec:vs[1]?vs[1].v:0,avg:fAvg[f]};}).filter(function(o){return o.top.v>=60&&(o.top.v-o.sec)>=22&&o.avg<55;}).sort(function(a,b){return (b.top.v-b.sec)-(a.top.v-a.sec);})[0];
- var hmText='<p style="margin:0 0 8px;font-size:14.5px;line-height:1.7;color:var(--ink-soft)"><b>함께 강한 결</b> — '+topF.map(function(f){return '<b style="color:'+DR[FC[f].d].hex+'">'+FC[f].name+'</b>('+fAvg[f]+')';}).join(' · ')+'. 이 팀이 자연스럽게 잘 굴러가는 영역이에요.</p>';
- hmText+='<p style="margin:0 0 8px;font-size:14.5px;line-height:1.7;color:var(--ink-soft)"><b>함께 옅은 결</b> — '+botF.map(function(f){return '<b style="color:'+DR[FC[f].d].hex+'">'+FC[f].name+'</b>('+fAvg[f]+')';}).join(' · ')+'. 아무도 확실히 채우지 않는 칸이라, 중요한 일에선 의식적으로 챙기거나 보강해야 합니다.</p>';
- if(pillar)hmText+='<p style="margin:0;font-size:14.5px;line-height:1.7;color:var(--ink-soft)"><b>혼자 떠받치는 기둥</b> — <b style="color:'+DR[FC[pillar.f].d].hex+'">'+FC[pillar.f].name+'</b>은 <b>'+pillar.top.n+'</b>('+pillar.top.v+') 한 사람에게 거의 의존해요(나머지는 '+pillar.sec+' 이하). '+pillar.top.n+'가 빠지면 이 결이 팀에서 사라지니, 그 역할을 알아주고 백업을 두세요.</p>';
- H+='<div style="margin-top:14px;border:1px solid var(--rule-strong);border-radius:2px;background:var(--fill);padding:15px 17px"><div class="sec" style="margin:0 0 10px;font-size:12.5px">히트맵이 말해주는 것</div>'+hmText+'</div></div>';
+ // 팀 약속 · 다음 주에 바로 (신호 → 실행 약속 자동 도출)
+ H+='<div style="margin-top:clamp(26px,3vw,38px);border:2px solid var(--drive);border-radius:2px;background:color-mix(in srgb,var(--drive) 6%,transparent);padding:clamp(16px,2.5vw,22px)">'+
+  '<div class="mono" style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--drive);margin-bottom:5px">팀 약속 · 다음 주에 바로</div>'+
+  '<p style="margin:0 0 14px;font-size:13.5px;line-height:1.65;color:var(--ink-soft)">위에서 감지된 신호를 실행 약속으로 옮겼어요. <b>신호 → 약속</b> 순으로 읽고, 강사 가이드 5단계(약속)에서 <b>1~2개를 골라 합의</b>하세요.</p>';
+ promises.forEach(function(pm){H+='<div style="border:1px solid var(--rule);border-left:3px solid var(--drive);border-radius:2px;background:var(--panel);padding:13px 15px;margin-bottom:8px"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:5px"><span class="mono" style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--drive)">신호</span><span style="font-weight:700;font-size:13px">'+pm.tag+'</span>'+(pm.who?'<span style="font-size:12px;color:var(--faint)">· '+pm.who+'</span>':'')+'</div><p style="margin:0;font-size:14px;line-height:1.6;color:var(--ink-soft)">→ '+pm.act+'</p></div>';});
+ H+='</div>';
  H+='<div class="noprint" style="display:flex;gap:11px;flex-wrap:wrap;margin-top:18px"><button class="btn dark" onclick="MEUS.print()">인쇄 / PDF</button><button class="btn" onclick="MEUS.usReset()">팀원 편집</button></div>';
  H+='<p style="margin-top:18px;text-align:center;font-size:13px;color:var(--faint)">자기보고식 진단의 합산 · 채용·평가가 아닌 팀 대화를 여는 지도입니다.</p></div>';
  app.innerHTML=H;
@@ -1565,7 +1652,7 @@ function renderLead(){
  H+=phase('2 · 나','15분','각자 자기 결과지를 3가지로 요약 공유','한 사람씩 돌아가며: <b>①시그니처 강점 1개 ②과용주의(⚠) 1개 ③"이렇게 대해주세요" 한 줄</b>. 강사는 "그게 실제로 드러난 최근 사례 있어요?"로 한 번 더 끌어냅니다. (1인 2분)');
  H+=phase('3 · 너','10분','가까이 일하는 2명씩 보완 짝 맞추기','두 사람의 코드를 /너에 넣고 "내가 도와줄게 / 미안, 부탁해" 카드를 소리 내어 읽게 하세요. 서로의 사각지대를 채워주는 관계가 눈에 보입니다.');
  H+=phase('4 · 우리','15분','팀 지도를 같이 읽고 우리 팀을 한 문장으로','/우리에 전원 코드를 넣고 분포 지도·시너지·집단 사각지대를 함께 봅니다. "우리 팀은 ___가 강하고 ___가 빈다"를 팀이 합의하게 하세요.');
- H+=phase('5 · 약속','5분','다음 주에 바로 쓸 팀 약속 1–2개','집단 사각지대를 메울 작은 약속을 정합니다. 예) "결정 전에 신중형 의견을 한 번은 듣는다", "갈등 초기에 작게 표현한다".');
+ H+=phase('5 · 약속','5분','다음 주에 바로 쓸 팀 약속 1–2개','/우리 리포트 맨 아래 <b>"팀 약속 · 다음 주에 바로"</b>에 신호별 약속 후보가 자동으로 떠 있습니다. 그중 <b>1~2개를 팀이 골라 합의</b>하게 하세요. 예) "결정 전에 신중형 의견을 한 번은 듣는다", "갈등 초기에 작게 표현한다".');
  // 핵심 활동 — 유형별 그룹 나눔
  H+='<div class="sec">핵심 활동 · 유형별 그룹 나눔 (3단계)</div><div class="card"><p style="margin:0 0 14px;font-size:14.5px;line-height:1.65;color:var(--ink-soft)">데이터 활용의 정점. 같은 결의 사람끼리 모아 같은 질문을 나누면, "나만 이런 게 아니구나"와 "쟤는 정말 다르구나"를 동시에 느낍니다. 위 타임라인 4단계(우리)를 이 활동으로 확장해도 좋아요.</p>'+
   row('① 그룹 나누기','주 동력이 같은 사람끼리 모읍니다 — 추진 / 조화 / 체계 / 탐구 계열. 한 계열에 몰리면 부 동력으로 다시 쪼개고, 통역자(균형형)는 따로 한 조 또는 관찰자로.')+
@@ -1597,6 +1684,11 @@ function renderLead(){
   reading('갈등 삼각형 · 화살표','초기→한계로의 이동. 길수록 평소와 갈등이 다름.','화살표 긴 사람에겐 "갈등 깊어지면 갑자기 달라지니, 바뀌기 전 신호를 주자"고 팀에 부탁하세요.')+
   reading('결정의 렌즈 (가치)','무엇을 먼저 두느냐.','팀 충돌의 대부분은 "누가 옳냐"가 아니라 1순위 가치가 달라서입니다. 두 사람의 1순위를 나란히 보여주세요.')+
   reading('나 사용설명서','본인이 직접 알려주는 취급법.','가장 실용적인 부분. 옆자리 동료가 바로 적용하게 하세요.')+'</div>';
+ // 팀 리포트 새로 읽는 법
+ H+='<div class="sec">팀 리포트 새로 읽는 법</div><div class="card" style="padding:6px 22px 14px">'+
+  row('한 장 요약','맨 위 카드로 세션을 엽니다 — "우리 팀은 ___, 다음 주에 ___". 팀 유형과 약속 미리보기를 먼저 소리 내어 읽으면 방향이 잡혀요.')+
+  row('멤버 스포트라이트','각자 <b>자기 카드</b>를 직접 읽게 하세요(나 공유 보조). "대체 불가 지점"은 그 사람만 이 팀에서 또렷이 가진 결 — 보완·사과 라운드와 자연스럽게 이어집니다.')+
+  row('팀 약속','맨 아래 약속은 위 신호(주도권·추궁회피·사각지대·가치 분산 등)에서 자동 도출된 것. 근거가 함께 보이니 "왜 이 약속인지"를 팀이 납득하기 쉬워요.')+'</div>';
  // 팀 지도 해석
  H+='<div class="sec">팀 분포 지도 해석</div><div class="card">'+
   row('한쪽 쏠림','그 방향이 팀의 강점이자 기질 — 동시에 반대편이 사각지대. 예) 추진·체계로 쏠리면 빠르고 빈틈없지만 사람·새 시도가 빌 수 있음.')+
