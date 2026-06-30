@@ -1919,10 +1919,12 @@ function renderOrg(){
  var H='<div class="wrap result fade"><div class="head"><span class="ix">OG</span><div><div class="kicker" style="margin-bottom:4px">조직 분석 · 직분 × 성향</div><h1>우리 조직을 읽는다.</h1></div></div>';
  H+='<p style="color:var(--ink-soft);font-size:16px;line-height:1.65;margin:14px 0 8px;max-width:36em">팀 분석이 "누가 어떤 사람인가"라면, 조직 분석은 거기에 <b>직분</b>을 얹습니다 — 같은 두 사람도 CEO와 CSO로 만나면 권한·결정·존중의 결이 달라지니까요.</p>';
  if(M.length<2){H+='<div class="card" style="margin-top:14px"><p style="margin:0 0 12px;font-size:15.5px;color:var(--ink-soft)">먼저 <b>우리(팀)</b>에서 팀원 결과 코드를 불러와 주세요 — 그 데이터에 직분을 엮어 조직 분석을 만듭니다.</p><a class="btn dark" href="#/us" style="text-decoration:none">우리(팀)에서 불러오기 →</a></div></div>';app.innerHTML=H;return;}
- var slots=ORG_ROLES.map(function(role){return {role:role,p:orgMember(M,role)};});
+ // 멤버를 직분에 1:1 배정 — 한 사람이 두 직분을 차지하지 못하게(이름 겹침 방어)
+ var usedM={};
+ var slots=ORG_ROLES.map(function(role){var mp=null;for(var mi=0;mi<M.length;mi++){if(usedM[mi])continue;var nm=M[mi].name||'';if(nm&&(nm.indexOf(role.m)>=0||role.m.indexOf(nm)>=0)){mp=M[mi];usedM[mi]=1;break;}}return {role:role,p:mp};});
  var filled=slots.filter(function(s){return s.p;});
- var assigned={};filled.forEach(function(s){assigned[s.p.name]=1;});
- var extra=M.filter(function(p){return !assigned[p.name];});
+ var extra=M.filter(function(p,mi){return !usedM[mi];});
+ if(filled.length<2){H+='<div class="card" style="margin-top:14px"><p style="margin:0;font-size:15px;line-height:1.7;color:var(--ink-soft)">직분(역할)에 매칭된 팀원이 <b>'+filled.length+'명</b>뿐이라 조직 분석을 만들 수 없어요 — <b>2명 이상</b> 필요합니다.<br>매칭은 <b>이름</b> 기준이에요(현재: '+ORG_ROLES.map(function(r){return r.m;}).join(' · ')+'). 이름이 다르면 안 잡히니, 직분 매핑을 바꾸려면 말씀해 주세요.</p></div></div>';app.innerHTML=H;return;}
  function topFacOf(r){return FK.slice().sort(function(a,b){return r.fs[b]-r.fs[a];})[0];}
  function warmth(p){return Math.round((p.r.fs.support+p.r.fs.trust+p.r.fs.empathy)/3);}
  function roleFacAvg(p,fk){return fk.reduce(function(a,f){return a+p.r.fs[f];},0)/fk.length;}
