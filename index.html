@@ -286,6 +286,28 @@ var COMP_DESC={
  time:{t:'계획을 세워 시간을 지키는 힘',s:'여러 일이 얽혀 우선순위와 일정 관리가 중요할 때'},
  crisis:{t:'예상 밖 상황에 침착하게 대응하는 힘',s:'갑작스런 변수·위기에서 빠르게 판단하고 움직여야 할 때'}
 };
+/* 사용설명서 — 동력별 "이렇게 대해 주세요" 구체 행동지침 */
+var PF_MANUAL={
+ drive:['결론부터 주세요 — 긴 배경 설명보다 핵심·요청·기한을 먼저, 맥락은 그다음.','목표와 권한을 주고 방법은 맡기세요. 단계마다 간섭하면 가장 빨리 의욕이 꺾입니다.','속도를 존중하되, 되돌리기 힘든 결정 전엔 "한 박자 점검"을 미리 약속해 독주를 막으세요.','피드백은 짧고 직접적으로 — 돌려 말하면 핵심으로 받아들이지 않습니다.','"왜 막혔나"보다 "그래서 뭘 할까"로 대화를 끌면 빠르게 움직입니다.'],
+ connect:['업무 얘기 전에 짧은 안부·관계 확인 한마디. 곧장 본론만 던지면 차갑게 느낍니다.','결정 전에 "네 생각은?"으로 먼저 의견을 물어주세요 — 의견을 구하면 힘이 납니다.','부정 피드백은 공개석상이 아니라 1:1로, 사람이 아니라 사안을 짚어 전하세요.','기여를 자주 알아봐 주세요. 인정과 감사가 가장 큰 연료입니다.','거절을 잘 못하니 일을 몰아주기보다 "이건 안 해도 된다"를 분명히 해주세요.'],
+ order:['근거·절차·기한을 갖춰 요청하세요 — 왜·어떻게·언제까지가 분명해야 움직입니다.','즉흥 요청엔 검토 시간을 주세요. "지금 당장"이 가장 큰 스트레스입니다.','변경은 미리, 이유와 함께 공유하세요. 갑작스런 방향 전환을 가장 싫어합니다.','완벽주의로 늦어질 땐 "이번 일은 80%면 충분"의 기준을 같이 정해주세요.','명확한 기준과 책임 범위를 주면 알아서 끝까지 챙깁니다.'],
+ explore:['"왜 이게 중요한지" 맥락과 큰 그림을 먼저 주세요. 방법부터 지시하면 막힙니다.','목표만 주고 접근·방법은 열어두세요. 정해진 절차를 강요하면 에너지가 꺼집니다.','새 아이디어를 가져오면 "안 돼"보다 "그중 뭘 먼저 해볼까"로 받아 발전시키세요.','반복·루틴 업무는 최소화하고, 가능하면 실험·학습 요소를 한 스푼 섞어주세요.','자유는 주되 마감·완료 기준은 명확히 — 끝맺음을 함께 합의해야 일이 새지 않습니다.']
+};
+/* facet별 과용 브레이크 (구체 처방) */
+var OV_FIX={
+ decision:'되돌리기 어려운 결정 전엔 "한 번 더 점검" 단계를 의무화하세요.',
+ lead:'결정 전 "네 생각은?"을 먼저 물어 다른 사람의 입을 여세요.',
+ achieve:'성과만큼 "어떻게·누구와"의 과정을 체크포인트에 넣으세요.',
+ support:'"이건 내 일이 아니다"의 경계를 정해 떠안기를 줄이세요.',
+ trust:'중요한 위임엔 가벼운 검증·확인 단계를 한 번 두세요.',
+ empathy:'불편해도 필요한 피드백은 미루지 말고 1:1로 분명히 전하세요.',
+ precision:'"이번 일은 80%면 출시"의 기준을 미리 합의해 완벽주의를 끊으세요.',
+ plan:'"계획을 바꿀 조건"을 미리 정해 변화에 문을 열어두세요.',
+ caution:'"여기까지 보면 간다"는 결정선을 정해 시작을 늦추지 마세요.',
+ idea:'벌인 일에 "끝내는 책임자와 마감"을 붙여 마무리 누수를 막으세요.',
+ flex:'바꾸지 않을 핵심 기준 한두 개를 고정해 팀 혼란을 줄이세요.',
+ vision:'큰 그림 옆에 "다음 한 걸음"의 구체 실행을 항상 붙이세요.'
+};
 
 /* ---------- facet별 관계 역학 텍스트 (미시 분석) — #H#높은쪽 #L#낮은쪽 #Hn/#Ln 은·는 #Hg/#Lg 이·가 #hv/#lv 점수 ---------- */
 var FREL={
@@ -894,9 +916,14 @@ function renderResult(){
  // 나 사용설명서 (4블록)
  var pf=PF[r.p];var anti=ANTI[r.p].map(function(d){return '<b style="color:var('+DR[d].v+')">'+DR[d].name+'</b>';}).join('·');
  var shadF=FK.filter(function(f){return r.dial[f]&&r.dial[f].ov!=null&&r.dial[f].ov>=4;});
- var measured=shadF.length?' 특히 '+shadF.map(function(f){return FC[f].name;}).join('·')+'에서 과용이 잡혔어요.':'';
- function blk(t,b){return '<div><div style="font-weight:800;font-size:15px;margin-bottom:7px">'+t+'</div><p style="font-size:14px;line-height:1.65;color:var(--ink-soft);margin:0">'+b+'</p></div>';}
- var man='<div class="kv">'+blk('이렇게 대해 주세요',pf.cm+' '+pf.nd+'.')+blk('제가 빛나는 순간',ap.shine)+blk('주의 신호 — 그림자',pf.tr+'. 스트레스 땐 '+({drive:'말이 세지고 급해집니다',connect:'조용히 참고 맞춥니다',order:'더 깐깐·완벽해집니다',explore:'딴 데 한눈팝니다'}[r.p])+'.'+measured)+blk('과용 조절',DR[r.p].name+' 과용은 '+anti+'가 눌러 줍니다. 옆에 이 동력이 강한 동료를 두세요.')+'</div>';
+ // 과용 후보: 실제로 높은(>=60) 또는 자가보고 과용(>=4) facet, 신호 강한 순 top3
+ var ovPick=FK.map(function(f){var ovv=(r.dial[f]&&r.dial[f].ov!=null)?r.dial[f].ov:null;return{f:f,fs:r.fs[f],ov:ovv,sig:r.fs[f]+(ovv?ovv*6:0)};}).filter(function(o){return o.fs>=60||(o.ov!=null&&o.ov>=4);}).sort(function(a,b){return b.sig-a.sig;}).slice(0,3);
+ function blk(t,b){return '<div><div style="font-weight:800;font-size:15px;margin-bottom:7px">'+t+'</div><div style="font-size:14px;line-height:1.6;color:var(--ink-soft)">'+b+'</div></div>';}
+ function bullets(a){return '<ul style="margin:0;padding-left:17px">'+a.map(function(x){return '<li style="margin-bottom:6px">'+x+'</li>';}).join('')+'</ul>';}
+ var stressSig={drive:'말이 빨라지고 세지며 급해집니다',connect:'조용히 참고 맞추다 속으로 쌓입니다',order:'더 깐깐해지고 완벽하려 듭니다',explore:'집중이 흩어지고 딴 데로 샙니다'}[r.p];
+ var shadowBody='강점이 지나치면 이렇게 나타납니다 — <b>'+pf.sh.join('</b>, <b>')+'</b>. 그리고 <b>'+pf.tr+'</b> 같은 환경에선 에너지가 빠르게 빠지고, 스트레스를 받으면 '+stressSig+'.'+(shadF.length?' <span style="color:var(--ink)">(이번 응답: 특히 '+shadF.map(function(f){return FC[f].name;}).join('·')+'에서 과용 신호가 잡혔어요.)</span>':'');
+ var ovBody=ovPick.length?bullets(ovPick.map(function(o){return '<b style="color:'+DR[FC[o.f].d].hex+'">'+FC[o.f].name+'</b> <span style="color:var(--mute)">'+FC[o.f].ov+'</span> → '+(OV_FIX[o.f]||'');}))+'<div style="margin-top:8px;font-size:12.5px;color:var(--mute)">구조적으로는 옆에 '+anti+' 동력이 강한 동료를 두면 자연스러운 브레이크가 됩니다.</div>':'지금 응답에선 뚜렷한 과용 구간이 적습니다 — 좋은 신호예요. 다만 강점도 지나치면 약점이 되니, '+anti+'가 강한 동료와 짝이면 균형이 잡힙니다.';
+ var man='<div class="kv">'+blk('이렇게 대해 주세요',bullets(PF_MANUAL[r.p]||[]))+blk('제가 빛나는 순간',ap.shine)+blk('주의 신호 — 그림자',shadowBody)+blk('과용 조절',ovBody)+'</div>';
  var extra='';if(S.reflection)extra+='<div style="border:1px solid var(--hairline);border-radius:2px;background:var(--fill);padding:14px 16px;margin-top:12px;font-size:14.5px;color:var(--ink-soft)"><b style="color:var(--ink)">내가 남긴 메모 ·</b> '+esc(S.reflection)+'</div>';
  var loBlend2=r.bl[r.lo];var loLabel2=loBlend2<18?'사각지대':loBlend2<24?'상대적으로 덜 쓰는 힘':'가장 조용한 힘';
  extra+='<p style="margin:12px 0 0;font-size:14px;color:var(--mute)">가장 덜 쓰는 근육은 <b style="color:var('+DR[r.lo].v+')">'+DR[r.lo].name+'</b>('+loBlend2+'%) — '+loLabel2+'. 이 힘이 강한 동료가 당신을 보완해 줍니다.</p>';
