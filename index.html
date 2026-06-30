@@ -1139,17 +1139,31 @@ function relDynamics(ra,rb,na,nb){
  var diffs=FK.map(function(f){return Math.abs(ra.fs[f]-rb.fs[f]);});
  var meanDiff=rd(diffs.reduce(function(x,y){return x+y;},0)/diffs.length);
  var head=meanDiff<=12?'두 사람의 결이 전반적으로 <b>닮았습니다</b>(평균 차 '+meanDiff+'점). 라포가 빠르고 편하지만, <b>같은 자리에 사각지대를 공유</b>합니다 — 유사성은 호감을 키우는 대신(유사성–매력 가설) 빠진 동력을 둘 다 못 봅니다. 그 동력은 제3자가 채워야 해요.':meanDiff>=24?'두 사람의 결이 <b>뚜렷이 다릅니다</b>(평균 차 '+meanDiff+'점). 서로의 빈자리를 넓게 덮는 <b>상보형</b>입니다 — 커버리지는 강하지만, 같은 단어를 다르게 받아들이기 쉬워 의식적인 "번역"이 필요합니다.':'닮음과 다름이 섞여 있습니다(평균 차 '+meanDiff+'점) — 동력마다 통하는 곳과 어긋나는 곳이 갈립니다. 아래에서 동력별로 읽으세요.';
- // 주도권(상대적 지배)
- var la=ra.fs.lead,lb=rb.fs.lead,dom;
- if(Math.abs(la-lb)<8&&la>=55&&lb>=55)dom='⚠ <b>주도권 경쟁</b> — '+An+'('+la+')'+(batchim(na)?'과':'와')+' '+Bn+'('+lb+'), 둘 다 주도성이 높고 거의 같습니다. 대인관계에서 <b>지배는 상보가 아니라 대칭</b>으로 맞물려, 누가 키를 잡을지 정하지 않으면 정면 충돌하기 쉽습니다. <b>영역별 최종 결정권</b>을 미리 나누세요.';
- else if(Math.max(la,lb)>=55){var leader=la>lb?An:Bn,follow=la>lb?Bn:An,lh=Math.max(la,lb),ll=Math.min(la,lb);dom='주도성은 <b>'+leader+'</b>('+lh+')'+ig(leader)+' <b>'+follow+'</b>('+ll+')보다 앞섭니다. 둘 다 이끄는 힘이 있어도 <b>관계 안에서는 '+leader+ig(leader)+' 방향을 잡고 '+follow+ig(follow)+' 받치는</b> 구도가 자연스럽습니다(지배↔순응의 상보 — 가장 안정적인 짝). '+(ll>=55?follow+'도 주도성이 낮지 않으니, 자기 영역에선 키를 갖도록 보장하면 답답함이 줄어요.':'');}
- else dom='두 사람 다 주도성이 높지 않습니다('+la+' · '+lb+'). 아무도 먼저 핸들을 잡지 않아 <b>결정이 미뤄지거나 표류</b>하기 쉬워요 — 사안마다 "이번 결정자는 누구"를 정해두면 좋습니다.';
- // 조용한 쪽의 목소리 묵살 위험 — 지배 격차 + 수용형 갈등 스타일
- (function(){var loA=la<lb,loSeq=loA?ra.seq:rb.seq,loN=loA?An:Bn,hiN=loA?Bn:An;var acc=(loSeq||[]).filter(function(m){return m==='accommodate';}).length;if(Math.abs(la-lb)>=18&&acc>=2){dom+=' <span style="color:var(--ink)">그런데 '+loN+eb(loN)+' 갈등에서 <b>맞춰주고 양보하는(수용)</b> 편이라, 주도적인 '+hiN+' 앞에서 자기 의견·속마음이 <b>묵살되기 쉽습니다</b>. '+loN+ig(loN)+' 받쳐준다고 다 괜찮은 게 아니에요 — '+hiN+ig(hiN)+' 가끔 먼저 "네 생각은?"으로 '+loN+'의 진짜 의견을 꺼내 주는 것이 건강한 관계의 핵심입니다.</span>';}})();
+ // ── 종합 관계 해석(숲): 여러 facet을 엮은 통합 리딩 ──
+ function who(f){var d=ra.fs[f]-rb.fs[f];return{d:Math.abs(d),hi:d>=0?An:Bn,lo:d>=0?Bn:An,hv:Math.max(ra.fs[f],rb.fs[f]),lv:Math.min(ra.fs[f],rb.fs[f])};}
+ var synth=[];
+ var Ldr=da.drive>=db.drive?An:Bn,Flw=da.drive>=db.drive?Bn:An;
+ var ldrEdges=['lead','achieve'].filter(function(f){var w=who(f);return w.d>=10&&w.hi===Ldr;}).map(function(f){return FC[f].name;});
+ synth.push('전체적으로 <b>'+Ldr+'</b>'+ig(Ldr)+' '+(ldrEdges.length?'<b>'+ldrEdges.join('·')+'</b>에서 앞서 ':'추진 동력에서 앞서 ')+'관계의 <b>방향을 잡고 끌고 가는</b> 쪽입니다. 하지만 한 사람이 끌고 한 사람이 끌려가는 단순한 그림이 아닙니다 —');
+ var dec=who('decision');
+ if(dec.d>=10){if(dec.hi===Flw)synth.push('<b>'+Flw+'</b>'+ig(Flw)+' 오히려 <b>결단</b>이 +'+dec.d+' 빠릅니다('+dec.hv+' vs '+dec.lv+') — '+Ldr+ig(Ldr)+' 큰 그림을 그리면 '+Flw+ig(Flw)+' 빠르게 결정을 끊어 실행으로 옮기는, <b>방향('+Ldr+')·결단('+Flw+') 분업</b>이 자연스럽습니다.');else synth.push('<b>'+Ldr+'</b>'+ig(Ldr)+' <b>결단</b>까지 +'+dec.d+' 높아 방향과 실행 속도를 함께 쥡니다 — '+Flw+eb(Flw)+' 속도 경쟁보다 다른 축에서 보완하는 편이 낫습니다.');}
+ var conHolder=da.connect>=db.connect?An:Bn,conG=rd(Math.abs(da.connect-db.connect)),supW=who('support'),empW=who('empathy');
+ if(conG>=8){var det=[];if(supW.d>=10)det.push('지지 +'+supW.d);if(empW.d>=10)det.push('공감 +'+empW.d);var detS=det.length?'('+det.join(', ')+') ':'';
+  if(conHolder!==Ldr)synth.push('받치는 힘은 <b>'+conHolder+'</b>에게 있습니다 — <b>지지·공감</b>이 +'+conG+' 높아 '+detS+'<b>'+Ldr+'</b>의 추진을 떠받칩니다. '+Ldr+ig(Ldr)+' 밀어붙일 때 '+conHolder+ig(conHolder)+' 사람과 관계를 돌봐, '+Ldr+'의 결정에 <b>사람을 태우고</b> 부드럽게 만듭니다(조화는 상응적 상보).');
+  else synth.push('게다가 <b>'+Ldr+'</b>'+ig(Ldr)+' <b>지지·공감</b>까지 +'+conG+' 높아 추진과 관계를 모두 쥡니다 — 강력하지만 혼자 다 짊어질 위험이 있어, 더 과업·논리적인 '+Flw+ig(Flw)+' 객관성·실무로 균형을 잡아줘야 합니다.');}
+ var cauW=who('caution'),ordHolder=da.order>=db.order?An:Bn,ordG=rd(Math.abs(da.order-db.order));
+ if(cauW.d>=10||ordG>=10){var brakeN=cauW.d>=10?cauW.hi:ordHolder,fastN=brakeN===An?Bn:An;synth.push('<b>'+brakeN+'</b>'+ig(brakeN)+' <b>신중</b>'+(cauW.d>=10?'(+'+cauW.d+')':'')+'이 높아 리스크부터 점검하는 <b>브레이크</b>입니다 — '+fastN+eb(fastN)+' 더 과감한 편이라 '+brakeN+'의 신중이 둘의 속도에 균형을 잡아요. 단 '+fastN+ig(fastN)+' '+brakeN+'의 "잠깐"을 답답해할 수 있으니 "어디까지 검토하고 갈지"를 미리 맞추세요.');}
+ var visW=who('vision');
+ if(visW.d>=10)synth.push('장기 관점·큰 그림은 <b>'+visW.hi+'</b>'+ig(visW.hi)+' +'+visW.d+' 더 봅니다('+visW.hv+' vs '+visW.lv+') — '+visW.lo+eb(visW.lo)+' 더 현실·실행에 가까워, 방향은 '+visW.hi+ig(visW.hi)+' 그리고 '+visW.lo+ig(visW.lo)+' 땅에 붙이는 조합입니다. '+visW.lo+'에겐 그 비전이 뜬구름처럼, '+visW.hi+'에겐 '+visW.lo+ig(visW.lo)+' 근시안으로 보일 수 있으니 서로의 시야를 번역하세요.');
+ var la=ra.fs.lead,lb=rb.fs.lead;
+ (function(){var loA=la<lb,loSeq=loA?ra.seq:rb.seq,loN=loA?An:Bn,hiN=loA?Bn:An;var acc=(loSeq||[]).filter(function(m){return m==='accommodate';}).length;if(Math.abs(la-lb)>=15&&acc>=2)synth.push('⚠ 다만 <b>'+loN+'</b>'+eb(loN)+' 갈등에서 <b>맞춰주는(수용)</b> 편이라 주도적인 '+hiN+' 앞에서 의견이 <b>묵살되기 쉽습니다</b> — '+hiN+ig(hiN)+' 먼저 "네 생각은?"으로 '+loN+'의 진짜 의견을 꺼내 줘야 건강합니다.');})();
+ var flwAxis=(conHolder===Flw&&conG>=8)?'지지·공감으로 결정을 받치는':(dec.hi===Flw&&dec.d>=10)?'빠른 결단으로 실행을 끊는':(visW.hi===Flw&&visW.d>=10)?'비전으로 큰 그림을 더하는':(cauW.hi===Flw&&cauW.d>=10)?'신중으로 리스크를 거르는':'다른 축에서 보완하는';
+ synth.push('<b>정리하면</b> — '+Ldr+ig(Ldr)+' 방향·추진을, '+Flw+ig(Flw)+' '+flwAxis+' 역할을 맡는 <b>보완 구조</b>입니다. 서로의 우위를 역할로 인정하면 시너지가, 같은 자리에서 겹치면 마찰이 됩니다.');
+ var synthHtml=synth.map(function(t){return '<p style="margin:0 0 10px;font-size:14.5px;line-height:1.72;color:var(--ink-soft)">'+t+'</p>';}).join('');
  // 친화·신뢰
  // ── 미시 분석: facet 12개 개별 비교 (동력 평균이 가린 차이를 잡는다) ──
  function fillT(t,hiN,loN,hv,lv){return t.replace(/#Hn#/g,eb(hiN)).replace(/#Ln#/g,eb(loN)).replace(/#Hg#/g,ig(hiN)).replace(/#Lg#/g,ig(loN)).replace(/#He#/g,el(hiN)).replace(/#Le#/g,el(loN)).replace(/#H#/g,'<b>'+hiN+'</b>').replace(/#L#/g,'<b>'+loN+'</b>').replace(/#hv#/g,hv).replace(/#lv#/g,lv);}
- var GAP_T=22,gapList=[];
+ var GAP_T=10,gapList=[];
  var micro='';
  DK.forEach(function(d){
   var rows='';
@@ -1168,9 +1182,10 @@ function relDynamics(ra,rb,na,nb){
  if(!micro)micro='<div style="border:1px solid var(--rule);border-radius:2px;background:var(--panel);padding:14px 16px;margin-top:12px"><p style="margin:0;font-size:14px;color:var(--mute)">12개 특성이 전반적으로 비슷한 수준입니다 — 큰 마찰 facet은 적지만, 같은 강·약을 공유하니 공통 사각지대(아래)를 함께 보세요.</p></div>';
  var H='<div style="margin-top:clamp(28px,4vw,40px);border-top:2px solid var(--ink);padding-top:clamp(20px,3vw,26px)"><div class="sec" style="margin:0 0 6px">관계 역학 · Relational Dynamics</div>';
  H+='<p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:var(--ink-soft)">'+head+'</p>';
- H+='<div style="border:1px solid var(--rule-strong);border-radius:2px;background:var(--fill);padding:15px 18px;margin-bottom:14px"><div class="mono" style="font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin-bottom:7px">누가 방향을 잡나 · 상대적 주도</div><p style="margin:0;font-size:15px;line-height:1.6;color:var(--ink-soft)">'+dom+'</p></div>';
- H+='<div class="sec" style="margin:20px 0 4px;font-size:13.5px">미시 분석 · 특성별 관계 포인트</div>';
- H+='<p style="margin:0 0 6px;font-size:12.5px;color:var(--mute)">동력 평균이 비슷해도 개별 특성에서 의미 있는 차이(Δ≥'+GAP_T+')나 공명(둘 다 높음/낮음)이 드러납니다 — 큰 차이부터 대화를 꺼내보세요.</p>';
+ H+='<div class="sec" style="margin:18px 0 6px;font-size:13.5px">종합 관계 해석 · 숲</div>';
+ H+='<div style="border:1px solid var(--rule-strong);border-radius:2px;background:var(--fill);padding:16px 18px;margin-bottom:8px">'+synthHtml+'</div>';
+ H+='<div class="sec" style="margin:22px 0 4px;font-size:13.5px">특성별 차이 · 나무 (Δ≥'+GAP_T+')</div>';
+ H+='<p style="margin:0 0 6px;font-size:12.5px;color:var(--mute)">10점 이상 벌어진 특성을 빠짐없이 — 어느 동력이든. 위 종합 해석의 근거입니다.</p>';
  H+=micro;
  H+='<div class="mono" style="font-size:10px;color:var(--faint);margin-top:12px;line-height:1.6">근거 · 대인관계 원형이론(지배=대칭·친화=상응 상보) · 유사성–매력 가설 · 신뢰성향 모델(Mayer·Davis·Schoorman) · 성실성·개방성 적합. 자기보고 기반 경향이며 고정된 진단이 아닙니다.</div>';
  H+='</div>';
