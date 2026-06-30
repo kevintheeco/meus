@@ -1648,13 +1648,22 @@ function renderUs(){
   var sf=(r.fs[scndF]>=62)?scndF:bestF;
   var shadowP='<b>'+FC[sf].name+'</b>('+r.fs[sf]+')도 강한데, 과해지면 <b>'+FC[sf].ov+'</b>로 흐를 수 있어요 — '+(OV_FIX[sf]||'');
   var combos=facetCombos(r.fs);
-  // 약한 결 & 보완 — 가장 약한 동력 + 그게 강점인 팀원(궁합) + 유독 낮은 facet(43↓)
-  var weakD=r.rk[3];
-  var compW=M.slice().filter(function(q){return q!==p;}).sort(function(a,b){return b.r.ds[weakD]-a.r.ds[weakD];})[0];
-  var lowF=FK.filter(function(f){return r.fs[f]<=43;}).sort(function(a,b){return r.fs[a]-r.fs[b];}).slice(0,2);
-  var weakHtml='가장 옅은 결은 <b style="color:var('+DR[weakD].v+')">'+DR[weakD].name+'</b>('+r.ds[weakD]+')예요 — '+LOW_DRIVE[weakD].d+(lowF.length?' 특히 <b>'+lowF.map(function(f){return FC[f].name+'('+r.fs[f]+')';}).join('·')+'</b>가 많이 낮아요.':'');
-  weakHtml+=(compW&&compW.r.ds[weakD]>=r.ds[weakD]+10)?(' 마침 이건 <b>'+esc(compW.name||'한 명')+'</b>('+compW.r.ds[weakD]+')의 강점이라 — 그 일은 '+esc(compW.name||'')+'와 짝지으면 자연스럽게 메워져요.'):(' 팀 전체가 이 결이 옅은 편이라, 규칙이나 외부 보강으로 받쳐야 해요.');
-  weakHtml+=' '+LOW_DRIVE[weakD].t;
+  // 약한 결 — 본인 4순위가 아니라 "절대적으로 낮고 팀에서도 하위"일 때만 동력 약점. 아니면 낮은 facet, 둘 다 없으면 "뚜렷하지 않음"
+  var weakD=r.rk[3],weakDs=r.ds[weakD];
+  var teamRankW=M.slice().sort(function(a,b){return b.r.ds[weakD]-a.r.ds[weakD];}).indexOf(p);
+  var lowF=FK.filter(function(f){return r.fs[f]<=45;}).sort(function(a,b){return r.fs[a]-r.fs[b];});
+  var ownLow=FK.slice().sort(function(a,b){return r.fs[a]-r.fs[b];})[0];
+  function bestAtF(f){return M.slice().filter(function(q){return q!==p;}).sort(function(a,b){return b.r.fs[f]-a.r.fs[f];})[0];}
+  var weakHtml;
+  if(weakDs<=44&&teamRankW>=2){
+   var cW=M.slice().filter(function(q){return q!==p;}).sort(function(a,b){return b.r.ds[weakD]-a.r.ds[weakD];})[0];
+   weakHtml='가장 옅은 결은 <b style="color:var('+DR[weakD].v+')">'+DR[weakD].name+'</b>('+weakDs+')예요 — '+LOW_DRIVE[weakD].d+(lowF.length?' 특히 <b>'+lowF.slice(0,2).map(function(f){return FC[f].name+'('+r.fs[f]+')';}).join('·')+'</b>가 많이 낮아요.':'')+(cW&&cW.r.ds[weakD]>=weakDs+10?' 마침 이건 <b>'+esc(cW.name||'한 명')+'</b>('+cW.r.ds[weakD]+')의 강점이라, 그 일은 '+esc(cW.name||'')+'와 짝지으면 메워져요.':' 팀 전체가 옅은 편이라 규칙·외부 보강으로 받쳐야 해요.')+' '+LOW_DRIVE[weakD].t;
+  } else if(lowF.length){
+   var lf=lowF[0],bA=bestAtF(lf);
+   weakHtml='크게 비는 동력은 없어요 — 다만 특성으로 보면 <b style="color:'+DR[FC[lf].d].hex+'">'+FC[lf].name+'</b>('+r.fs[lf]+')'+(lowF[1]?' · <b>'+FC[lowF[1]].name+'</b>('+r.fs[lowF[1]]+')':'')+'가 낮은 편이에요. 이 결이 필요한 순간엔 '+(bA&&bA.r.fs[lf]>=r.fs[lf]+12?'<b>'+esc(bA.name||'')+'</b>('+bA.r.fs[lf]+')에게 맡기거나 ':'')+'의식적으로 한 번 챙기면 좋아요.';
+  } else {
+   weakHtml='약한 결이 <b>뚜렷하지 않아요</b> — 어느 영역도 크게 비지 않은, 고루 갖춘 편이에요. 굳이 꼽자면 <b>'+FC[ownLow].name+'</b>('+r.fs[ownLow]+')가 상대적으로 낮지만, 절대적으론 무난합니다.';
+  }
   H+='<div style="border:1px solid var(--rule);border-top:3px solid '+col+';border-radius:2px;background:var(--panel);padding:16px 18px;margin-bottom:11px">'+
    '<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px"><span style="font-weight:900;font-size:17px">'+nm+'</span><span style="font-size:13px;color:'+col+';font-weight:700">'+r.arch+'</span><span style="font-size:12px;color:var(--faint)">'+(AD[r.arch]||'')+'</span></div>'+
    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(228px,1fr));gap:11px 18px">'+
