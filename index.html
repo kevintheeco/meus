@@ -323,6 +323,15 @@ var FACET_SIG={
  flex:{s:'상황에 맞춰 갈아타는 유연',lead:'발상·비전보다 적응력이 강점이에요 — 변수가 생겨도 빠르게 방식을 바꿉니다.'},
  vision:{s:'큰 그림과 미래를 보는 비전',lead:'발상·유연보다 장기 방향에 꽂히는 쪽이에요 — 눈앞보다 "이게 결국 어디로 가는가"를 먼저 봅니다.'}
 };
+/* 가치 1순위 렌즈 — d:실제로 어떻게 결정하나 c:누구와 왜 부딪히나 t:푸는 법 */
+var VAL_LENS={
+ speed:{d:'선택이 갈리면 "어느 쪽이 더 빨리 결과를 내나"부터 봅니다. 완벽한 준비보다 일단 실행을 택하고, 느린 의사결정을 가장 못 견뎌요.',c:'<b>정확·품질</b>이나 <b>안정</b>을 먼저 두는 사람과 부딪히기 쉬워요 — 당신에겐 그들이 굼떠 보이고, 그들에겐 당신이 성급해 보입니다.',t:'"이건 빠르게, 저건 제대로"를 일마다 나눠 정하면 충돌이 줄어요.'},
+ people:{d:'선택이 갈리면 "사람·관계가 상하지 않나"부터 봅니다. 옳은 결정이라도 누가 다치면 망설이고, 분위기와 합의를 결과만큼 중히 둬요.',c:'<b>성과·속도</b>를 먼저 두는 사람과 부딪히기 쉬워요 — 그들에겐 당신이 일보다 사람을 챙기는 걸로, 당신에겐 그들이 차갑게 보입니다.',t:'결정 전에 "이게 사람에게 어떤 영향을 줄까"를 한 번 같이 짚으면 서로 납득이 빨라져요.'},
+ quality:{d:'선택이 갈리면 "어느 쪽이 더 정확하고 완성도 높나"부터 봅니다. 빠르지만 엉성한 것보다 느려도 빈틈없는 걸 택하고, 졸속을 싫어해요.',c:'<b>성과·속도</b>나 <b>혁신</b>을 먼저 두는 사람과 부딪히기 쉬워요 — 그들에겐 당신이 깐깐해 보이고, 당신에겐 그들이 대충해 보입니다.',t:'"이번 일에 필요한 완성도(80이냐 100이냐)"를 처음에 합의하면 마찰이 줄어요.'},
+ novel:{d:'선택이 갈리면 "이게 더 새롭고 배울 게 있나"부터 봅니다. 검증된 안전한 길보다 안 가본 길을 택하고, "원래 이렇게 해왔다"가 당신껜 가장 약한 이유예요.',c:'<b>안정·예측</b>이나 <b>정확·품질</b>을 먼저 두는 사람과 부딪히기 쉬워요 — 그들에겐 당신이 위태로워 보이고, 당신에겐 그들이 답답해 보입니다.',t:'새 시도에 "되돌릴 수 있는 작은 실험"의 틀을 씌우면, 안정형도 안심하고 당신도 마음껏 시도할 수 있어요.'},
+ auto:{d:'선택이 갈리면 "내 방식대로 정할 수 있나"부터 봅니다. 간섭받는 걸 싫어하고, 자유가 보장되면 책임도 기꺼이 집니다.',c:'규칙·절차나 위계로 정렬하려는 사람과 부딪히기 쉬워요 — 그들에겐 당신이 제멋대로로, 당신에겐 그들이 통제적으로 보입니다.',t:'"목표·기한은 합의하되 방법은 맡긴다"는 경계를 정하면 양쪽이 편해져요.'},
+ stable:{d:'선택이 갈리면 "어느 쪽이 더 안전하고 예측 가능한가"부터 봅니다. 급격한 변화보다 검증된 안정을 택하고, 흔들림과 불확실성을 불편해해요.',c:'<b>혁신·성장</b>이나 <b>성과·속도</b>를 먼저 두는 사람과 부딪히기 쉬워요 — 그들에겐 당신이 보수적으로, 당신에겐 그들이 무모해 보입니다.',t:'변화를 "단계적으로, 이유와 함께" 제안하면 당신도 받아들이기 쉽고 상대도 답답함이 줄어요.'}
+};
 
 /* ---------- facet별 관계 역학 텍스트 (미시 분석) — #H#높은쪽 #L#낮은쪽 #Hn/#Ln 은·는 #Hg/#Lg 이·가 #hv/#lv 점수 ---------- */
 var FREL={
@@ -906,7 +915,8 @@ function renderResult(){
  // 결정의 렌즈 (가치관)
  if(r.vals&&r.vals.length){var vh='';r.vals.forEach(function(k,i){var vd=VAL.filter(function(v){return v.k===k;})[0];if(!vd)return;vh+='<span style="display:inline-flex;align-items:center;gap:8px;border:1px solid var(--rule);border-radius:2px;padding:9px 14px;margin:0 9px 9px 0;'+(i===0?'background:var('+DR[vd.drv].v+');color:var(--screen);border-color:transparent':'')+'"><span class="mono" style="font-size:12px;'+(i===0?'':'color:var(--faint)')+'">'+(i+1)+'</span> <b>'+vd.t+'</b></span>';});
   var v0=VAL.filter(function(v){return v.k===r.vals[0];})[0];
-  var vT=v0?'결정의 1순위는 <b style="color:var('+DR[v0.drv].v+')">'+v0.t+'</b>입니다. 회의에서 이걸 먼저 챙기고, 충돌은 대개 상대의 1순위가 달라서 생깁니다 — "누가 옳냐"가 아니라 "무엇을 먼저 두냐"의 차이.':'';
+  var vL=v0?VAL_LENS[v0.k]:null;
+  var vT=v0?('결정의 1순위는 <b style="color:var('+DR[v0.drv].v+')">'+v0.t+'</b>입니다.'+(vL?'<br>'+vL.d+'<br><span style="color:var(--ink-soft)">⚔ 충돌 — '+vL.c+'</span><br><span style="color:var(--mute)">🤝 푸는 법 — '+vL.t+'</span>':'')):'';
   H+='<div style="margin-top:clamp(28px,4vw,44px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,28px)"><div class="sec" style="margin:0 0 14px">Decision lens · 결정의 렌즈 (가치 우선순위)</div><div style="margin-bottom:8px">'+vh+'</div><p style="margin:6px 0 0;color:var(--ink-soft);font-size:15px">'+vT+'</p></div>';}
  // 강점 포트레이트 — 점수 순위 + 서술 + 빛나는 상황
  var compScore={};COMP.forEach(function(c){compScore[c.k]=Math.round(c.fac.reduce(function(x,f){return x+r.fs[f];},0)/c.fac.length);});
