@@ -1205,12 +1205,14 @@ function relDynamics(ra,rb,na,nb){
   var rows='';
   FK.filter(function(f){return FC[f].d===d&&f!=='lead'&&FREL[f];}).forEach(function(f){
    var a=ra.fs[f],b=rb.fs[f],diff=a-b,adf=Math.abs(diff),fr=FREL[f],kind=null,body='';
-   if(adf>=GAP_T){kind='gap';var hiN=a>b?An:Bn,loN=a>b?Bn:An;body=fillT(fr.gap,hiN,loN,Math.max(a,b),Math.min(a,b));gapList.push(adf);}
+   if(adf>=GAP_T){kind='gap';var hiN=a>b?An:Bn,loN=a>b?Bn:An;body=fillT(fr.gap,hiN,loN,Math.max(a,b),Math.min(a,b));
+    body+=adf>=30?'<br><b style="color:'+DR[d].hex+'">이 차이는 특히 큽니다</b> — 위 역할을 분명히 약속해두지 않으면 두 사람 사이 반복 마찰의 핵심이 돼요. 약점이 아니라 분담으로 보면 오히려 강점이 됩니다.':adf<20?'<br><span style="color:var(--faint)">차이가 크진 않으니, 이런 결이 있다는 걸 알아두는 정도면 충분해요.</span>':'';
+    gapList.push(adf);}
    else if(Math.min(a,b)>=64){kind='both';body=fr.both;}
    else if(Math.max(a,b)<=38){kind='low';body=fr.low;}
    if(!kind)return;
-   var tag=kind==='gap'?('Δ'+(diff>0?'+':'')+diff):kind==='both'?'둘 다 높음':'둘 다 낮음';
-   var tagcol=kind==='gap'?DR[d].hex:kind==='both'?'var(--connect)':'var(--faint)';
+   var tag=kind==='gap'?(adf>=30?'큰 차이':adf>=20?'뚜렷한 차이':'살짝 차이'):kind==='both'?'둘 다 높음':'둘 다 낮음';
+   var tagcol=kind==='gap'?(adf>=30?DR[d].hex:'var(--mute)'):kind==='both'?'var(--connect)':'var(--faint)';
    rows+='<div style="border:1px solid var(--rule);border-left:3px solid '+DR[d].hex+';border-radius:2px;background:var(--panel);padding:12px 15px;margin-bottom:8px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap"><span style="font-weight:800;font-size:13.5px">'+fr.n+'</span><span class="mono" style="font-size:11px;color:var(--mute)">'+An+' '+a+' · '+Bn+' '+b+'</span><span class="mono" style="font-size:10.5px;color:'+tagcol+';font-weight:700;margin-left:auto">'+tag+'</span></div><p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--ink-soft)">'+body+'</p></div>';
   });
   if(rows)micro+='<div style="margin-top:14px"><div style="display:flex;align-items:center;gap:7px;margin-bottom:8px"><span style="width:8px;height:8px;border-radius:50%;background:'+DR[d].hex+'"></span><span style="font-weight:700;font-size:13px;color:var(--ink)">'+DR[d].name+' · '+DR[d].en+'</span></div>'+rows+'</div>';
