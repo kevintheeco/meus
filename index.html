@@ -1536,18 +1536,25 @@ function renderUs(){
   var uf=FK.filter(function(f){var sorted=M.slice().sort(function(a,b){return b.r.fs[f]-a.r.fs[f];});return sorted[0]===p&&p.r.fs[f]>=58&&(p.r.fs[f]-(sorted[1]?sorted[1].r.fs[f]:0))>=UNIQ_GAP;}).sort(function(a,b){return p.r.fs[b]-p.r.fs[a];});
   return{solo:solo,uf:uf};
  }
- M.forEach(function(p,i){var r=p.r,nm=esc(p.name||('멤버'+(i+1))),ap=AP[r.arch]||{},col=DR[r.p].hex,u=uniqOf(p);
+ M.forEach(function(p,i){var r=p.r,nm=esc(p.name||('멤버'+(i+1))),col=DR[r.p].hex,u=uniqOf(p);
   var uniqHtml;
   if(u.solo.length)uniqHtml='이 팀에서 <b style="color:'+col+'">'+u.solo.map(function(d){return DR[d].name;}).join('·')+'</b> ●을 <b>혼자</b> 쥔 사람이에요. '+nm+ig(nm)+' 빠지면 그 결이 팀에서 옅어집니다.'+(u.uf.length?' 특히 <b>'+FC[u.uf[0]].name+'</b>(팀 1위 '+r.fs[u.uf[0]]+')가 도드라져요.':'');
   else if(u.uf.length)uniqHtml='팀에서 <b style="color:'+DR[FC[u.uf[0]].d].hex+'">'+u.uf.slice(0,2).map(function(f){return FC[f].name+'('+r.fs[f]+')';}).join(' · ')+'</b>가 가장 도드라집니다 — 2위와 뚜렷이 벌어진, '+nm+'만의 결이에요.';
   else uniqHtml=(r.bal?'특정 결을 독점하진 않지만, 여러 결을 고루 받치는 <b>팀의 안정축</b>이에요 — 빠진 자리를 그때그때 메웁니다.':'다른 멤버와 강점이 겹치는 영역이 많아요 — 같은 결을 <b>함께 두껍게</b> 만드는 역할입니다.')+(n<=3?' (인원이 적어 상대 비교는 참고로 보세요.)':'');
+  // 개인 데이터 기반 (유형 일반 문구 대체)
+  var topFac=FK.slice().sort(function(a,b){return r.fs[b]-r.fs[a];})[0];
+  var cs={};COMP.forEach(function(c){cs[c.k]=Math.round(c.fac.reduce(function(x,f){return x+r.fs[f];},0)/c.fac.length);});
+  var topComp=COMP.slice().sort(function(a,b){return cs[b.k]-cs[a.k];})[0];
+  var shineP=(COMP_DESC[topComp.k]&&COMP_DESC[topComp.k].s)?'<b>'+topComp.label+'</b>이 가장 강해요('+cs[topComp.k]+') — '+COMP_DESC[topComp.k].s+'.':((AP[r.arch]&&AP[r.arch].shine)||'');
+  var workP=(PF_MANUAL[r.p]&&PF_MANUAL[r.p][0])||'';
+  var shadowP='강점이 과해지면 <b>'+FC[topFac].name+'</b>('+r.fs[topFac]+')'+ig(FC[topFac].name)+' <b>'+FC[topFac].ov+'</b>로 흐를 수 있어요 — '+(OV_FIX[topFac]||'');
   H+='<div style="border:1px solid var(--rule);border-top:3px solid '+col+';border-radius:2px;background:var(--panel);padding:16px 18px;margin-bottom:11px">'+
    '<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px"><span style="font-weight:900;font-size:17px">'+nm+'</span><span style="font-size:13px;color:'+col+';font-weight:700">'+r.arch+'</span><span style="font-size:12px;color:var(--faint)">'+(AD[r.arch]||'')+'</span></div>'+
    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(228px,1fr));gap:11px 18px">'+
     '<div><div class="mono" style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--drive);margin-bottom:3px">대체 불가 지점</div><p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--ink-soft)">'+uniqHtml+'</p></div>'+
-    (ap.shine?'<div><div class="mono" style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--connect);margin-bottom:3px">빛나는 순간</div><p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--ink-soft)">'+ap.shine+'</p></div>':'')+
-    (ap.work?'<div><div class="mono" style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--order);margin-bottom:3px">이렇게 대해주세요</div><p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--ink-soft)">'+ap.work+'</p></div>':'')+
-    (ap.shadow?'<div><div class="mono" style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);margin-bottom:3px">⚠ 과용주의</div><p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--ink-soft)">'+ap.shadow+'</p></div>':'')+
+    (shineP?'<div><div class="mono" style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--connect);margin-bottom:3px">빛나는 순간</div><p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--ink-soft)">'+shineP+'</p></div>':'')+
+    (workP?'<div><div class="mono" style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--order);margin-bottom:3px">이렇게 대해주세요</div><p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--ink-soft)">'+workP+'</p></div>':'')+
+    '<div><div class="mono" style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);margin-bottom:3px">⚠ 과용주의</div><p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--ink-soft)">'+shadowP+'</p></div>'+
    '</div></div>';
  });
  // 보완 매트릭스 (●○·)
