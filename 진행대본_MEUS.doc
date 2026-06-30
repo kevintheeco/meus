@@ -1,0 +1,114 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta charset="utf-8">
+<title>MEUS 팀 세션 진행 대본</title>
+<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->
+<style>
+ body{font-family:'맑은 고딕','Malgun Gothic',sans-serif;font-size:11pt;line-height:1.7;color:#1c1814;margin:2cm}
+ h1{font-size:22pt;border-bottom:3px solid #1c1814;padding-bottom:8px;margin-bottom:4px}
+ h2{font-size:15pt;color:#7c2d2a;border-bottom:1px solid #ccc;padding-bottom:4px;margin-top:26px}
+ h3{font-size:12.5pt;margin-top:18px;margin-bottom:4px}
+ .sub{color:#666;font-size:10.5pt;margin-top:2px}
+ .meta{color:#666;font-size:10pt}
+ .box{border:1px solid #ccc;background:#f8f2e4;padding:10px 14px;margin:8px 0}
+ .say{background:#eef4ee;border-left:4px solid #178a66;padding:8px 12px;margin:6px 0;font-style:italic}
+ .tip{color:#7c2d2a;font-size:10.5pt}
+ table{border-collapse:collapse;width:100%;margin:8px 0}
+ td,th{border:1px solid #bbb;padding:6px 9px;font-size:10.5pt;text-align:left;vertical-align:top}
+ th{background:#eee}
+ ul{margin:4px 0 4px 0;padding-left:20px}
+ li{margin-bottom:3px}
+ .phase{font-weight:bold;color:#fff;background:#1c1814;padding:2px 8px;border-radius:2px}
+</style>
+</head>
+<body>
+
+<h1>MEUS 팀 세션 · 진행 대본</h1>
+<p class="meta">퍼실리테이터용 · 약 60분 · 6명 내외 &nbsp;|&nbsp; URP Corporation · 니가교수</p>
+
+<div class="box">
+<b>이 세션의 단 하나의 원칙</b><br>
+이건 <b>평가가 아니라, 서로를 읽는 공용어</b>를 만드는 시간입니다. 우열은 없고, 사람을 한 글자로 가두지 않으며, 약점은 결함이 아니라 강점을 과하게 쓴 그림자일 뿐입니다.
+</div>
+
+<h2>준비 (세션 전)</h2>
+<table>
+<tr><th>항목</th><th>내용</th></tr>
+<tr><td>사전 검사</td><td>참가자 전원이 미리 진단 완료(결과지/코드 또는 구글 로그인). 임준서 등 미제출자가 있으면 세션 전 독려.</td></tr>
+<tr><td>화면</td><td>큰 화면 공유 또는 결과지 인쇄. <b>/우리</b>에 팀 코드 입력, <b>/조직</b>에서 직분 확인.</td></tr>
+<tr><td>자리</td><td>둘러앉아 서로 보이게. 강사는 진행자이자 참여자.</td></tr>
+<tr><td>마음가짐</td><td>"맞히기"가 아니라 "꺼내기". 침묵이 와도 기다린다.</td></tr>
+</table>
+
+<h2>① 도입 &nbsp;<span class="meta">5분</span></h2>
+<h3>목표 — "오늘은 점수 매기는 자리가 아니다"를 먼저 못 박기</h3>
+<p>세 가지를 말하고 시작하세요.</p>
+<div class="say">"오늘 우리가 보는 건 누가 더 낫냐가 아니에요. ① <b>우열은 없습니다</b> — 어떤 동력도 더 좋은 게 아니에요. ② <b>사람을 한 글자로 가두지 않습니다</b> — '넌 추진형이라'가 아니라 '그 상황엔 추진이 세게 나왔네'로 말해요. ③ <b>약점은 결함이 아니라, 강점을 과하게 썼을 때 생기는 그림자</b>예요."</div>
+
+<h2>② 나 &nbsp;<span class="meta">15분 · 1인 2분</span></h2>
+<h3>목표 — 각자 자기 결과지를 세 가지로 요약 공유</h3>
+<p>한 사람씩 돌아가며 자기 결과지에서 세 가지만 뽑아 말합니다.</p>
+<ul>
+<li><b>시그니처 강점 1개</b> — "내가 가장 자연스럽게 꺼내는 힘"</li>
+<li><b>과용주의(⚠) 1개</b> — "이게 지나치면 이렇게 흐른다"</li>
+<li><b>"이렇게 대해주세요" 한 줄</b></li>
+</ul>
+<p class="tip">강사 팁 — 한 명이 끝날 때마다 "그게 실제로 드러난 최근 사례가 있어요?"로 한 번 더 끌어내면 추상이 구체가 됩니다.</p>
+
+<h2>③ 너 (1:1) &nbsp;<span class="meta">10분</span></h2>
+<h3>목표 — 가까이 일하는 2명씩 보완 짝 맞추기</h3>
+<p>자주 부딪히거나 함께 일하는 두 사람의 코드를 <b>/너</b>에 넣습니다.</p>
+<ul>
+<li>"서로를 채우는 자리" 카드를 <b>소리 내어</b> 읽게 하세요 — 동력마다 결이 다릅니다. (추진은 "함께 끄는 추진축", 탐구는 "발산↔선별 짝"처럼)</li>
+<li>"소통 가이드"와 "상담가 한마디"를 읽으며, 서로의 의도를 번역해 봅니다.</li>
+</ul>
+<p class="tip">강사 팁 — "주도가 둘 다 높아도 신뢰·지지가 두터우면 충돌이 아니라 협업"이라는 점을 짚어주세요. 차이는 위협이 아니라 분담의 기회입니다.</p>
+
+<h2>④ 우리 (팀) &nbsp;<span class="meta">15분</span></h2>
+<h3>목표 — 팀 지도를 같이 읽고 우리 팀을 한 문장으로</h3>
+<p><b>/우리</b>에 전원 코드를 넣고 함께 봅니다.</p>
+<ul>
+<li><b>① 우리 팀은</b> — 각자의 또렷한 시그니처(누구는 정밀, 누구는 지지…)를 고루 확인. 한 사람을 "중심"으로 세우지 않습니다.</li>
+<li><b>② 각자의 자리</b> — 멤버 스포트라이트(대체 불가 지점·빛나는 순간·대해주세요·과용주의)를 각자 읽기.</li>
+<li><b>③ 마찰과 예방</b> — "함께 일할 때 미리 맞춰두면 좋은 조합". 충돌 예측이 아니라 합을 맞추는 가이드로 읽기.</li>
+<li>마무리: <b>"우리 팀은 ___가 강하고 ___가 빈다"</b>를 팀이 합의하게 하세요.</li>
+</ul>
+
+<h2>⑤ 조직 (직분을 얹어) &nbsp;<span class="meta">10분</span></h2>
+<h3>목표 — CEO·CSO·CTO로서의 관계까지 읽기 (1:1 궁합과 결이 다름)</h3>
+<p><b>/조직</b>에서 각자의 직분과 성향을 함께 봅니다. 권한·결정권이 얽힌 관계는 단순 성향 궁합과 다릅니다.</p>
+<ul>
+<li><b>직분 × 강점 적합도</b> — 이 자리가 요구하는 힘과 그 사람의 강점이 맞는가. 안 맞으면 사람 문제가 아니라 <b>구조로 보완</b>할 신호.</li>
+<li><b>CEO 라인</b> — 대표가 각 임원을 어떻게 위임·존중하고, 어디서 의견을 들을지. (최종 결정권은 CEO에게 있다는 전제)</li>
+<li><b>경영진 커버리지</b> — 리더십이 함께 비어 있는 결은 무엇인가.</li>
+<li><b>조직 리스크 & 조율</b> — 직분 경계가 겹쳐 주도권이 부딪힐 수 있는 지점을 미리 명문화.</li>
+</ul>
+<p class="tip">강사 팁 — "우리 회사 구조에서 이 사람의 강점이 제 역할에 쓰이고 있나?"를 핵심 질문으로 던지세요.</p>
+
+<h2>⑥ 약속 &nbsp;<span class="meta">5분</span></h2>
+<h3>목표 — 다음 주에 바로 쓸 팀 약속 1–2개</h3>
+<p>/우리 리포트 맨 아래 <b>"팀 약속 · 다음 주에 바로"</b>에 신호별 약속 후보가 자동으로 떠 있습니다. 그중 <b>1~2개</b>를 팀이 골라 합의하게 하세요.</p>
+<div class="box">예시 — "결정 전에 신중형 의견을 한 번은 듣는다" · "갈등 초기에 작게 표현한다" · "역할별 결정권을 명문화한다"</div>
+
+<h2>리포트 읽는 법 (강사 참고)</h2>
+<table>
+<tr><th>섹션</th><th>의미</th><th>강사 팁</th></tr>
+<tr><td>동력 점수</td><td>0~100, 50이 또래 평균. 4가지 힘(추진·관계·질서·탐구)의 균형.</td><td>높낮이보다 "어떤 조합인가"를 보게 하세요.</td></tr>
+<tr><td>시그니처</td><td>그 사람이 팀에서 가장 도드라지는 결.</td><td>"이건 이 사람만의 결"로 인정해 주기.</td></tr>
+<tr><td>과용주의</td><td>가장 강한 특성이 지나칠 때의 그림자.</td><td>약점이 아니라 "세기 조절" 신호로.</td></tr>
+<tr><td>마찰과 예방</td><td>미리 맞춰두면 좋은 조합. 친화가 두터우면 주도 겹침도 협업.</td><td>"싸움 예측"이 아니라 "합 맞추기"로 프레이밍.</td></tr>
+<tr><td>조직 분석</td><td>직분을 얹은 분석. 적합도·CEO 라인·조직 리스크.</td><td>권한이 있는 관계는 다르다는 점을 강조.</td></tr>
+</table>
+
+<h2>흔한 함정 & 대처</h2>
+<ul>
+<li><b>"내 점수가 낮은데요?"</b> → "낮은 게 아니라, 그 힘을 덜 앞세운다는 뜻. 약점이 아니라 우선순위예요."</li>
+<li><b>한 사람이 말을 독점</b> → "고마워요. 다른 분 결도 들어볼까요?"로 자연스럽게 넘기기.</li>
+<li><b>유형으로 사람 단정</b> → "그 상황엔 그게 세게 나왔다"로 동사화해서 되돌리기.</li>
+<li><b>침묵</b> → 기다리세요. 강사가 먼저 자기 사례를 짧게 꺼내면 물꼬가 트입니다.</li>
+</ul>
+
+<p class="meta" style="margin-top:30px;border-top:1px solid #ccc;padding-top:8px">MEUS · 업무성향 진단 / 팀빌딩용 · 채용·평가가 아닌 상호 이해를 위한 도구</p>
+
+</body>
+</html>
