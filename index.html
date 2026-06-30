@@ -1475,7 +1475,7 @@ function renderUs(){
   '<p style="margin:0 0 9px;font-size:15.5px;line-height:1.65;color:var(--ink-soft)">'+summaryLine+'</p>'+
   '<div style="display:flex;flex-wrap:wrap;gap:6px 18px;margin:0 0 14px;font-size:14px;color:var(--ink-soft)">'+
    '<span><b>함께 강한 결</b> '+topF0.map(function(f){return '<span style="color:'+DR[FC[f].d].hex+'">'+FC[f].name+'</span>';}).join('·')+'</span>'+
-   '<span><b>빈 결</b> <span style="color:'+DR[blind].hex+'">'+DR[blind].name+'</span></span>'+
+   '<span><b>아직 얇은 힘</b> <span style="color:'+DR[blind].hex+'">'+DR[blind].name+'</span></span>'+
    (topV0?'<span><b>결정 기준</b> '+topV0.t+'</span>':'')+'</div>'+
   '<div style="border-top:1px dashed var(--rule-strong);padding-top:12px"><div class="mono" style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--drive);margin-bottom:7px">다음 주에 바로 · 팀 약속 미리보기</div>'+
    promises.slice(0,2).map(function(pm){return '<p style="margin:0 0 5px;font-size:14px;line-height:1.55;color:var(--ink-soft)">✓ '+pm.act+'</p>';}).join('')+
@@ -1486,8 +1486,15 @@ function renderUs(){
  var TN=[];var topD0=teamRk[0],topD1=teamRk[1];
  var keyRole={drive:'추진과 결단',connect:'관계와 화합',order:'질서와 기준',explore:'새 시도와 탐색'};
  var strongestIn=function(d){return M.slice().sort(function(a,b){return b.r.ds[d]-a.r.ds[d];})[0];};
- var anchor0=strongestIn(topD0),a0n=esc(anchor0.name||'한 명');
- TN.push('이 팀의 무게중심은 <b style="color:var('+DR[topD0].v+')">'+DR[topD0].name+'</b>('+avg[topD0]+')과 <b style="color:var('+DR[topD1].v+')">'+DR[topD1].name+'</b>('+avg[topD1]+')에 있습니다. 그중 <b>'+a0n+'</b>('+anchor0.r.ds[topD0]+')'+ig(a0n)+' '+keyRole[topD0]+'의 엔진으로 팀을 끌어가는 중심이에요.');
+ // 한 사람을 "팀의 중심"으로 왕관 씌우지 않음 — 각자의 distinctive 시그니처를 전원 고루
+ var fAvgT={};FK.forEach(function(f){fAvgT[f]=Math.round(M.reduce(function(a,p){return a+p.r.fs[f];},0)/n);});
+ var sigMap={},takenF={};var sigPairs=[];
+ M.forEach(function(p,pi){FK.forEach(function(f){if(p.r.fs[f]>=50)sigPairs.push({pi:pi,f:f,v:p.r.fs[f]-fAvgT[f]});});});
+ sigPairs.sort(function(a,b){return b.v-a.v;});
+ sigPairs.forEach(function(pr){if(sigMap[pr.pi]===undefined&&!takenF[pr.f]){sigMap[pr.pi]=pr.f;takenF[pr.f]=1;}});
+ M.forEach(function(p,pi){if(sigMap[pi]===undefined)sigMap[pi]=FK.slice().sort(function(a,b){return (p.r.fs[b]-fAvgT[b])-(p.r.fs[a]-fAvgT[a]);})[0];});
+ var sigList=M.map(function(p,pi){return '<b style="color:'+DR[FC[sigMap[pi]].d].hex+'">'+esc(p.name||'멤버')+'</b> '+FC[sigMap[pi]].name+'('+p.r.fs[sigMap[pi]]+')';}).join(' · ');
+ TN.push('이 팀의 힘은 <b style="color:var('+DR[topD0].v+')">'+DR[topD0].name+'</b>('+avg[topD0]+')과 <b style="color:var('+DR[topD1].v+')">'+DR[topD1].name+'</b>('+avg[topD1]+') 쪽에 모여 있어요 — 하지만 그게 한 사람의 색은 아닙니다. 각자 <b>자기만의 또렷한 결</b>을 하나씩 쥐고 있어요 ▸ '+sigList+'. 누구 하나가 끌고 가는 팀이 아니라, 서로 다른 강점이 맞물려 굴러가는 팀이에요.');
  var spread=avg[topD0]-avg[blind];
  TN.push(spread>=22?'힘이 <b>'+DR[topD0].name+'</b> 쪽으로 뚜렷이 쏠려 있어요 — 그 방향은 누구보다 강하지만, 반대편 <b style="color:var('+DR[blind].v+')">'+DR[blind].name+'</b>이 팀의 빈자리로 남습니다.':'네 동력이 비교적 고르게 퍼져 역할이 자연스럽게 나뉘는 균형 팀이에요 — 대신 "우리 팀은 무엇에 강한가"가 흐릿할 수 있습니다.');
  var bA=strongestIn(blind),bAn=esc(bA.name||'한 명'),bScore=bA.r.ds[blind];
@@ -1608,11 +1615,13 @@ function renderUs(){
   var rs=[],score=0;
   var la=rA.fs.lead,lb=rB.fs.lead;
   if(Math.min(la,lb)>=58){var hN=la>=lb?an:bn,lN=la>=lb?bn:an,hV=Math.max(la,lb),lV=Math.min(la,lb);
-   if(hV-lV<12){rs.push('둘 다 주도성이 높고 <b>비등</b>해요(주도 '+la+'·'+lb+') — 방향이 같아도 "누가 끌지"에서 <b>정면으로 부딪히기</b> 쉽습니다. 지배 성향은 양보가 아니라 경쟁으로 맞물려요(대인관계 상보성). 영역별 결정권을 미리 나눠두세요.');score+=3;}
-   else{rs.push('둘 다 주도성이 높은데 <b>'+hN+'</b>('+hV+')가 <b>'+lN+'</b>('+lV+')보다 더 셉니다 — '+hN+'가 주도권을 쥐기 쉽지만, '+lN+'도 주도성이 높아 쉽게 물러서지 않아요. <b>'+lN+'이 그 아래에서 부딪히거나 눌리는</b> 긴장이 생길 수 있으니, '+lN+'에게 분명한 자기 결정 영역을 보장해 주세요.');score+=3;}}
+   var aff=Math.round(((rA.fs.support+rA.fs.trust+rA.fs.empathy)/3+(rB.fs.support+rB.fs.trust+rB.fs.empathy)/3)/2);
+   if(aff>=55){rs.push('둘 다 주도성이 높지만(주도 '+la+'·'+lb+'), 서로 <b>지지·신뢰·공감이 두터워</b>(친화 '+aff+') 주도권을 다투기보다 <b>나눠서 함께 끄는</b> 조합이에요 — 영역만 가볍게 정해두면 오히려 시너지가 큽니다.');score+=1;}
+   else if(hV-lV<12){rs.push('둘 다 주도성이 높고 비등한데(주도 '+la+'·'+lb+'), 서로 받쳐주는 지지·신뢰는 아직 옅은 편이에요(친화 '+aff+') — 방향이 같아도 "누가 끌지"에서 호흡이 어긋날 수 있어요. <b>영역별 결정권</b>을 나누고 서로의 강점을 먼저 인정하는 한마디면 충분히 풀립니다.');score+=2;}
+   else{rs.push('둘 다 주도적인데 <b>'+hN+'</b>('+hV+')가 더 세고 서로의 지지·신뢰는 옅은 편이에요(친화 '+aff+') — '+lN+'이 눌리지 않게 <b>'+lN+'의 결정 영역</b>을 분명히 두고, '+hN+'은 "네 생각은?"을 먼저 묻는 습관이면 좋습니다.');score+=2;}}
   var aA=sqc(rA.seq,'assert'),bA=sqc(rB.seq,'assert'),aZ=sqc(rA.seq,'analyze'),bZ=sqc(rB.seq,'analyze');
-  if(aA>=2&&bA>=2){rs.push('갈등이 깊어지면 둘 다 정면으로 밀어붙이는 <b>주장형</b>이라 한번 부딪히면 빠르게 격해져요 — "한 박자 식히고 다시"를 규칙으로 정해두세요.');score+=2;}
-  else if((aA>=2&&bZ>=2)||(bA>=2&&aZ>=2)){var pushN=aA>=2?an:bn,pullN=aA>=2?bn:an;rs.push('한 명('+pushN+')은 밀어붙이고 한 명('+pullN+')은 물러나 따지는 <b>추궁–회피</b> 패턴 — 관계를 가장 갉아먹는 구조예요. '+pushN+'는 몰아세우지 말고, '+pullN+'은 "생각할 시간을 달라"고 신호를 주세요.');score+=2;}
+  if(aA>=2&&bA>=2){rs.push('둘 다 의견이 부딪히면 정면으로 말하는 <b>주장형</b>이에요 — 솔직해서 좋지만 달아오르기 쉬우니 "한 박자 식히고 다시"만 미리 약속해두면 매끄러워요.');score+=2;}
+  else if((aA>=2&&bZ>=2)||(bA>=2&&aZ>=2)){var pushN=aA>=2?an:bn,pullN=aA>=2?bn:an;rs.push('<b>'+pushN+'</b>은 바로 말하고 <b>'+pullN+'</b>은 한발 물러나 생각하는 편이라 타이밍이 엇갈리기 쉬워요 — '+pushN+'은 답을 재촉하지 말고, '+pullN+'은 "생각할 시간 좀 줘"라고 신호만 주면 잘 맞습니다.');score+=2;}
   var vClash=rA.vals[0]&&rB.vals[0]&&rA.vals[0]!==rB.vals[0];
   if(OPP[rA.p]===rB.p&&vClash){rs.push('주 동력 방향(<b>'+DR[rA.p].name+' vs '+DR[rB.p].name+'</b>)도 1순위 가치도 정반대라 "무엇을 먼저 둘지"에서 자주 갈려요 — 옳고 그름이 아니라 <b>우선순위 차이</b>임을 서로 인정하는 게 출발점입니다.');score+=2;}
   var pace=Math.max(Math.abs(rA.fs.decision-rB.fs.decision),Math.abs(rA.fs.caution-rB.fs.caution),Math.abs(rA.fs.precision-rB.fs.precision));
@@ -1623,8 +1632,8 @@ function renderUs(){
  }}
  riskPairs2.sort(function(x,y){return y.score-x.score;});
  if(riskPairs2.length||echoPairs.length){
-  H+='<div style="margin-top:clamp(26px,3vw,38px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,26px)"><div class="sec" style="margin:0 0 6px">마찰·충돌이 예상되는 쌍</div><p style="margin:0 0 14px;font-size:12.5px;color:var(--mute)">방향이 달라서만 부딪히는 게 아니에요 — 둘 다 주도하려 할 때, 밀어붙임과 회피가 엇갈릴 때도 마찰이 납니다.</p>';
-  riskPairs2.slice(0,4).forEach(function(rp){var col=rp.score>=4?'var(--drive)':rp.score>=2?'var(--explore)':'var(--mute)',lab=rp.score>=4?'⚠ 높은 마찰':rp.score>=2?'조율 필요':'가벼운 주의';
+  H+='<div style="margin-top:clamp(26px,3vw,38px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,26px)"><div class="sec" style="margin:0 0 6px">함께 일할 때 · 미리 맞춰두면 좋은 조합</div><p style="margin:0 0 14px;font-size:12.5px;color:var(--mute)">충돌 예측이 아니에요 — 서로 다른 결을 미리 알면 <b>싸우지 않고 더 잘 맞출 수</b> 있어요. 합을 맞추는 가이드입니다.</p>';
+  riskPairs2.slice(0,4).forEach(function(rp){var col=rp.score>=4?'var(--order)':rp.score>=2?'var(--explore)':'var(--connect)',lab=rp.score>=4?'미리 합의 권장':rp.score>=2?'가볍게 조율':'잘 맞는 편';
    H+='<div style="border:1px solid var(--rule);border-left:3px solid '+col+';border-radius:2px;background:var(--panel);padding:14px 16px;margin-bottom:9px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px"><span style="font-weight:800">'+rp.a+' × '+rp.b+'</span><span class="mono" style="font-size:10px;color:'+col+'">'+lab+'</span></div>'+rp.rs.slice(0,2).map(function(t){return '<p style="margin:0 0 6px;font-size:13.5px;line-height:1.6;color:var(--ink-soft)">• '+t+'</p>';}).join('')+'</div>';});
   if(echoPairs.length)H+='<div style="border:1px dashed var(--rule-strong);border-radius:2px;background:var(--fill);padding:13px 16px;margin-top:4px"><div style="font-size:12.5px;font-weight:700;color:var(--mute);margin-bottom:5px">닮음 주의 · 에코챔버 (갈등이 아니라 너무 비슷한 쌍)</div><p style="margin:0;font-size:13px;line-height:1.6;color:var(--ink-soft)">'+echoPairs.slice(0,3).map(function(ep){return '<b>'+ep.a+' × '+ep.b+'</b>(차이 '+ep.md+')';}).join(', ')+' — 잘 통하지만 <b>같은 사각지대를 공유</b>해요. 둘만 두면 빠진 관점을 함께 놓치니, 다른 결의 사람을 한 명 끼우면 균형이 잡힙니다.</p></div>';
   H+='</div>';
