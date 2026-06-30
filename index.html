@@ -386,45 +386,44 @@ function done(st){
 }
 
 /* ---------- 채점 엔진 (순수) ---------- */
+/* 규준(20k 상관 합성응답자 시뮬레이션 산출, authoring-time) — facet mFacet(1–5), drive dsAbs(절대합) */
+var NORM_F={decision:{mu:3.432,sd:0.83},lead:{mu:3.398,sd:0.891},achieve:{mu:3.314,sd:0.838},support:{mu:3.414,sd:0.869},trust:{mu:3.361,sd:0.874},empathy:{mu:3.423,sd:0.91},precision:{mu:3.425,sd:0.856},plan:{mu:3.388,sd:0.826},caution:{mu:3.424,sd:0.837},idea:{mu:3.401,sd:0.903},flex:{mu:3.363,sd:0.837},vision:{mu:3.411,sd:0.911}};
+var NORM_D={drive:{mu:99.008,sd:23.982},connect:{mu:99.595,sd:25.022},order:{mu:99.986,sd:23.88},explore:{mu:99.324,sd:25.079}};
 function compute(s){
  // ══════════════════════════════════════════════════
  // 통합 facet 누산기 — 모든 질문 유형이 fsum/fcnt에 기여
  // 채점 원칙: 선택=val5 강긍정, 미선택=val2 약부정, 각 유형별 가중치
  // ══════════════════════════════════════════════════
- var fsum={},fcnt={};FK.forEach(function(f){fsum[f]=0;fcnt[f]=0;});
+ // 측정 채널 분리: primary(직접 측정) vs modifier(베타·보조 — 영향 ≤λ)
+ var pSum={},pCnt={},mSum={},mCnt={};FK.forEach(function(f){pSum[f]=0;pCnt[f]=0;mSum[f]=0;mCnt[f]=0;});
+ function prim(f,val,w){pSum[f]+=val*w;pCnt[f]+=w;}
+ function modf(f,val,w){mSum[f]+=val*w;mCnt[f]+=w;}
 
- // ① LK Likert(36) — primary w=1.0 + 교차 베타
- // 부정 베타(모순 답변)는 NEG_MULT로 증폭: 기준선에서 더 강하게 깎임
- var NEG_MULT=1.6;
+ // ① Likert(36) — 직접문항=primary, 교차베타=modifier (NEG_MULT 완화)
+ var NEG_MULT=1.1;
  LK.forEach(function(q){
   var v=s.LK[q.id];if(v==null)return;
   var val=q.rev?(6-v):v;
-  fsum[q.f]+=val;fcnt[q.f]+=1;
+  prim(q.f,val,1);
   if(q.x)Object.keys(q.x).forEach(function(f2){
    var beta=q.x[f2];
-   if(beta>0){fsum[f2]+=val*beta;fcnt[f2]+=beta;}
-   else{var aw=(-beta)*NEG_MULT;fsum[f2]+=(6-val)*aw;fcnt[f2]+=aw;}
+   if(beta>0)modf(f2,val,beta);
+   else modf(f2,(6-val),(-beta)*NEG_MULT);
   });
  });
 
- // ② A 상황판단(6×4) — 4지 강제선택: 1순위=5/w0.60, 2순위=4/w0.50, 미선택=2/w0.25
+ // ② 상황판단(SJT) — 1·2순위만 primary (미선택 baseline 제거 = 평균회귀 최대 원인)
  A.forEach(function(q){
   var ranks=s.A[q.id]||[];
-  var pos={};ranks.forEach(function(oi,pi){pos[oi]=pi;});
-  q.o.forEach(function(opt,oi){
-   if(!opt.f)return;
-   var pi=pos[oi];
-   var val=(pi===0)?5:(pi===1)?4:2;
-   var w=(pi===0)?0.60:(pi===1)?0.50:0.38; // 미선택=0.38(↑): 선택 안 한 행동양식도 명확하게 차감
-   fsum[opt.f]+=val*w;fcnt[opt.f]+=w;
+  ranks.forEach(function(oi,pi){
+   if(pi>1)return;
+   var opt=q.o[oi];if(!opt||!opt.f)return;
+   prim(opt.f,pi===0?5:4,pi===0?0.60:0.50);
   });
  });
 
- // ③ OV 과용(12 facets) — 높은 자기보고 = 해당 facet 적극 사용 중 (저가중 확인 신호)
- OV.forEach(function(q){
-  var v=s.OV[q.id];if(v==null)return;
-  fsum[q.f]+=v*0.30;fcnt[q.f]+=0.30;
- });
+ // ③ OV 과용 — modifier (저가중 확인신호)
+ OV.forEach(function(q){var v=s.OV[q.id];if(v==null)return;modf(q.f,v,0.30);});
 
  // ④ D 갈등 스타일(3단계) — 단계가 깊을수록 가중치 ↑, facet 레벨 직접 매핑
  var dFacets={
@@ -436,15 +435,7 @@ function compute(s){
  D.forEach(function(q,di){
   var m=(s.D[q.id]||[])[0];if(!m||!dFacets[m])return;
   var sw=dStW[di];
-  Object.keys(dFacets[m]).forEach(function(f){
-   var b=dFacets[m][f];fsum[f]+=5*b*sw;fcnt[f]+=b*sw;
-  });
-  Object.keys(dFacets).forEach(function(st){
-   if(st===m)return;
-   Object.keys(dFacets[st]).forEach(function(f){
-    var b=dFacets[st][f];fsum[f]+=2*b*sw*0.35;fcnt[f]+=b*sw*0.35;
-   });
-  });
+  Object.keys(dFacets[m]).forEach(function(f){prim(f,5,dFacets[m][f]*sw);});
  });
 
  // ⑤ E 에너지(5문항) — 선택 동력 → 해당 facets 긍정, 미선택 → 약부정
@@ -458,15 +449,7 @@ function compute(s){
  E.forEach(function(q){
   var d=s.E[q.id];if(!d||!eFacets[d])return;
   var qw=eQW[q.id]||0.55;
-  Object.keys(eFacets[d]).forEach(function(f){
-   var b=eFacets[d][f];fsum[f]+=5*b*qw;fcnt[f]+=b*qw;
-  });
-  DK.forEach(function(od){
-   if(od===d)return;
-   Object.keys(eFacets[od]).forEach(function(f){
-    var b=eFacets[od][f];fsum[f]+=2*b*qw*0.25;fcnt[f]+=b*qw*0.25;
-   });
-  });
+  Object.keys(eFacets[d]).forEach(function(f){prim(f,5,eFacets[d][f]*qw);});
  });
 
  // ⑥ V 가치관(상위 3 선택) — 순위별 facet 직접 기여
@@ -482,23 +465,33 @@ function compute(s){
  (s.V||[]).slice(0,3).forEach(function(k,rank){
   var fm=vFacets[k];if(!fm)return;
   var val=vVals[rank],w=vWts[rank];
-  Object.keys(fm).forEach(function(f){fsum[f]+=val*fm[f]*w;fcnt[f]+=fm[f]*w;});
+  Object.keys(fm).forEach(function(f){prim(f,val,fm[f]*w);});
  });
 
- // ── facet 점수 0~100 (모든 신호 통합) ──
- var fs={};FK.forEach(function(f){var m=fcnt[f]?fsum[f]/fcnt[f]:3;fs[f]=Math.round((m-1)/4*100);});
+ // ── facet 평균(1–5): primary 주도, modifier 영향 ≤λ ──
+ var LAMBDA=0.15;
+ var mFacet={};FK.forEach(function(f){var mP=pCnt[f]?pSum[f]/pCnt[f]:3;var mM=mCnt[f]?mSum[f]/mCnt[f]:mP;mFacet[f]=mP*(1-LAMBDA)+mM*LAMBDA;});
+ // 규준 정규화: z → 백분위(fs 0–100, 모집단 대비 위치) + 스테나인
+ function _erf(x){var t=1/(1+0.3275911*Math.abs(x)),y=1-(((((1.061405429*t-1.453152027)*t+1.421413741)*t-0.284496736)*t+0.254829592)*t)*Math.exp(-x*x);return x>=0?y:-y;}
+ function _phi(z){return 0.5*(1+_erf(z/Math.SQRT2));}
+ var fs={},zf={},stan={};
+ FK.forEach(function(f){var n=NORM_F[f]||{mu:3.4,sd:0.85},z=n.sd?(mFacet[f]-n.mu)/n.sd:0;zf[f]=z;fs[f]=Math.max(0,Math.min(100,Math.round(100*_phi(z))));stan[f]=Math.max(1,Math.min(9,Math.round(z*2+5)));});
+ var FLOOR=8,CEIL=50,fsRaw={},dsAbs={drive:0,connect:0,order:0,explore:0};
+ FK.forEach(function(f){fsRaw[f]=Math.round(FLOOR+(mFacet[f]-1)/4*(CEIL-FLOOR));});
+ DK.forEach(function(d){dsAbs[d]=FK.filter(function(f){return FC[f].d===d;}).reduce(function(a,f){return a+fsRaw[f];},0);});
 
- // ── drive = facet 순수 평균 (외부 보정 없음) ──
- var ds={drive:0,connect:0,order:0,explore:0};
- DK.forEach(function(d){var ff=FK.filter(function(f){return FC[f].d===d;});ds[d]=ff.reduce(function(a,f){return a+fs[f];},0)/ff.length;});
- var sum=DK.reduce(function(a,k){return a+ds[k];},0)||1;
- var bl={};DK.forEach(function(k){bl[k]=Math.round(ds[k]/sum*100);});
- var diff=100-DK.reduce(function(a,k){return a+bl[k];},0);
- if(diff){var top=DK.slice().sort(function(a,b){return bl[b]-bl[a];})[0];bl[top]+=diff;}
- var rk=DK.slice().sort(function(a,b){return bl[b]-bl[a]||DK.indexOf(a)-DK.indexOf(b);});
+ // ── 동력: 정규화 평균(ds 0–100, 분석·비교용) + 모집단 z(zd) ──
+ var ds={drive:0,connect:0,order:0,explore:0},zd={};
+ DK.forEach(function(d){var ff=FK.filter(function(f){return FC[f].d===d;});ds[d]=Math.round(ff.reduce(function(a,f){return a+fs[f];},0)/ff.length);var n=NORM_D[d]||{mu:99,sd:24};zd[d]=n.sd?(dsAbs[d]-n.mu)/n.sd:0;});
+ // bl: 스택바 비율 전용 (절대합 기준)
+ var blSum=DK.reduce(function(a,k){return a+dsAbs[k];},0)||1,bl={};
+ DK.forEach(function(k){bl[k]=Math.round(dsAbs[k]/blSum*100);});
+ var blDiff=100-DK.reduce(function(a,k){return a+bl[k];},0);if(blDiff){var bt=DK.slice().sort(function(a,b){return bl[b]-bl[a];})[0];bl[bt]+=blDiff;}
+ // 순위·아키타입: 모집단 z(zd) 기반 — 진짜 평탄할 때만 통역자
+ var rk=DK.slice().sort(function(a,b){return zd[b]-zd[a]||DK.indexOf(a)-DK.indexOf(b);});
  var p=rk[0],sd=rk[1],lo=rk[3];
- var bal=(bl[rk[0]]-bl[rk[3]])<=8;
- var secStr=(bl[rk[1]]-bl[rk[2]])>=5;
+ var bal=(zd[rk[0]]<0.5)&&((zd[rk[0]]-zd[rk[3]])<0.8);
+ var secStr=(zd[rk[1]]-zd[rk[2]])>=0.4;
  var arch=bal?'통역자':AR[p+'_'+sd];
  // 다이얼: facet 점수 위치 + 과용(OV) 가산
  var ovv={};OV.forEach(function(q){var v=s.OV[q.id];if(v!=null)ovv[q.f]=v;});
@@ -511,7 +504,7 @@ function compute(s){
  var compLv={};COMP.forEach(function(c){var a=c.fac.reduce(function(x,f){return x+fs[f];},0)/c.fac.length;compLv[c.k]=Math.round(a/100*3*10)/10;});
  var topFacets=FK.slice().sort(function(a,b){return fs[b]-fs[a];}).slice(0,4);
  var sigFacets=FK.filter(function(f){return fs[f]>=72;}).sort(function(a,b){return fs[b]-fs[a];});
- return{fs:fs,ds:ds,bl:bl,rk:rk,p:p,s:sd,lo:lo,bal:bal,secStr:secStr,arch:arch,dial:dial,seq:seq,vals:vals,comp:compLv,topFacets:topFacets,sigFacets:sigFacets};
+ return{fs:fs,ds:ds,bl:bl,rk:rk,p:p,s:sd,lo:lo,bal:bal,secStr:secStr,arch:arch,dial:dial,seq:seq,vals:vals,comp:compLv,topFacets:topFacets,sigFacets:sigFacets,mFacet:mFacet,fsRaw:fsRaw,dsAbs:dsAbs,zf:zf,stan:stan,zd:zd};
 }
 function dialZone(over,under){
  if(over>=2&&over>under)return'over';
@@ -1633,7 +1626,16 @@ if(location.hash==='#/selftest'){(function(){
  t('12 facet × 3 Likert',FK.every(function(f){return fcount[f]===3;}));
  var revOk=FK.every(function(f){return LK.filter(function(q){return q.f===f&&q.rev;}).length===1;});
  t('facet마다 역문항 1개',revOk);
- // 5) code 길이 합리적
+ // 5) 엔진 재설계 가드 — de-compression·norming·아키타입
+ var sord=blank();LK.forEach(function(q){sord.LK[q.id]=(FC[q.f].d==='order')?(q.rev?1:5):3;});var rord=compute(sord);
+ t('facet 분산 충분(추진편향: 추진−체계 ds ≥25)',Math.abs(rd.ds.drive-rd.ds.order)>=25);
+ t('정규화 fs∈[0,100]',FK.every(function(f){return rd.fs[f]>=0&&rd.fs[f]<=100;}));
+ t('절대 fsRaw∈[8,50]',FK.every(function(f){return rd.fsRaw[f]>=8&&rd.fsRaw[f]<=50;}));
+ var _rawSum=FK.reduce(function(a,f){return a+rd.fsRaw[f];},0);t('총점 ΣfsRaw∈[96,600]',_rawSum>=96&&_rawSum<=600);
+ t('뾰족 프로필 → 통역자 아님',rd.arch!=='통역자');
+ var sflat=blank();LK.forEach(function(q){sflat.LK[q.id]=3;});var rflat=compute(sflat);
+ t('평탄 프로필 → 통역자',rflat.arch==='통역자');
+ // 6) code 길이 합리적
  t('코드 길이 < 90자',code.length<90);
  document.body.innerHTML='<div class="wrap"><div class="card"><h2>MEUS 셀프테스트</h2><p class="mono" style="font-size:14px;color:'+(fail?'#C0392B':'var(--connect)')+'">'+ok+' passed · '+fail+' failed</p><pre class="mono" style="font-size:13.5px;white-space:pre-wrap">'+log.join('\n')+'</pre><p class="mono" style="font-size:12px;color:var(--faint)">code = '+code+'</p></div></div>';
 })();}
