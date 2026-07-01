@@ -88,7 +88,8 @@ input:focus,textarea:focus{outline:2px solid var(--ink);outline-offset:0;backgro
 .fade{animation:f .4s ease}
 @keyframes f{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.fade{animation:none}.dialfill{transition:none!important}}
-@media print{body{background:#fff}.noprint{display:none!important}.card{break-inside:avoid;box-shadow:none}.nav{display:none}}
+.printonly{display:none}
+@media print{body{background:#fff}.noprint{display:none!important}.printonly{display:block!important}.card{break-inside:avoid;box-shadow:none}.nav{display:none}}
 @media (max-width:560px){.wrap{padding:8px 14px 64px}.pair{grid-template-columns:1fr}.popt{min-height:0;padding:16px}}
 </style>
 </head>
@@ -2085,6 +2086,9 @@ function renderOrg(){
  H+='<div style="display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin:10px 0 12px">'+cats.filter(function(c){return (MEUS._orgCat[c.k]||[]).length;}).map(function(c){return '<button class="btn" data-orgcat="'+c.k+'" onclick="MEUS.orgCat(\''+c.k+'\')" style="padding:6px 13px;font-size:12.5px;border-left:3px solid '+c.col+'">'+c.ic+' '+c.lbl+' <span class="mono" style="font-size:10px;color:var(--mute)">'+(MEUS._orgCat[c.k]||[]).length+'</span></button>';}).join('')+'</div>';
  H+='<div id="orgRelDetail" style="border:1px solid var(--rule-strong);border-radius:2px;background:var(--fill);padding:15px 17px;min-height:64px"><p style="margin:0;font-size:13.5px;color:var(--mute)">위 버튼(<b>조율 필요·시너지…</b>)을 누르면 해당 관계가 여기 나와요. 특정 두 사람만 보려면 지도에서 <b>선</b>을 누르세요.</p></div>';
  H+='<p style="margin:18px 0 0;font-size:12px;color:var(--faint);line-height:1.6">※ 직분 매핑은 현재 고정값(CEO 김수민 · CSO 노필터 · CTO 최지민 · CBO 윤세빈 · 재무전략 임준서 · 해외총괄 김은우). 변경이 필요하면 알려주세요.</p>';
+ // 인쇄/PDF — 화면에선 접혀 있는 관계 상세를 인쇄본엔 모두 펼쳐 담는다
+ if(relPairs.length)H+='<div class="printonly" style="margin-top:22px;border-top:1px solid var(--hairline);padding-top:16px"><div class="sec" style="margin:0 0 12px">전체 관계 상세 · '+relPairs.length+'쌍</div>'+relPairs.map(function(pr){return '<div style="border:1px solid var(--rule);border-left:4px solid '+pr.d.col+';border-radius:2px;background:var(--panel);padding:13px 16px;margin-bottom:9px;break-inside:avoid">'+pr.d.html+'</div>';}).join('')+'</div>';
+ H+='<div class="noprint" style="display:flex;gap:11px;flex-wrap:wrap;margin-top:20px"><button class="btn dark" onclick="MEUS.print()">조직 분석 인쇄 / PDF 저장</button></div>';
  H+='</div>';
  app.innerHTML=H;
 }
