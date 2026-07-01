@@ -1332,24 +1332,38 @@ function renderYou(){
  H+='<div class="sec" style="margin:clamp(26px,3vw,34px) 0 14px">공통 사각지대</div><div style="border:1px solid var(--rule-strong);border-radius:2px;background:var(--fill);padding:16px 18px"><p style="margin:0;font-size:15.5px;color:var(--ink-soft)">'+blindT+'</p></div>';
  // ===== 심층 분석 (HR PhD 수준) =====
  var ra=pa.r,rb=pb.r;
- // 1. 호환 지수
- var aTop2=ra.rk.slice(0,2),bTop2=rb.rk.slice(0,2);
- var driveComp=aTop2.filter(function(d){return bTop2.indexOf(d)<0;}).length;
- var driveScore=[16,28,38][driveComp];
+ // 1. 호환 지수 — facet(미시) + 관계(심층) 기반 재설계
+ function clmp(x,a,b){return Math.max(a,Math.min(b,x));}
+ function warmth(r){return (r.fs.support+r.fs.trust+r.fs.empathy)/3;}
+ var wA=warmth(ra),wB=warmth(rb);
+ var cushion=Math.min(wA,wB)*0.6+Math.max(wA,wB)*0.4;      // 얇은 쪽 위주, 두터운 쪽이 일부 보완
+ var cushF=clmp((cushion-38)/30,0,1);                       // 0~1 완충 계수
+ // ① 상호 보완 — 12 facet마다 둘 중 강한 쪽이 그 자리를 덮는가 + 진짜 갭필 보너스
+ var covSum=0,gapFill=0;
+ FK.forEach(function(f){var peak=Math.max(ra.fs[f],rb.fs[f]),low=Math.min(ra.fs[f],rb.fs[f]);covSum+=clmp((peak-32)/40,0,1);if(peak>=60&&low<=45)gapFill++;});
+ var coverPct=covSum/FK.length;
+ var coverScore=Math.min(40,Math.round(coverPct*33+Math.min(gapFill,6)*1.3));
+ // ② 관계 완충 — 친화(지지·신뢰·공감)가 두터우면 갈등이 협업으로
+ var cushScore=Math.round(cushF*24);
+ // ③ 마찰 안정도 — 강(70↑)-약(32↓) 정면충돌 facet, 완충이 최대 55% 흡수
+ var frCount=0;FK.forEach(function(f){if((ra.fs[f]>=70&&rb.fs[f]<=32)||(rb.fs[f]>=70&&ra.fs[f]<=32))frCount++;});
+ var stabScore=Math.round(clmp(20-frCount*(1-cushF*0.55)*5,4,20));
+ // ④ 결정 렌즈(가치) — 정렬이든 보완이든 감점 아님(다름=시야 보완)
  var va0=ra.vals[0],vb0=rb.vals[0];
- var vFam2={speed:'d',people:'c',quality:'o',novel:'e',auto:'e',stable:'o'};
- var valScore=va0&&vb0?(va0===vb0?30:(ra.vals.indexOf(vb0)>=0||rb.vals.indexOf(va0)>=0)?20:(vFam2[va0]&&vFam2[va0]===vFam2[vb0])?12:5):16;
- var covered=FK.filter(function(f){return ra.fs[f]>=58||rb.fs[f]>=58;}).length;
- var covScore=Math.round(covered/FK.length*27);
- var compatTotal=driveScore+valScore+covScore;
- var compatLabel=compatTotal>=78?'시너지 탁월':compatTotal>=62?'강한 보완':compatTotal>=48?'적절한 보완':'상당한 조율 필요';
- var compatColor=compatTotal>=78?'var(--connect)':compatTotal>=62?'var(--order)':compatTotal>=48?'var(--explore)':'var(--drive)';
- H+='<div style="margin-top:clamp(28px,4vw,40px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,26px)"><div class="sec" style="margin:0 0 14px">호환 지수 · Compatibility Index</div>';
+ var valSame=!!(va0&&vb0&&va0===vb0),valOverlap=!!(va0&&vb0&&(ra.vals.indexOf(vb0)>=0||rb.vals.indexOf(va0)>=0));
+ var valScore=(!va0||!vb0)?13:valSame?16:valOverlap?15:14;
+ var valMode=(!va0||!vb0)?'미입력':valSame?'정렬':valOverlap?'교차':'보완';
+ var compatTotal=clmp(Math.round(coverScore+cushScore+stabScore+valScore),30,100);
+ var compatLabel=compatTotal>=80?'시너지 탁월':compatTotal>=66?'강한 보완':compatTotal>=52?'적절한 보완':'조율이 필요';
+ var compatColor=compatTotal>=80?'var(--connect)':compatTotal>=66?'var(--order)':compatTotal>=52?'var(--explore)':'var(--drive)';
+ H+='<div style="margin-top:clamp(28px,4vw,40px);border-top:1px solid var(--hairline);padding-top:clamp(20px,3vw,26px)"><div class="sec" style="margin:0 0 6px">호환 지수</div><p style="margin:0 0 14px;font-size:12.5px;color:var(--mute)">겉으로 비슷한지가 아니라, <b>특성 하나하나에서 서로를 얼마나 채워주고 갈등을 얼마나 감싸주는지</b>로 매깁니다.</p>';
  H+='<div style="display:flex;align-items:baseline;gap:14px;margin-bottom:16px"><span style="font-size:clamp(40px,7vw,60px);font-weight:900;font-family:var(--font-display);color:'+compatColor+'">'+compatTotal+'</span><span style="font-size:18px;color:var(--mute)">/100 · <b style="color:var(--ink)">'+compatLabel+'</b></span></div>';
- H+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">';
- H+='<div style="border:1px solid var(--rule);border-radius:2px;background:var(--panel);padding:13px 14px"><div class="mono" style="font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin-bottom:6px">Drive 보완도</div>'+fillbar(Math.round(driveScore/38*100),'var(--drive)')+'<div style="font-size:12.5px;color:var(--ink-soft);margin-top:5px">'+(driveComp===2?'상위 동력 완전 다름 — 강한 보완':driveComp===1?'한 동력 겹침 — 적정 보완':'동일 상위 동력 — 증폭 관계')+'</div></div>';
- H+='<div style="border:1px solid var(--rule);border-radius:2px;background:var(--panel);padding:13px 14px"><div class="mono" style="font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin-bottom:6px">가치 정렬도</div>'+fillbar(Math.round(valScore/30*100),'var(--connect)')+'<div style="font-size:12.5px;color:var(--ink-soft);margin-top:5px">'+(valScore>=28?'1순위 가치 일치':valScore>=18?'가치권 유사':valScore>=10?'가치 계열 비슷':'가치 방향 달라')+'</div></div>';
- H+='<div style="border:1px solid var(--rule);border-radius:2px;background:var(--panel);padding:13px 14px"><div class="mono" style="font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin-bottom:6px">Facet 커버리지</div>'+fillbar(Math.round(covered/FK.length*100),'var(--order)')+'<div style="font-size:12.5px;color:var(--ink-soft);margin-top:5px">12 facet 중 '+covered+'개 커버 — '+(covered>=10?'폭넓은 조합':covered>=7?'균형 잡힌 조합':'좁은 커버리지')+'</div></div>';
+ function cix(t,pct,col,body){return '<div style="border:1px solid var(--rule);border-radius:2px;background:var(--panel);padding:13px 14px"><div style="font-size:11.5px;font-weight:700;color:var(--ink);margin-bottom:7px">'+t+'</div>'+fillbar(pct,col)+'<div style="font-size:12.5px;color:var(--ink-soft);margin-top:6px;line-height:1.5">'+body+'</div></div>';}
+ H+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">';
+ H+=cix('서로 채우는 자리',Math.round(coverScore/40*100),'var(--drive)','12 특성 중 함께 덮는 폭이 '+(coverPct>=0.72?'넓어요':coverPct>=0.5?'고른 편이에요':'좁은 편이에요')+(gapFill>=3?' — 그중 '+gapFill+'칸은 한쪽이 확실히 메워줘요.':gapFill>0?' — '+gapFill+'칸은 한쪽이 메워줘요.':'.'));
+ H+=cix('관계 완충',Math.round(cushScore/24*100),'var(--connect)',cushF>=0.66?'지지·신뢰·공감이 두터워 <b>부딪혀도 협업으로</b> 풀려요.':cushF>=0.4?'서로 챙기는 바탕은 있어요 — 솔직한 말은 의식적으로.':'따뜻한 완충이 얇은 편 — <b>불편한 말은 미루지 말고</b> 일찍 꺼내세요.');
+ H+=cix('마찰 안정도',Math.round(stabScore/20*100),'var(--order)',frCount===0?'강-약이 정면으로 부딪히는 자리가 거의 없어요.':frCount+'곳에서 한쪽 강점이 상대 약점과 만나요'+(cushF>=0.5?' — 완충이 상당 부분 감싸줍니다.':' — 미리 알아두면 대부분 예방돼요.'));
+ H+=cix('결정 렌즈',Math.round(valScore/16*100),'var(--explore)',valMode==='정렬'?'1순위 가치가 같아 <b>결정 기준이 잘 맞아요.</b>':valMode==='교차'?'가치가 겹쳐 결정 방향이 대체로 통해요.':valMode==='보완'?'가치 방향이 달라 <b>결정 시야가 넓어져요</b> — 서로 다른 잣대가 사각을 메웁니다.':'한 사람의 가치가 아직 안 담겼어요.');
  H+='</div></div>';
  // 1.5 관계 역학 (대인관계 이론 기반)
  H+=relDynamics(ra,rb,na,nb);
